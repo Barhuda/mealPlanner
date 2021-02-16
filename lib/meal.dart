@@ -1,4 +1,9 @@
+import 'database_helper.dart';
+import 'injection.dart';
+
 class Meal {
+  DatabaseHelper _databaseHelper = Injection.injector.get();
+  
   int id;
   String mealName;
   String date;
@@ -30,4 +35,10 @@ class Meal {
       mealName: data['meal_name'],
       date: data['date'],
       dayTime: data['daytime']);
+
+  Map<DateTime, Meal> getWeekList(DateTime firstWeekDay) async{
+    List<Map> dbResult = await _databaseHelper.db.rawQuery('SELECT * FROM meals WHERE date >= "${firstWeekDay}" AND date <= "${firstWeekDay.add(new Duration(days: 6))}"');
+    final map = new Map<DateTime, Meal>();
+    forEach()
+  }
 }

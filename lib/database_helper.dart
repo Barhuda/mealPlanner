@@ -27,12 +27,7 @@ class DatabaseHelper {
     await db.execute('CREATE TABLE meals (id INTEGER PRIMARY KEY AUTOINCREMENT,'
         'meal_name TEXT,'
         'date INTEGER,'
-        'daytime TEXT)');
-    await db
-        .execute('CREATE TABLE mealday (id INTEGER PRIMARY KEY AUTOINCREMENT,'
-            'date INTEGER,'
-            'mealmorning TEXT,'
-            'meallunch TEXT,'
-            'mealevening TEXT)');
+        'daytime TEXT,'
+        'UNIQUE (date, daytime))');
   }
 }

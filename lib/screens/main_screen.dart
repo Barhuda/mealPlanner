@@ -96,7 +96,7 @@ class _MainScreenState extends State<MainScreen> {
             onTap: () {
               backToCurrentDate();
             },
-            child: Icon(Icons.calendar_today),
+            child: Icon(Icons.today),
           ),
         ),
         actions: <Widget>[
@@ -163,7 +163,7 @@ class _MainScreenState extends State<MainScreen> {
                           height: 10,
                         ),
                         Text(
-                            '${formatter.format(DateTime.fromMillisecondsSinceEpoch(breakfast.date))} ${DateTime.fromMillisecondsSinceEpoch(breakfast.date).day.toString()}.${DateTime.fromMillisecondsSinceEpoch(breakfast.date).month.toString()}.${DateTime.fromMillisecondsSinceEpoch(breakfast.date).year.toString()}',
+                            '${formatter.format(DateTime.fromMillisecondsSinceEpoch(weekMap.keys.elementAt(index)))} ${DateTime.fromMillisecondsSinceEpoch(weekMap.keys.elementAt(index)).day.toString()}.${DateTime.fromMillisecondsSinceEpoch(weekMap.keys.elementAt(index)).month.toString()}.${DateTime.fromMillisecondsSinceEpoch(weekMap.keys.elementAt(index)).year.toString()}',
                             style: TextStyle(
                                 fontSize: 15, fontWeight: FontWeight.bold)),
                         Text(breakfast.mealName),
@@ -222,7 +222,7 @@ class _MainScreenState extends State<MainScreen> {
                                     lastDate: DateTime(2100));
 
                                 dateCtl.text =
-                                    '${DateFormat('EE').format(date)} ${DateTime.now().day.toString()}.${date.month.toString()}.${date.year.toString()}';
+                                    '${DateFormat('EE').format(date)} ${date.day.toString()}.${date.month.toString()}.${date.year.toString()}';
                                 mealDate =
                                     DateTime(date.year, date.month, date.day)
                                         .millisecondsSinceEpoch;
@@ -290,6 +290,7 @@ class _MainScreenState extends State<MainScreen> {
                             ).toMapWithoutId());
 
                         Navigator.of(context).pop();
+                        setState(() {});
                       },
                     ),
                   ],

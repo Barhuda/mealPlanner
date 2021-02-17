@@ -1,6 +1,6 @@
 class DayMeal {
   int id;
-  String date;
+  int date;
   String mealMorning;
   String mealLunch;
   String mealEvening;
@@ -30,7 +30,7 @@ class DayMeal {
   factory DayMeal.fromMap(Map<String, dynamic> data) => new DayMeal(
       id: data['id'],
       date: data['date'],
-      mealMorning: data['mealMorning'];
-      mealLunch: data['mealLunch'];
+      mealMorning: data['mealMorning'],
+      mealLunch: data['mealLunch'],
       mealEvening: data['mealEvening']);
 }

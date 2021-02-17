@@ -26,7 +26,7 @@ class DatabaseHelper {
     // When creating the db, create the table
     await db.execute('CREATE TABLE meals (id INTEGER PRIMARY KEY AUTOINCREMENT,'
         'meal_name TEXT,'
-        'date TEXT,'
+        'date INTEGER,'
         'daytime TEXT)');
     await db
         .execute('CREATE TABLE mealday (id INTEGER PRIMARY KEY AUTOINCREMENT,'

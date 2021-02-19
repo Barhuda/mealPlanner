@@ -7,6 +7,8 @@ import 'package:mealpy/injection.dart';
 import 'package:mealpy/database_helper.dart';
 import 'package:mealpy/screens/food_list.dart';
 import 'package:mealpy/day_meals.dart';
+import 'package:mealpy/constants.dart' as Constants;
+import 'package:sqflite/sqflite.dart';
 
 class MainScreen extends StatefulWidget {
   MainScreen({Key key}) : super(key: key);
@@ -25,10 +27,12 @@ class _MainScreenState extends State<MainScreen> {
   String mealTime = 'Breakfast';
   DateTime selectedDate;
   String mealName = '';
+  String editBreakfast = "";
+  String editLunch = "";
+  String editEvening = "";
   List<Meal> mealList = [];
-  Map<int, Map<String, Meal>> weekMap = {};
+  Map<DateTime, Map<String, Meal>> weekMap = {};
   Meal defaultMeal = Meal(
-      id: 0,
       mealName: "-",
       date: DateTime.utc(2000, 1, 1).millisecondsSinceEpoch,
       dayTime: "Breakfast");
@@ -81,10 +85,109 @@ class _MainScreenState extends State<MainScreen> {
     });
   }
 
+  bool allEntriesEmpty(Map mapToCheck) {
+    if (mapToCheck["Breakfast"] == null &&
+        mapToCheck["Lunch"] == null &&
+        mapToCheck["Dinner"] == null) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  void editDay(Meal breakfast, Meal lunch, Meal evening, DateTime date) async {
+    Batch batch = _databaseHelper.db.batch();
+    if (breakfast.id != null && editBreakfast != null) {
+      print("updated Breakfast");
+      batch.update(
+          "meals",
+          Meal(
+            mealName: editBreakfast,
+            date: breakfast.date,
+            dayTime: breakfast.mealName,
+          ).toMapWithoutId(),
+          where: 'id = ?',
+          whereArgs: [breakfast.id],
+          conflictAlgorithm: ConflictAlgorithm.replace);
+    } else {
+      if (editBreakfast != null) {
+        batch.insert(
+            "meals",
+            Meal(
+              mealName: editBreakfast,
+              date: DateTime(date.year, date.month, date.day)
+                  .millisecondsSinceEpoch,
+              dayTime: "Breakfast",
+            ).toMapWithoutId(),
+            conflictAlgorithm: ConflictAlgorithm.ignore);
+        print("neu Breakfast");
+      }
+    }
+    if (lunch.id != null && editLunch != null) {
+      print("updated Lunch");
+      batch.update(
+          "meals",
+          Meal(
+            mealName: editLunch,
+            date: lunch.date,
+            dayTime: lunch.mealName,
+          ).toMapWithoutId(),
+          where: 'id = ?',
+          whereArgs: [lunch.id],
+          conflictAlgorithm: ConflictAlgorithm.replace);
+    } else {
+      if (editLunch != null) {
+        batch.insert(
+            "meals",
+            Meal(
+              mealName: editLunch,
+              date: DateTime(date.year, date.month, date.day)
+                  .millisecondsSinceEpoch,
+              dayTime: "Lunch",
+            ).toMapWithoutId(),
+            conflictAlgorithm: ConflictAlgorithm.ignore);
+        print("neu Lunch");
+      }
+    }
+    if (evening.id != null && editEvening != null) {
+      print("updated Dinner");
+      batch.update(
+          "meals",
+          Meal(
+            mealName: editEvening,
+            date: evening.date,
+            dayTime: evening.mealName,
+          ).toMapWithoutId(),
+          where: "id = ?",
+          whereArgs: [evening.id],
+          conflictAlgorithm: ConflictAlgorithm.replace);
+    } else {
+      if (editEvening != null) {
+        batch.insert(
+            "meals",
+            Meal(
+              mealName: editEvening,
+              date: DateTime(date.year, date.month, date.day)
+                  .millisecondsSinceEpoch,
+              dayTime: "Dinner",
+            ).toMapWithoutId(),
+            conflictAlgorithm: ConflictAlgorithm.ignore);
+        print("neu Dinner");
+      }
+    }
+    await batch.commit(noResult: true, continueOnError: true);
+    asyncMethod().then((value) {
+      setState(() {});
+      Navigator.of(context).pop();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Constants.secondaryColor,
       appBar: AppBar(
+        backgroundColor: Constants.mainColor,
         actionsIconTheme: IconThemeData(size: 40),
         title: Text(
           'Mealplaner',
@@ -104,11 +207,7 @@ class _MainScreenState extends State<MainScreen> {
             padding: EdgeInsets.only(right: 10),
             child: GestureDetector(
               onTap: () async {
-                weekMap = {};
-                weekMap = await Meal().generateWeekList(currentDate);
-
-                //Navigator.of(context).pushNamed(FoodList.id);
-                setState(() {});
+                Navigator.of(context).pushNamed(FoodList.id);
               },
               child: Icon(Icons.list),
             ),
@@ -118,58 +217,181 @@ class _MainScreenState extends State<MainScreen> {
       body: Center(
         child: Column(
           children: <Widget>[
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: <Widget>[
-                RaisedButton(
-                  child: Text("<"),
-                  onPressed: () {
-                    subtractWeek();
-                  },
-                ),
-                Text(
-                  '${currentDate.day.toString()}.${currentDate.month.toString()}.${currentDate.year.toString()}  -  '
-                  '${datePeriod.day.toString()}.${datePeriod.month.toString()}.${datePeriod.year.toString()}',
-                ),
-                RaisedButton(
-                  onPressed: () {
-                    addWeek();
-                  },
-                  child: Text(">"),
-                ),
-              ],
+            Padding(
+              padding: const EdgeInsets.all(5.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: <Widget>[
+                  RaisedButton(
+                    color: Constants.fourthColor,
+                    child: Text("<",
+                        style: TextStyle(color: Colors.white, fontSize: 25)),
+                    onPressed: () {
+                      subtractWeek();
+                    },
+                  ),
+                  Text(
+                    '${currentDate.day.toString()}.${currentDate.month.toString()}.${currentDate.year.toString()}  -  '
+                    '${datePeriod.day.toString()}.${datePeriod.month.toString()}.${datePeriod.year.toString()}',
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                  ),
+                  RaisedButton(
+                    color: Constants.fourthColor,
+                    onPressed: () {
+                      addWeek();
+                    },
+                    child: Text(
+                      ">",
+                      style: TextStyle(color: Colors.white, fontSize: 25),
+                    ),
+                  ),
+                ],
+              ),
             ),
             Expanded(
               child: ListView.builder(
                 scrollDirection: Axis.vertical,
                 itemCount: weekMap.length ?? 1,
                 itemBuilder: (context, int index) {
-                  int key = weekMap.keys.elementAt(index);
+                  DateTime key = weekMap.keys.elementAt(index);
                   Map currentMap = weekMap[key];
-                  Meal breakfast = currentMap["Breakfast"] ?? defaultMeal;
-                  Meal lunch = currentMap["Lunch"] ?? defaultMeal;
-                  Meal evening = currentMap["Dinner"] ?? defaultMeal;
-                  return Card(
-                    color: index % 2 == 0 ? Colors.orange : Colors.orangeAccent,
-                    elevation: 6,
-                    key: ValueKey(index),
-                    margin: EdgeInsets.all(6),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Column(
-                      children: <Widget>[
-                        SizedBox(
-                          height: 10,
-                        ),
-                        Text(
-                            '${formatter.format(DateTime.fromMillisecondsSinceEpoch(weekMap.keys.elementAt(index)))} ${DateTime.fromMillisecondsSinceEpoch(weekMap.keys.elementAt(index)).day.toString()}.${DateTime.fromMillisecondsSinceEpoch(weekMap.keys.elementAt(index)).month.toString()}.${DateTime.fromMillisecondsSinceEpoch(weekMap.keys.elementAt(index)).year.toString()}',
-                            style: TextStyle(
-                                fontSize: 15, fontWeight: FontWeight.bold)),
-                        Text(breakfast.mealName),
-                        Text(lunch.mealName),
-                        Text(evening.mealName),
-                      ],
+                  Meal breakfast = currentMap["Breakfast"] ?? Meal();
+                  Meal lunch = currentMap["Lunch"] ?? Meal();
+                  Meal evening = currentMap["Dinner"] ?? Meal();
+                  return GestureDetector(
+                    onTap: () {
+                      print(currentDate);
+                      print("Morgen: ${breakfast.id}");
+                      print(lunch.id);
+                      print(evening.id);
+                      editBreakfast = null;
+                      editLunch = null;
+                      editEvening = null;
+                      showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return AlertDialog(
+                              backgroundColor: Constants.secondaryColor,
+                              scrollable: false,
+                              title: Text(
+                                '${formatter.format(weekMap.keys.elementAt(index))} ${weekMap.keys.elementAt(index).day.toString()}.${weekMap.keys.elementAt(index).month.toString()}.${weekMap.keys.elementAt(index).year.toString()}',
+                                textAlign: TextAlign.center,
+                              ),
+                              content: StatefulBuilder(builder:
+                                  (BuildContext context, StateSetter setState) {
+                                return Container(
+                                  height: 250,
+                                  child: Form(
+                                    child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
+                                      children: <Widget>[
+                                        TextFormField(
+                                          decoration: InputDecoration(
+                                              labelText: 'Breakfast',
+                                              suffixIcon: IconButton(
+                                                icon:
+                                                    Icon(Icons.delete_forever),
+                                              )),
+                                          initialValue:
+                                              breakfast.mealName ?? '',
+                                          textAlign: TextAlign.left,
+                                          onChanged: (value) {
+                                            editBreakfast = value;
+                                          },
+                                        ),
+                                        TextFormField(
+                                          decoration: InputDecoration(
+                                            labelText: 'Lunch',
+                                            suffixIcon: IconButton(
+                                              icon: Icon(Icons.delete_forever),
+                                            ),
+                                          ),
+                                          initialValue: lunch.mealName ?? '',
+                                          textAlign: TextAlign.left,
+                                          onChanged: (value) {
+                                            editLunch = value;
+                                          },
+                                        ),
+                                        TextFormField(
+                                          decoration: InputDecoration(
+                                            labelText: 'Dinner',
+                                            suffixIcon: IconButton(
+                                              icon: Icon(Icons.delete_forever),
+                                            ),
+                                          ),
+                                          initialValue: evening.mealName ?? '',
+                                          textAlign: TextAlign.left,
+                                          onChanged: (value) {
+                                            editEvening = value;
+                                          },
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                );
+                              }),
+                              actions: <Widget>[
+                                TextButton(
+                                  child: Text(
+                                    'Cancel',
+                                  ),
+                                  onPressed: () {
+                                    Navigator.of(context).pop();
+                                  },
+                                ),
+                                TextButton(
+                                  child: Text(
+                                    'Save',
+                                  ),
+                                  onPressed: () {
+                                    editDay(breakfast, lunch, evening,
+                                        weekMap.keys.elementAt(index));
+                                  },
+                                ),
+                              ],
+                            );
+                          });
+                    },
+                    child: Card(
+                      color: index % 2 == 0
+                          ? Constants.thirdColor
+                          : Constants.thirdColor,
+                      elevation: 6,
+                      key: ValueKey(index),
+                      margin: EdgeInsets.all(6),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: allEntriesEmpty(currentMap)
+                          ? Column(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: <Widget>[
+                                Text(
+                                    '${formatter.format(weekMap.keys.elementAt(index))} ${weekMap.keys.elementAt(index).day.toString()}.${weekMap.keys.elementAt(index).month.toString()}.${weekMap.keys.elementAt(index).year.toString()}',
+                                    style: TextStyle(
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.bold)),
+                                Text(""),
+                                Text("-"),
+                                Text(""),
+                              ],
+                            )
+                          : Column(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: <Widget>[
+                                Text(
+                                    '${formatter.format(weekMap.keys.elementAt(index))} ${weekMap.keys.elementAt(index).day.toString()}.${weekMap.keys.elementAt(index).month.toString()}.${weekMap.keys.elementAt(index).year.toString()}',
+                                    style: TextStyle(
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.bold)),
+                                Text(breakfast.mealName ?? "-"),
+                                Text(lunch.mealName ?? "-"),
+                                Text(evening.mealName ?? "-"),
+                              ],
+                            ),
                     ),
                   );
                 },
@@ -180,11 +402,11 @@ class _MainScreenState extends State<MainScreen> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          print(currentDate);
           showDialog(
               context: context,
               builder: (BuildContext context) {
                 return AlertDialog(
+                  backgroundColor: Constants.secondaryColor,
                   scrollable: true,
                   title: Text(
                     'Mealplan',
@@ -201,7 +423,7 @@ class _MainScreenState extends State<MainScreen> {
                           children: <Widget>[
                             TextFormField(
                               decoration: InputDecoration(labelText: 'Meal'),
-                              textAlign: TextAlign.center,
+                              textAlign: TextAlign.left,
                               onChanged: (value) {
                                 mealName = value;
                               },
@@ -217,6 +439,7 @@ class _MainScreenState extends State<MainScreen> {
 
                                 date = await showDatePicker(
                                     context: context,
+                                    locale: const Locale('en'),
                                     initialDate: DateTime.now(),
                                     firstDate: DateTime(1900),
                                     lastDate: DateTime(2100));
@@ -287,10 +510,13 @@ class _MainScreenState extends State<MainScreen> {
                               mealName: mealName,
                               date: mealDate,
                               dayTime: mealTime,
-                            ).toMapWithoutId());
+                            ).toMapWithoutId(),
+                            conflictAlgorithm: ConflictAlgorithm.ignore);
 
                         Navigator.of(context).pop();
-                        setState(() {});
+                        asyncMethod().then((value) {
+                          setState(() {});
+                        });
                       },
                     ),
                   ],

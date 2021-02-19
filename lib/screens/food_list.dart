@@ -16,6 +16,10 @@ class _FoodListState extends State<FoodList> {
         centerTitle: true,
         title: Text('Mahlzeit Liste'),
       ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {},
+        child: Icon(Icons.add),
+      ),
       body: Center(
         child: ListView.builder(itemBuilder: (context, int index) {}),
       ),

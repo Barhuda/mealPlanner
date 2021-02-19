@@ -58,26 +58,25 @@ class Meal {
     return mealMap;
   }
 
-  Future<Map<int, Map<String, Meal>>> generateWeekList(
+  Future<Map<DateTime, Map<String, Meal>>> generateWeekList(
       DateTime firstWeekDay) async {
     List<Meal> weekList = [];
-    Map<int, Map<String, Meal>> resultMap = {};
+    Map<DateTime, Map<String, Meal>> resultMap = {};
     for (int i = 0; i < 7; i++) {
       DateTime defaultDate = firstWeekDay.add(Duration(days: i));
-      print(defaultDate);
-      int formattedDefaultDate = defaultDate.millisecondsSinceEpoch;
-      print("Datum: ${formattedDefaultDate}");
+      DateTime formattedDefaultDate =
+          new DateTime(defaultDate.year, defaultDate.month, defaultDate.day);
       resultMap[formattedDefaultDate] = <String, Meal>{};
     }
     await getWeekList(firstWeekDay).then(
         (value) => Future.forEach(value, (element) => weekList.add(element)));
-    for (int i = 0; i < weekList.length; i++) {
+    for (int i = 0; i < weekList.length - 1; i++) {
       Meal meal = weekList[i];
       DateTime inputDate = DateTime.fromMillisecondsSinceEpoch(meal.date);
-      int formattedDate = inputDate.millisecondsSinceEpoch;
+      DateTime formattedDate =
+          new DateTime(inputDate.year, inputDate.month, inputDate.day);
       Map<String, Meal> mapToAdd = {};
       mapToAdd[meal.dayTime] = meal;
-      print(formattedDate);
       if (resultMap.containsKey(formattedDate)) {
         resultMap[formattedDate][meal.dayTime] = meal;
       } else {

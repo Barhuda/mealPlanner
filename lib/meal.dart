@@ -58,6 +58,14 @@ class Meal {
     return mealMap;
   }
 
+  Future<void> deleteMeal() async {
+    await _databaseHelper.db.delete(
+      "meals",
+      where: "id = ?",
+      whereArgs: [this.id],
+    );
+  }
+
   Future<Map<DateTime, Map<String, Meal>>> generateWeekList(
       DateTime firstWeekDay) async {
     List<Meal> weekList = [];

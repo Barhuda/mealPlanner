@@ -31,12 +31,14 @@ dependencies:
   intl: ^0.16.1
   sqflite: ^1.1.0
   flutter_simple_dependency_injection: ^1.0.1
-  path_provider: ^0.5.0+1
+  path_provider: ^1.6.27
+  screenshot: ^0.3.0
+  share: ^0.6.5+4
 
 
 dependency_overrides:
   intl: ^0.16.1
-  path: ^1.7.0
+
 
 dev_dependencies:
   flutter_test:

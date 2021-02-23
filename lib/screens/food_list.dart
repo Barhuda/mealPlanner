@@ -53,13 +53,15 @@ class _FoodListState extends State<FoodList> {
                     content: StatefulBuilder(
                         builder: (BuildContext context, StateSetter setState) {
                       return Container(
-                        height: 400,
+                        height: 200,
                         child: Form(
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.start,
                             crossAxisAlignment: CrossAxisAlignment.center,
                             children: <Widget>[
                               TextFormField(
+                                textCapitalization:
+                                    TextCapitalization.sentences,
                                 decoration: InputDecoration(labelText: 'Meal'),
                                 textAlign: TextAlign.left,
                                 onChanged: (value) {
@@ -67,6 +69,10 @@ class _FoodListState extends State<FoodList> {
                                 },
                               ),
                               TextFormField(
+                                textCapitalization:
+                                    TextCapitalization.sentences,
+                                maxLines: 3,
+                                minLines: 2,
                                 decoration: InputDecoration(labelText: 'Note'),
                                 textAlign: TextAlign.left,
                                 onChanged: (value) {
@@ -92,13 +98,15 @@ class _FoodListState extends State<FoodList> {
                           'Save',
                         ),
                         onPressed: () async {
-                          _databaseHelper.db.insert(
-                            "meallist",
-                            Meallist(
-                              mealName: mealName,
-                              note: mealNote,
-                            ).toMapWithoutId(),
-                          );
+                          if (mealName != null) {
+                            _databaseHelper.db.insert(
+                              "meallist",
+                              Meallist(
+                                mealName: mealName,
+                                note: mealNote ?? "",
+                              ).toMapWithoutId(),
+                            );
+                          }
 
                           Navigator.of(context).pop();
                           asyncMethod().then((value) {
@@ -118,8 +126,26 @@ class _FoodListState extends State<FoodList> {
               itemBuilder: (context, int index) {
                 Meallist currentMeal = meallist[index];
                 return Card(
-                  child: Column(
-                    children: [Text(currentMeal.mealName)],
+                  margin: EdgeInsets.all(6),
+                  elevation: 6,
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20)),
+                  child: Padding(
+                    padding: const EdgeInsets.all(5.0),
+                    child: Column(
+                      children: [
+                        Text(
+                          currentMeal.mealName,
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                              fontSize: 15, fontWeight: FontWeight.bold),
+                        ),
+                        Text(
+                          currentMeal.note ?? "",
+                          textAlign: TextAlign.center,
+                        ),
+                      ],
+                    ),
                   ),
                 );
               }),

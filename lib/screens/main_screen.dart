@@ -424,7 +424,7 @@ class _MainScreenState extends State<MainScreen> {
                         key: ValueKey(index),
                         margin: EdgeInsets.all(6),
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
+                          borderRadius: BorderRadius.circular(20),
                         ),
                         child: allEntriesEmpty(currentMap)
                             ? Column(
@@ -485,6 +485,8 @@ class _MainScreenState extends State<MainScreen> {
                             crossAxisAlignment: CrossAxisAlignment.center,
                             children: <Widget>[
                               TextFormField(
+                                textCapitalization:
+                                    TextCapitalization.sentences,
                                 decoration: InputDecoration(labelText: 'Meal'),
                                 textAlign: TextAlign.left,
                                 onChanged: (value) {
@@ -543,6 +545,8 @@ class _MainScreenState extends State<MainScreen> {
                                 ),
                               ),
                               TextFormField(
+                                textCapitalization:
+                                    TextCapitalization.sentences,
                                 keyboardType: TextInputType.multiline,
                                 minLines: 2,
                                 maxLines: 5,

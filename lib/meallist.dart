@@ -1,3 +1,5 @@
+import 'package:sqflite/sqflite.dart';
+
 import 'database_helper.dart';
 import 'injection.dart';
 
@@ -26,6 +28,34 @@ class Meallist {
     return map;
   }
 
+  void saveMealtoDB() async {
+    await _databaseHelper.db.insert(
+      "meallist",
+      this.toMapWithoutId(),
+    );
+  }
+
+  Future<void> deleteMealFromDB() async {
+    await _databaseHelper.db.delete(
+      "meallist",
+      where: "id = ?",
+      whereArgs: [this.id],
+    );
+  }
+
+  Future<void> updateMealInDB(String newName, String newNote) async {
+    await _databaseHelper.db.update(
+        "meallist",
+        Meallist(
+          id: this.id,
+          mealName: newName ?? this.mealName,
+          note: newNote ?? "",
+        ).toMap(),
+        where: "id = ?",
+        whereArgs: [this.id],
+        conflictAlgorithm: ConflictAlgorithm.replace);
+  }
+
   factory Meallist.fromMap(Map<String, dynamic> data) => new Meallist(
         id: data['id'],
         mealName: data['meal_name'],
@@ -33,13 +63,9 @@ class Meallist {
       );
 
   Future<List<Meallist>> generateMealList() async {
-    final List<Map<String, dynamic>> maps =
-        await _databaseHelper.db.query("meallist");
+    final List<Map<String, dynamic>> maps = await _databaseHelper.db.query("meallist");
     return List.generate(maps.length, (i) {
-      return Meallist(
-          id: maps[i]['id'],
-          mealName: maps[i]['meal_name'],
-          note: maps[i]['note']);
+      return Meallist(id: maps[i]['id'], mealName: maps[i]['meal_name'], note: maps[i]['note']);
     });
   }
 }

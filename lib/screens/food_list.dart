@@ -5,10 +5,13 @@ import 'package:mealpy/constants.dart' as Constants;
 import 'package:mealpy/database_helper.dart';
 import 'package:flutter_simple_dependency_injection/injector.dart';
 import 'package:mealpy/injection.dart';
+import 'package:mealpy/meal.dart';
+import 'package:intl/intl.dart';
 
 class FoodList extends StatefulWidget {
   FoodList({Key key}) : super(key: key);
   static const String id = 'food_list';
+
   @override
   _FoodListState createState() => _FoodListState();
 }
@@ -18,6 +21,12 @@ class _FoodListState extends State<FoodList> {
   List<Meallist> meallist = [];
   String mealName;
   String mealNote;
+  String mealTime = 'Breakfast';
+  int mealDate;
+
+  TextEditingController dateCtl = TextEditingController(
+      text:
+          '${DateFormat('EE').format(DateTime.now())} ${DateTime.now().day.toString()}.${DateTime.now().month.toString()}.${DateTime.now().year.toString()}');
 
   @override
   void initState() {
@@ -40,6 +49,9 @@ class _FoodListState extends State<FoodList> {
         ),
         floatingActionButton: FloatingActionButton(
           onPressed: () {
+            mealName = null;
+            mealNote = null;
+            mealDate = DateTime.now().millisecondsSinceEpoch;
             showDialog(
                 context: context,
                 builder: (BuildContext context) {
@@ -50,8 +62,7 @@ class _FoodListState extends State<FoodList> {
                       'Mealplan',
                       textAlign: TextAlign.center,
                     ),
-                    content: StatefulBuilder(
-                        builder: (BuildContext context, StateSetter setState) {
+                    content: StatefulBuilder(builder: (BuildContext context, StateSetter setState) {
                       return Container(
                         height: 200,
                         child: Form(
@@ -60,8 +71,7 @@ class _FoodListState extends State<FoodList> {
                             crossAxisAlignment: CrossAxisAlignment.center,
                             children: <Widget>[
                               TextFormField(
-                                textCapitalization:
-                                    TextCapitalization.sentences,
+                                textCapitalization: TextCapitalization.sentences,
                                 decoration: InputDecoration(labelText: 'Meal'),
                                 textAlign: TextAlign.left,
                                 onChanged: (value) {
@@ -69,8 +79,7 @@ class _FoodListState extends State<FoodList> {
                                 },
                               ),
                               TextFormField(
-                                textCapitalization:
-                                    TextCapitalization.sentences,
+                                textCapitalization: TextCapitalization.sentences,
                                 maxLines: 3,
                                 minLines: 2,
                                 decoration: InputDecoration(labelText: 'Note'),
@@ -85,7 +94,7 @@ class _FoodListState extends State<FoodList> {
                       );
                     }),
                     actions: <Widget>[
-                      FlatButton(
+                      TextButton(
                         child: Text(
                           'Cancel',
                         ),
@@ -93,19 +102,18 @@ class _FoodListState extends State<FoodList> {
                           Navigator.of(context).pop();
                         },
                       ),
-                      FlatButton(
+                      TextButton(
                         child: Text(
                           'Save',
                         ),
                         onPressed: () async {
                           if (mealName != null) {
-                            _databaseHelper.db.insert(
-                              "meallist",
-                              Meallist(
-                                mealName: mealName,
-                                note: mealNote ?? "",
-                              ).toMapWithoutId(),
+                            Meallist mealToSave = Meallist(
+                              mealName: mealName,
+                              note: mealNote ?? "",
                             );
+                            mealToSave.saveMealtoDB();
+                            print(mealToSave);
                           }
 
                           Navigator.of(context).pop();
@@ -125,26 +133,185 @@ class _FoodListState extends State<FoodList> {
               itemCount: meallist.length,
               itemBuilder: (context, int index) {
                 Meallist currentMeal = meallist[index];
-                return Card(
-                  margin: EdgeInsets.all(6),
-                  elevation: 6,
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20)),
-                  child: Padding(
-                    padding: const EdgeInsets.all(5.0),
-                    child: Column(
-                      children: [
-                        Text(
-                          currentMeal.mealName,
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                              fontSize: 15, fontWeight: FontWeight.bold),
-                        ),
-                        Text(
-                          currentMeal.note ?? "",
-                          textAlign: TextAlign.center,
-                        ),
-                      ],
+                return GestureDetector(
+                  onTap: () {
+                    mealName = null;
+                    mealNote = null;
+                    var mealNameCtrl = TextEditingController(text: currentMeal.mealName);
+                    var mealNoteCtrl = TextEditingController(text: currentMeal.note);
+                    showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return AlertDialog(
+                            backgroundColor: Constants.secondaryColor,
+                            scrollable: false,
+                            title: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text('Edit Meal'),
+                                IconButton(
+                                    icon: Icon(Icons.delete),
+                                    onPressed: () {
+                                      currentMeal.deleteMealFromDB();
+                                      Navigator.of(context).pop();
+                                      asyncMethod().then((value) {
+                                        setState(() {});
+                                      });
+                                    })
+                              ],
+                            ),
+                            content: StatefulBuilder(
+                              builder: (BuildContext context, StateSetter setState) {
+                                return Container(
+                                  height: 400,
+                                  child: Form(
+                                    child: Column(
+                                      children: [
+                                        TextFormField(
+                                          controller: mealNameCtrl,
+                                          textCapitalization: TextCapitalization.sentences,
+                                          decoration: InputDecoration(labelText: 'Meal'),
+                                          textAlign: TextAlign.left,
+                                          onChanged: (value) {
+                                            mealName = value;
+                                          },
+                                        ),
+                                        TextFormField(
+                                          controller: mealNoteCtrl,
+                                          textCapitalization: TextCapitalization.sentences,
+                                          decoration: InputDecoration(labelText: 'Note'),
+                                          textAlign: TextAlign.left,
+                                          onChanged: (value) {
+                                            mealNote = value;
+                                          },
+                                        ),
+                                        Padding(
+                                          padding: const EdgeInsets.only(top: 40.0, bottom: 20),
+                                          child: Text(
+                                            "Add Meal to your Meal Plan",
+                                            style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+                                          ),
+                                        ),
+                                        Container(
+                                          alignment: Alignment.centerLeft,
+                                          child: DropdownButton(
+                                            value: mealTime,
+                                            icon: Icon(Icons.local_dining),
+                                            elevation: 16,
+                                            onChanged: (String newValue) {
+                                              setState(() {
+                                                mealTime = newValue;
+                                              });
+                                            },
+                                            items: <String>[
+                                              'Breakfast',
+                                              'Lunch',
+                                              'Dinner',
+                                            ].map<DropdownMenuItem<String>>(
+                                              (String value) {
+                                                return DropdownMenuItem<String>(
+                                                  value: value,
+                                                  child: Text(value),
+                                                );
+                                              },
+                                            ).toList(),
+                                          ),
+                                        ),
+                                        TextFormField(
+                                          readOnly: true,
+                                          decoration: InputDecoration(labelText: 'Date'),
+                                          controller: dateCtl,
+                                          onTap: () async {
+                                            DateTime date = DateTime(1900);
+                                            FocusScope.of(context).requestFocus(FocusNode());
+
+                                            date = await showDatePicker(
+                                                context: context,
+                                                locale: const Locale('en'),
+                                                initialDate: DateTime.now(),
+                                                firstDate: DateTime(1900),
+                                                lastDate: DateTime(2100));
+
+                                            dateCtl.text = '${date.day.toString()}.${date.month.toString()}.${date.year.toString()}';
+                                            mealDate = DateTime(date.year, date.month, date.day).millisecondsSinceEpoch;
+                                          },
+                                        ),
+                                        Padding(
+                                          padding: const EdgeInsets.only(top: 8.0),
+                                          child: TextButton(
+                                            onPressed: () async {
+                                              try {
+                                                await _databaseHelper.db.insert(
+                                                    "meals",
+                                                    Meal(
+                                                      mealName: mealName ?? currentMeal.mealName,
+                                                      date: mealDate,
+                                                      dayTime: mealTime,
+                                                    ).toMapWithoutId());
+
+                                                Navigator.of(context).pop();
+                                              } catch (e) {
+                                                Navigator.of(context).pop();
+                                                ScaffoldMessenger.of(context)
+                                                    .showSnackBar(SnackBar(content: Text("Meal at this Date and Time already exists.")));
+                                              }
+                                            },
+                                            child: Text("Add Meal"),
+                                          ),
+                                        )
+                                      ],
+                                    ),
+                                  ),
+                                );
+                              },
+                            ),
+                            actions: [
+                              TextButton(
+                                child: Text(
+                                  'Cancel',
+                                ),
+                                onPressed: () {
+                                  Navigator.of(context).pop();
+                                  asyncMethod().then((value) {
+                                    setState(() {});
+                                  });
+                                },
+                              ),
+                              TextButton(
+                                child: Text(
+                                  'Save',
+                                ),
+                                onPressed: () {
+                                  currentMeal.updateMealInDB(mealName, mealNote);
+                                  Navigator.of(context).pop();
+                                  asyncMethod().then((value) {
+                                    setState(() {});
+                                  });
+                                },
+                              ),
+                            ],
+                          );
+                        });
+                  },
+                  child: Card(
+                    margin: EdgeInsets.all(6),
+                    elevation: 6,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                    child: Padding(
+                      padding: const EdgeInsets.all(5.0),
+                      child: Column(
+                        children: [
+                          Text(
+                            currentMeal.mealName ?? "",
+                            textAlign: TextAlign.center,
+                            style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+                          ),
+                          Text(
+                            currentMeal.note ?? "",
+                            textAlign: TextAlign.center,
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 );

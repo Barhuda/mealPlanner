@@ -38,19 +38,11 @@ class _MainScreenState extends State<MainScreen> {
   List<Meal> mealList = [];
   FocusNode focusNode = FocusNode();
   ScreenshotController screenshotController = ScreenshotController();
-  Uint8List _imageFile;
 
   Map<DateTime, Map<String, Meal>> weekMap = {};
-  Meal defaultMeal = Meal(
-      mealName: "-",
-      date: DateTime.utc(2000, 1, 1).millisecondsSinceEpoch,
-      dayTime: "Breakfast");
+  Meal defaultMeal = Meal(mealName: "-", date: DateTime.utc(2000, 1, 1).millisecondsSinceEpoch, dayTime: "Breakfast");
   List<Meal> meals = [
-    new Meal(
-        id: 0,
-        mealName: 'TestMeal',
-        date: DateTime.now().millisecondsSinceEpoch,
-        dayTime: "Breakfast"),
+    new Meal(id: 0, mealName: 'TestMeal', date: DateTime.now().millisecondsSinceEpoch, dayTime: "Breakfast"),
   ];
   TextEditingController dateCtl = TextEditingController(
       text:
@@ -95,17 +87,14 @@ class _MainScreenState extends State<MainScreen> {
   }
 
   bool allEntriesEmpty(Map mapToCheck) {
-    if (mapToCheck["Breakfast"] == null &&
-        mapToCheck["Lunch"] == null &&
-        mapToCheck["Dinner"] == null) {
+    if (mapToCheck["Breakfast"] == null && mapToCheck["Lunch"] == null && mapToCheck["Dinner"] == null) {
       return true;
     } else {
       return false;
     }
   }
 
-  Future<void> editDay(
-      Meal breakfast, Meal lunch, Meal evening, DateTime date) async {
+  Future<void> editDay(Meal breakfast, Meal lunch, Meal evening, DateTime date) async {
     print(editBreakfast);
     print(editEvening);
     print(editLunch);
@@ -125,7 +114,7 @@ class _MainScreenState extends State<MainScreen> {
       );
     } else {
       if (editBreakfast != null) {
-        batch.insert(
+        await _databaseHelper.db.insert(
             "meals",
             Meal(
               mealName: editBreakfast,
@@ -150,7 +139,7 @@ class _MainScreenState extends State<MainScreen> {
           whereArgs: [lunch.id]);
     } else {
       if (editLunch != null) {
-        batch.insert(
+        await _databaseHelper.db.insert(
           "meals",
           Meal(
             mealName: editLunch,
@@ -176,7 +165,7 @@ class _MainScreenState extends State<MainScreen> {
           whereArgs: [evening.id]);
     } else {
       if (editEvening != null) {
-        batch.insert(
+        await _databaseHelper.db.insert(
             "meals",
             Meal(
               mealName: editEvening,
@@ -188,13 +177,13 @@ class _MainScreenState extends State<MainScreen> {
       }
     }
     await batch.commit(noResult: true, continueOnError: true);
-    weekMap = await Meal().generateWeekList(currentDate);
-
-    setState(() {});
-    Navigator.of(context).pop();
     editBreakfast = null;
     editLunch = null;
     editEvening = null;
+    Navigator.of(context).pop();
+    asyncMethod().then((value) {
+      setState(() {});
+    });
   }
 
   @override
@@ -224,13 +213,10 @@ class _MainScreenState extends State<MainScreen> {
               padding: EdgeInsets.only(right: 30),
               child: GestureDetector(
                 onTap: () async {
-                  final directory =
-                      (await getApplicationDocumentsDirectory()).path;
-                  screenshotController
-                      .captureAndSave(directory, fileName: "Mealplan.jpg")
-                      .then((path) => Share.shareFiles([path],
-                          text:
-                              "Look at my Mealplan from ${currentDate.day.toString()}.${currentDate.month.toString()}.${currentDate.year.toString()} to ${datePeriod.day.toString()}.${datePeriod.month.toString()}.${datePeriod.year.toString()}"));
+                  final directory = (await getApplicationDocumentsDirectory()).path;
+                  screenshotController.captureAndSave(directory, fileName: "Mealplan.jpg").then((path) => Share.shareFiles([path],
+                      text:
+                          "Look at my Mealplan from ${currentDate.day.toString()}.${currentDate.month.toString()}.${currentDate.year.toString()} to ${datePeriod.day.toString()}.${datePeriod.month.toString()}.${datePeriod.year.toString()}"));
                 },
                 child: Icon(
                   Icons.share,
@@ -259,8 +245,7 @@ class _MainScreenState extends State<MainScreen> {
                   children: <Widget>[
                     RaisedButton(
                       color: Constants.fourthColor,
-                      child: Text("<",
-                          style: TextStyle(color: Colors.white, fontSize: 25)),
+                      child: Text("<", style: TextStyle(color: Colors.white, fontSize: 25)),
                       onPressed: () {
                         subtractWeek();
                       },
@@ -268,8 +253,7 @@ class _MainScreenState extends State<MainScreen> {
                     Text(
                       '${currentDate.day.toString()}.${currentDate.month.toString()}.${currentDate.year.toString()}  -  '
                       '${datePeriod.day.toString()}.${datePeriod.month.toString()}.${datePeriod.year.toString()}',
-                      style:
-                          TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                     ),
                     RaisedButton(
                       color: Constants.fourthColor,
@@ -299,12 +283,9 @@ class _MainScreenState extends State<MainScreen> {
                         editBreakfast = null;
                         editLunch = null;
                         editEvening = null;
-                        var breakfastCtrl =
-                            TextEditingController(text: breakfast.mealName);
-                        var lunchCtrl =
-                            TextEditingController(text: lunch.mealName);
-                        var dinnerCtrl =
-                            TextEditingController(text: evening.mealName);
+                        var breakfastCtrl = TextEditingController(text: breakfast.mealName);
+                        var lunchCtrl = TextEditingController(text: lunch.mealName);
+                        var dinnerCtrl = TextEditingController(text: evening.mealName);
                         showDialog(
                             context: context,
                             builder: (BuildContext context) {
@@ -315,17 +296,13 @@ class _MainScreenState extends State<MainScreen> {
                                   '${formatter.format(weekMap.keys.elementAt(index))} ${weekMap.keys.elementAt(index).day.toString()}.${weekMap.keys.elementAt(index).month.toString()}.${weekMap.keys.elementAt(index).year.toString()}',
                                   textAlign: TextAlign.center,
                                 ),
-                                content: StatefulBuilder(builder:
-                                    (BuildContext context,
-                                        StateSetter setState) {
+                                content: StatefulBuilder(builder: (BuildContext context, StateSetter setState) {
                                   return Container(
                                     height: 250,
                                     child: Form(
                                       child: Column(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.center,
+                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                        crossAxisAlignment: CrossAxisAlignment.center,
                                         children: <Widget>[
                                           TextFormField(
                                             keyboardType: TextInputType.text,
@@ -338,8 +315,7 @@ class _MainScreenState extends State<MainScreen> {
                                                     breakfastCtrl.clear();
                                                     editBreakfast = null;
                                                   },
-                                                  icon: Icon(
-                                                      Icons.delete_forever),
+                                                  icon: Icon(Icons.delete_forever),
                                                 )),
                                             textAlign: TextAlign.left,
                                             onChanged: (value) {
@@ -357,8 +333,7 @@ class _MainScreenState extends State<MainScreen> {
                                                   lunchCtrl.clear();
                                                   editLunch = null;
                                                 },
-                                                icon:
-                                                    Icon(Icons.delete_forever),
+                                                icon: Icon(Icons.delete_forever),
                                               ),
                                             ),
                                             textAlign: TextAlign.left,
@@ -377,8 +352,7 @@ class _MainScreenState extends State<MainScreen> {
                                                   dinnerCtrl.clear();
                                                   editEvening = null;
                                                 },
-                                                icon:
-                                                    Icon(Icons.delete_forever),
+                                                icon: Icon(Icons.delete_forever),
                                               ),
                                             ),
                                             textAlign: TextAlign.left,
@@ -408,8 +382,8 @@ class _MainScreenState extends State<MainScreen> {
                                       'Save',
                                     ),
                                     onPressed: () {
-                                      editDay(breakfast, lunch, evening,
-                                          weekMap.keys.elementAt(index));
+                                      print(weekMap.keys.elementAt(index));
+                                      editDay(breakfast, lunch, evening, weekMap.keys.elementAt(index));
                                     },
                                   ),
                                 ],
@@ -417,42 +391,86 @@ class _MainScreenState extends State<MainScreen> {
                             });
                       },
                       child: Card(
-                        color: index % 2 == 0
-                            ? Constants.thirdColor
-                            : Constants.thirdColor,
+                        color: index % 2 == 0 ? Constants.thirdColor : Constants.thirdColor,
                         elevation: 6,
                         key: ValueKey(index),
-                        margin: EdgeInsets.all(6),
+                        margin: EdgeInsets.all(5),
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(20),
+                          borderRadius: BorderRadius.circular(16),
                         ),
                         child: allEntriesEmpty(currentMap)
                             ? Column(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceEvenly,
+                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                                 children: <Widget>[
                                   Text(
                                       '${formatter.format(weekMap.keys.elementAt(index))} ${weekMap.keys.elementAt(index).day.toString()}.${weekMap.keys.elementAt(index).month.toString()}.${weekMap.keys.elementAt(index).year.toString()}',
-                                      style: TextStyle(
-                                          fontSize: 15,
-                                          fontWeight: FontWeight.bold)),
+                                      style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
                                   Text(""),
                                   Text("-"),
                                   Text(""),
                                 ],
                               )
                             : Column(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceEvenly,
+                                mainAxisAlignment: MainAxisAlignment.center,
                                 children: <Widget>[
-                                  Text(
-                                      '${formatter.format(weekMap.keys.elementAt(index))} ${weekMap.keys.elementAt(index).day.toString()}.${weekMap.keys.elementAt(index).month.toString()}.${weekMap.keys.elementAt(index).year.toString()}',
-                                      style: TextStyle(
-                                          fontSize: 15,
-                                          fontWeight: FontWeight.bold)),
-                                  Text(breakfast.mealName ?? "-"),
-                                  Text(lunch.mealName ?? "-"),
-                                  Text(evening.mealName ?? "-"),
+                                  Padding(
+                                    padding: const EdgeInsets.all(6.0),
+                                    child: Text(
+                                        '${formatter.format(weekMap.keys.elementAt(index))} ${weekMap.keys.elementAt(index).day.toString()}.${weekMap.keys.elementAt(index).month.toString()}.${weekMap.keys.elementAt(index).year.toString()}',
+                                        style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
+                                  ),
+                                  Row(
+                                    children: [
+                                      Expanded(
+                                        child: Padding(
+                                          padding: const EdgeInsets.only(left: 8.0),
+                                          child: Column(
+                                            children: [
+                                              Text(
+                                                "Breakfast",
+                                                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                                              ),
+                                              Text(breakfast.mealName ?? "-"),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                      Container(
+                                        color: Constants.fourthColor,
+                                        height: 30,
+                                        width: 1,
+                                        margin: EdgeInsets.all(4),
+                                      ),
+                                      Expanded(
+                                        child: Column(
+                                          children: [
+                                            Text(
+                                              "Lunch",
+                                              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                                            ),
+                                            Text(lunch.mealName ?? "-"),
+                                          ],
+                                        ),
+                                      ),
+                                      Container(
+                                        color: Constants.fourthColor,
+                                        height: 30,
+                                        width: 1,
+                                        margin: EdgeInsets.all(4),
+                                      ),
+                                      Expanded(
+                                        child: Column(
+                                          children: [
+                                            Text(
+                                              "Dinner",
+                                              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                                            ),
+                                            Text(evening.mealName ?? "-"),
+                                          ],
+                                        ),
+                                      ),
+                                    ],
+                                  ),
                                 ],
                               ),
                       ),
@@ -475,8 +493,7 @@ class _MainScreenState extends State<MainScreen> {
                       'Mealplan',
                       textAlign: TextAlign.center,
                     ),
-                    content: StatefulBuilder(
-                        builder: (BuildContext context, StateSetter setState) {
+                    content: StatefulBuilder(builder: (BuildContext context, StateSetter setState) {
                       return Container(
                         height: 400,
                         child: Form(
@@ -485,8 +502,7 @@ class _MainScreenState extends State<MainScreen> {
                             crossAxisAlignment: CrossAxisAlignment.center,
                             children: <Widget>[
                               TextFormField(
-                                textCapitalization:
-                                    TextCapitalization.sentences,
+                                textCapitalization: TextCapitalization.sentences,
                                 decoration: InputDecoration(labelText: 'Meal'),
                                 textAlign: TextAlign.left,
                                 onChanged: (value) {
@@ -499,8 +515,7 @@ class _MainScreenState extends State<MainScreen> {
                                 controller: dateCtl,
                                 onTap: () async {
                                   DateTime date = DateTime(1900);
-                                  FocusScope.of(context)
-                                      .requestFocus(FocusNode());
+                                  FocusScope.of(context).requestFocus(FocusNode());
 
                                   date = await showDatePicker(
                                       context: context,
@@ -509,11 +524,8 @@ class _MainScreenState extends State<MainScreen> {
                                       firstDate: DateTime(1900),
                                       lastDate: DateTime(2100));
 
-                                  dateCtl.text =
-                                      '${DateFormat('EE').format(date)} ${date.day.toString()}.${date.month.toString()}.${date.year.toString()}';
-                                  mealDate =
-                                      DateTime(date.year, date.month, date.day)
-                                          .millisecondsSinceEpoch;
+                                  dateCtl.text = '${date.day.toString()}.${date.month.toString()}.${date.year.toString()}';
+                                  mealDate = DateTime(date.year, date.month, date.day).millisecondsSinceEpoch;
                                 },
                               ),
                               SizedBox(
@@ -545,8 +557,7 @@ class _MainScreenState extends State<MainScreen> {
                                 ),
                               ),
                               TextFormField(
-                                textCapitalization:
-                                    TextCapitalization.sentences,
+                                textCapitalization: TextCapitalization.sentences,
                                 keyboardType: TextInputType.multiline,
                                 minLines: 2,
                                 maxLines: 5,
@@ -567,30 +578,32 @@ class _MainScreenState extends State<MainScreen> {
                         },
                       ),
                       FlatButton(
-                        child: Text(
-                          'Save',
-                        ),
-                        onPressed: () async {
-                          _databaseHelper.db.insert(
-                              "meals",
-                              Meal(
-                                mealName: mealName,
-                                date: mealDate,
-                                dayTime: mealTime,
-                              ).toMapWithoutId(),
-                              conflictAlgorithm: ConflictAlgorithm.ignore);
+                          child: Text(
+                            'Save',
+                          ),
+                          onPressed: () async {
+                            await _databaseHelper.db.insert(
+                                "meals",
+                                Meal(
+                                  mealName: mealName,
+                                  date: mealDate,
+                                  dayTime: mealTime,
+                                ).toMapWithoutId());
 
-                          Navigator.of(context).pop();
-                          asyncMethod().then((value) {
-                            setState(() {});
-                          });
-                        },
-                      ),
+                            Navigator.of(context).pop();
+                            asyncMethod().then((value) {
+                              setState(() {});
+                            });
+
+                            Scaffold.of(context).showSnackBar(SnackBar(
+                              content: Text("Couldn't save on this date."),
+                            ));
+                          }),
                     ],
                   );
                 });
           },
-          child: Icon(Icons.schedule),
+          child: Icon(Icons.add),
         ), // This trailing comma makes auto-formatting nicer for build methods.
       ),
     );

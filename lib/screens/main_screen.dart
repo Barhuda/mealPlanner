@@ -38,6 +38,12 @@ class _MainScreenState extends State<MainScreen> {
   List<Meal> mealList = [];
   FocusNode focusNode = FocusNode();
   ScreenshotController screenshotController = ScreenshotController();
+  var mealTimeListDropdown = <String>[
+    'Breakfast',
+    'Lunch',
+    'Dinner',
+  ];
+  String selectedLocalMealTime;
 
   Map<DateTime, Map<String, Meal>> weekMap = {};
   Meal defaultMeal = Meal(mealName: "-", date: DateTime.utc(2000, 1, 1).millisecondsSinceEpoch, dayTime: "Breakfast");
@@ -72,7 +78,7 @@ class _MainScreenState extends State<MainScreen> {
 
   void subtractWeek() {
     currentDate = currentDate.subtract(Duration(days: 7));
-    datePeriod = currentDate.subtract(Duration(days: 6));
+    datePeriod = currentDate.add(Duration(days: 6));
     asyncMethod().then((value) {
       setState(() {});
     });
@@ -228,7 +234,9 @@ class _MainScreenState extends State<MainScreen> {
               padding: EdgeInsets.only(right: 10),
               child: GestureDetector(
                 onTap: () async {
-                  Navigator.of(context).pushNamed(FoodList.id);
+                  Navigator.of(context).pushNamed(FoodList.id).then((value) => setState(() {
+                        asyncMethod();
+                      }));
                 },
                 child: Icon(Icons.list),
               ),
@@ -420,10 +428,11 @@ class _MainScreenState extends State<MainScreen> {
                                         style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
                                   ),
                                   Row(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
                                       Expanded(
                                         child: Padding(
-                                          padding: const EdgeInsets.only(left: 8.0),
+                                          padding: const EdgeInsets.only(left: 8.0, bottom: 4),
                                           child: Column(
                                             children: [
                                               Text(
@@ -442,14 +451,17 @@ class _MainScreenState extends State<MainScreen> {
                                         margin: EdgeInsets.all(4),
                                       ),
                                       Expanded(
-                                        child: Column(
-                                          children: [
-                                            Text(
-                                              "Lunch",
-                                              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
-                                            ),
-                                            Text(lunch.mealName ?? "-"),
-                                          ],
+                                        child: Padding(
+                                          padding: const EdgeInsets.only(bottom: 4.0),
+                                          child: Column(
+                                            children: [
+                                              Text(
+                                                "Lunch",
+                                                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                                              ),
+                                              Text(lunch.mealName ?? "-"),
+                                            ],
+                                          ),
                                         ),
                                       ),
                                       Container(
@@ -459,14 +471,17 @@ class _MainScreenState extends State<MainScreen> {
                                         margin: EdgeInsets.all(4),
                                       ),
                                       Expanded(
-                                        child: Column(
-                                          children: [
-                                            Text(
-                                              "Dinner",
-                                              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
-                                            ),
-                                            Text(evening.mealName ?? "-"),
-                                          ],
+                                        child: Padding(
+                                          padding: const EdgeInsets.only(bottom: 4.0),
+                                          child: Column(
+                                            children: [
+                                              Text(
+                                                "Dinner",
+                                                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                                              ),
+                                              Text(evening.mealName ?? "-"),
+                                            ],
+                                          ),
                                         ),
                                       ),
                                     ],
@@ -478,11 +493,17 @@ class _MainScreenState extends State<MainScreen> {
                   },
                 ),
               ),
+              SizedBox(
+                height: 75,
+              ),
             ],
           ),
         ),
         floatingActionButton: FloatingActionButton(
           onPressed: () {
+            DateTime date = DateTime.now();
+            selectedLocalMealTime = mealTimeListDropdown[0];
+            mealTime = "Breakfast";
             showDialog(
                 context: context,
                 builder: (BuildContext context) {
@@ -514,7 +535,6 @@ class _MainScreenState extends State<MainScreen> {
                                 decoration: InputDecoration(labelText: 'Date'),
                                 controller: dateCtl,
                                 onTap: () async {
-                                  DateTime date = DateTime(1900);
                                   FocusScope.of(context).requestFocus(FocusNode());
 
                                   date = await showDatePicker(
@@ -534,19 +554,26 @@ class _MainScreenState extends State<MainScreen> {
                               Container(
                                 alignment: Alignment.centerLeft,
                                 child: DropdownButton(
-                                  value: mealTime,
+                                  value: selectedLocalMealTime ?? mealTimeListDropdown[0],
                                   icon: Icon(Icons.local_dining),
                                   elevation: 16,
                                   onChanged: (String newValue) {
                                     setState(() {
-                                      mealTime = newValue;
+                                      if (mealTimeListDropdown.indexOf(newValue) == 0) {
+                                        mealTime = "Breakfast";
+                                        selectedLocalMealTime = mealTimeListDropdown[0];
+                                      }
+                                      if (mealTimeListDropdown.indexOf(newValue) == 1) {
+                                        mealTime = "Lunch";
+                                        selectedLocalMealTime = mealTimeListDropdown[1];
+                                      }
+                                      if (mealTimeListDropdown.indexOf(newValue) == 2) {
+                                        mealTime = "Dinner";
+                                        selectedLocalMealTime = mealTimeListDropdown[2];
+                                      }
                                     });
                                   },
-                                  items: <String>[
-                                    'Breakfast',
-                                    'Lunch',
-                                    'Dinner',
-                                  ].map<DropdownMenuItem<String>>(
+                                  items: mealTimeListDropdown.map<DropdownMenuItem<String>>(
                                     (String value) {
                                       return DropdownMenuItem<String>(
                                         value: value,
@@ -582,22 +609,23 @@ class _MainScreenState extends State<MainScreen> {
                             'Save',
                           ),
                           onPressed: () async {
-                            await _databaseHelper.db.insert(
-                                "meals",
-                                Meal(
-                                  mealName: mealName,
-                                  date: mealDate,
-                                  dayTime: mealTime,
-                                ).toMapWithoutId());
+                            try {
+                              await _databaseHelper.db.insert(
+                                  "meals",
+                                  Meal(
+                                    mealName: mealName,
+                                    date: mealDate,
+                                    dayTime: mealTime,
+                                  ).toMapWithoutId());
 
-                            Navigator.of(context).pop();
-                            asyncMethod().then((value) {
-                              setState(() {});
-                            });
-
-                            Scaffold.of(context).showSnackBar(SnackBar(
-                              content: Text("Couldn't save on this date."),
-                            ));
+                              Navigator.of(context).pop();
+                              asyncMethod().then((value) {
+                                setState(() {});
+                              });
+                            } catch (e) {
+                              Navigator.of(context).pop();
+                              ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Meal at this Date and Time already exists.")));
+                            }
                           }),
                     ],
                   );

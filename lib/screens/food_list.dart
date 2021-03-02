@@ -7,6 +7,7 @@ import 'package:flutter_simple_dependency_injection/injector.dart';
 import 'package:mealpy/injection.dart';
 import 'package:mealpy/meal.dart';
 import 'package:intl/intl.dart';
+import 'package:sqflite/sqflite.dart';
 
 class FoodList extends StatefulWidget {
   FoodList({Key key}) : super(key: key);
@@ -22,7 +23,13 @@ class _FoodListState extends State<FoodList> {
   String mealName;
   String mealNote;
   String mealTime = 'Breakfast';
+  String selectedLocalMealTime;
   int mealDate;
+  var mealTimeListDropdown = <String>[
+    'Breakfast',
+    'Lunch',
+    'Dinner',
+  ];
 
   TextEditingController dateCtl = TextEditingController(
       text:
@@ -44,8 +51,9 @@ class _FoodListState extends State<FoodList> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
+          backgroundColor: Constants.mainColor,
           centerTitle: true,
-          title: Text('Idea List'),
+          title: Text('Idea List 🍽️'),
         ),
         floatingActionButton: FloatingActionButton(
           onPressed: () {
@@ -137,6 +145,7 @@ class _FoodListState extends State<FoodList> {
                   onTap: () {
                     mealName = null;
                     mealNote = null;
+
                     var mealNameCtrl = TextEditingController(text: currentMeal.mealName);
                     var mealNoteCtrl = TextEditingController(text: currentMeal.note);
                     showDialog(
@@ -162,8 +171,9 @@ class _FoodListState extends State<FoodList> {
                             ),
                             content: StatefulBuilder(
                               builder: (BuildContext context, StateSetter setState) {
+                                DateTime date = DateTime.now();
                                 return Container(
-                                  height: 400,
+                                  height: 150,
                                   child: Form(
                                     child: Column(
                                       children: [
@@ -185,80 +195,6 @@ class _FoodListState extends State<FoodList> {
                                             mealNote = value;
                                           },
                                         ),
-                                        Padding(
-                                          padding: const EdgeInsets.only(top: 40.0, bottom: 20),
-                                          child: Text(
-                                            "Add Meal to your Meal Plan",
-                                            style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
-                                          ),
-                                        ),
-                                        Container(
-                                          alignment: Alignment.centerLeft,
-                                          child: DropdownButton(
-                                            value: mealTime,
-                                            icon: Icon(Icons.local_dining),
-                                            elevation: 16,
-                                            onChanged: (String newValue) {
-                                              setState(() {
-                                                mealTime = newValue;
-                                              });
-                                            },
-                                            items: <String>[
-                                              'Breakfast',
-                                              'Lunch',
-                                              'Dinner',
-                                            ].map<DropdownMenuItem<String>>(
-                                              (String value) {
-                                                return DropdownMenuItem<String>(
-                                                  value: value,
-                                                  child: Text(value),
-                                                );
-                                              },
-                                            ).toList(),
-                                          ),
-                                        ),
-                                        TextFormField(
-                                          readOnly: true,
-                                          decoration: InputDecoration(labelText: 'Date'),
-                                          controller: dateCtl,
-                                          onTap: () async {
-                                            DateTime date = DateTime(1900);
-                                            FocusScope.of(context).requestFocus(FocusNode());
-
-                                            date = await showDatePicker(
-                                                context: context,
-                                                locale: const Locale('en'),
-                                                initialDate: DateTime.now(),
-                                                firstDate: DateTime(1900),
-                                                lastDate: DateTime(2100));
-
-                                            dateCtl.text = '${date.day.toString()}.${date.month.toString()}.${date.year.toString()}';
-                                            mealDate = DateTime(date.year, date.month, date.day).millisecondsSinceEpoch;
-                                          },
-                                        ),
-                                        Padding(
-                                          padding: const EdgeInsets.only(top: 8.0),
-                                          child: TextButton(
-                                            onPressed: () async {
-                                              try {
-                                                await _databaseHelper.db.insert(
-                                                    "meals",
-                                                    Meal(
-                                                      mealName: mealName ?? currentMeal.mealName,
-                                                      date: mealDate,
-                                                      dayTime: mealTime,
-                                                    ).toMapWithoutId());
-
-                                                Navigator.of(context).pop();
-                                              } catch (e) {
-                                                Navigator.of(context).pop();
-                                                ScaffoldMessenger.of(context)
-                                                    .showSnackBar(SnackBar(content: Text("Meal at this Date and Time already exists.")));
-                                              }
-                                            },
-                                            child: Text("Add Meal"),
-                                          ),
-                                        )
                                       ],
                                     ),
                                   ),
@@ -301,10 +237,146 @@ class _FoodListState extends State<FoodList> {
                       padding: const EdgeInsets.all(5.0),
                       child: Column(
                         children: [
-                          Text(
-                            currentMeal.mealName ?? "",
-                            textAlign: TextAlign.center,
-                            style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+                          Stack(
+                            alignment: Alignment.center,
+                            children: [
+                              Align(
+                                alignment: Alignment.center,
+                                child: Text(
+                                  currentMeal.mealName ?? "",
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+                                ),
+                              ),
+                              Align(
+                                alignment: Alignment.centerRight,
+                                child: IconButton(
+                                  icon: Icon(
+                                    Icons.calendar_today,
+                                    color: Constants.fourthColor,
+                                  ),
+                                  onPressed: () {
+                                    mealName = null;
+                                    mealNote = null;
+
+                                    showDialog(
+                                        context: context,
+                                        builder: (BuildContext context) {
+                                          return AlertDialog(
+                                            backgroundColor: Constants.secondaryColor,
+                                            scrollable: false,
+                                            title: Row(
+                                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                              children: [
+                                                Text('Plan Meal'),
+                                              ],
+                                            ),
+                                            content: StatefulBuilder(
+                                              builder: (BuildContext context, StateSetter setState) {
+                                                DateTime date = DateTime.now();
+                                                return Container(
+                                                  height: 150,
+                                                  child: Form(
+                                                    child: Column(
+                                                      children: [
+                                                        Container(
+                                                          alignment: Alignment.centerLeft,
+                                                          child: DropdownButton(
+                                                            value: selectedLocalMealTime ?? mealTimeListDropdown[0],
+                                                            icon: Icon(Icons.local_dining),
+                                                            elevation: 16,
+                                                            onChanged: (String newValue) {
+                                                              setState(() {
+                                                                if (mealTimeListDropdown.indexOf(newValue) == 0) {
+                                                                  mealTime = "Breakfast";
+                                                                  selectedLocalMealTime = mealTimeListDropdown[0];
+                                                                }
+                                                                if (mealTimeListDropdown.indexOf(newValue) == 1) {
+                                                                  mealTime = "Lunch";
+                                                                  selectedLocalMealTime = mealTimeListDropdown[1];
+                                                                }
+                                                                if (mealTimeListDropdown.indexOf(newValue) == 2) {
+                                                                  mealTime = "Dinner";
+                                                                  selectedLocalMealTime = mealTimeListDropdown[2];
+                                                                }
+                                                              });
+                                                            },
+                                                            items: mealTimeListDropdown.map<DropdownMenuItem<String>>(
+                                                              (String value) {
+                                                                return DropdownMenuItem<String>(
+                                                                  value: value,
+                                                                  child: Text(value),
+                                                                );
+                                                              },
+                                                            ).toList(),
+                                                          ),
+                                                        ),
+                                                        TextFormField(
+                                                          readOnly: true,
+                                                          decoration: InputDecoration(labelText: 'Date'),
+                                                          controller: dateCtl,
+                                                          onTap: () async {
+                                                            FocusScope.of(context).requestFocus(FocusNode());
+
+                                                            date = await showDatePicker(
+                                                                context: context,
+                                                                locale: const Locale('en', 'GB'),
+                                                                initialDate: DateTime.now(),
+                                                                firstDate: DateTime(1900),
+                                                                lastDate: DateTime(2100));
+
+                                                            dateCtl.text = '${date.day.toString()}.${date.month.toString()}.${date.year.toString()}';
+                                                            mealDate = DateTime(date.year, date.month, date.day).millisecondsSinceEpoch;
+                                                          },
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                );
+                                              },
+                                            ),
+                                            actions: [
+                                              TextButton(
+                                                child: Text(
+                                                  'Cancel',
+                                                ),
+                                                onPressed: () {
+                                                  Navigator.of(context).pop();
+                                                  asyncMethod().then((value) {
+                                                    setState(() {});
+                                                  });
+                                                },
+                                              ),
+                                              TextButton(
+                                                child: Text(
+                                                  'Save',
+                                                ),
+                                                onPressed: () async {
+                                                  try {
+                                                    await _databaseHelper.db.insert(
+                                                        "meals",
+                                                        Meal(
+                                                          mealName: mealName ?? currentMeal.mealName,
+                                                          date: mealDate,
+                                                          dayTime: mealTime,
+                                                        ).toMapWithoutId(),
+                                                        conflictAlgorithm: ConflictAlgorithm.ignore);
+
+                                                    Navigator.of(context).pop();
+                                                  } catch (e) {
+                                                    Navigator.of(context).pop();
+                                                    ScaffoldMessenger.of(context)
+                                                        .showSnackBar(SnackBar(content: Text("Meal at this Date and Time already exists.")));
+                                                  }
+                                                },
+                                              ),
+                                            ],
+                                          );
+                                        });
+                                  },
+                                ),
+                              )
+                            ],
                           ),
                           Text(
                             currentMeal.note ?? "",

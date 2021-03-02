@@ -34,6 +34,7 @@ dependencies:
   path_provider: ^1.6.27
   screenshot: ^0.3.0
   share: ^0.6.5+4
+  flutter_launcher_icons: "^0.9.0"
 
 
 dependency_overrides:
@@ -43,6 +44,11 @@ dependency_overrides:
 dev_dependencies:
   flutter_test:
     sdk: flutter
+
+flutter_icons:
+  image_path: "assets/icon/icon.png"
+  android: true
+  ios: true
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

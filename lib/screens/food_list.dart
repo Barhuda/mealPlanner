@@ -8,6 +8,7 @@ import 'package:mealpy/injection.dart';
 import 'package:mealpy/meal.dart';
 import 'package:intl/intl.dart';
 import 'package:sqflite/sqflite.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class FoodList extends StatefulWidget {
   FoodList({Key key}) : super(key: key);
@@ -26,9 +27,9 @@ class _FoodListState extends State<FoodList> {
   String selectedLocalMealTime;
   int mealDate;
   var mealTimeListDropdown = <String>[
-    'Breakfast',
-    'Lunch',
-    'Dinner',
+    'Breakfast'.tr(),
+    'Lunch'.tr(),
+    'Dinner'.tr(),
   ];
 
   TextEditingController dateCtl = TextEditingController(
@@ -53,7 +54,7 @@ class _FoodListState extends State<FoodList> {
         appBar: AppBar(
           backgroundColor: Constants.mainColor,
           centerTitle: true,
-          title: Text('Idea List 🍽️'),
+          title: Text('Idea List 🍽️'.tr()),
         ),
         floatingActionButton: FloatingActionButton(
           onPressed: () {
@@ -67,7 +68,7 @@ class _FoodListState extends State<FoodList> {
                     backgroundColor: Constants.secondaryColor,
                     scrollable: true,
                     title: Text(
-                      'Mealplan',
+                      'Mealplan'.tr(),
                       textAlign: TextAlign.center,
                     ),
                     content: StatefulBuilder(builder: (BuildContext context, StateSetter setState) {
@@ -80,7 +81,7 @@ class _FoodListState extends State<FoodList> {
                             children: <Widget>[
                               TextFormField(
                                 textCapitalization: TextCapitalization.sentences,
-                                decoration: InputDecoration(labelText: 'Meal'),
+                                decoration: InputDecoration(labelText: 'Meal'.tr()),
                                 textAlign: TextAlign.left,
                                 onChanged: (value) {
                                   mealName = value;
@@ -90,7 +91,7 @@ class _FoodListState extends State<FoodList> {
                                 textCapitalization: TextCapitalization.sentences,
                                 maxLines: 3,
                                 minLines: 2,
-                                decoration: InputDecoration(labelText: 'Note'),
+                                decoration: InputDecoration(labelText: 'Note'.tr()),
                                 textAlign: TextAlign.left,
                                 onChanged: (value) {
                                   mealNote = value;
@@ -104,7 +105,7 @@ class _FoodListState extends State<FoodList> {
                     actions: <Widget>[
                       TextButton(
                         child: Text(
-                          'Cancel',
+                          'Cancel'.tr(),
                         ),
                         onPressed: () {
                           Navigator.of(context).pop();
@@ -112,7 +113,7 @@ class _FoodListState extends State<FoodList> {
                       ),
                       TextButton(
                         child: Text(
-                          'Save',
+                          'Save'.tr(),
                         ),
                         onPressed: () async {
                           if (mealName != null) {
@@ -157,7 +158,7 @@ class _FoodListState extends State<FoodList> {
                             title: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                Text('Edit Meal'),
+                                Text('Edit Meal'.tr()),
                                 IconButton(
                                     icon: Icon(Icons.delete),
                                     onPressed: () {
@@ -180,7 +181,7 @@ class _FoodListState extends State<FoodList> {
                                         TextFormField(
                                           controller: mealNameCtrl,
                                           textCapitalization: TextCapitalization.sentences,
-                                          decoration: InputDecoration(labelText: 'Meal'),
+                                          decoration: InputDecoration(labelText: 'Meal'.tr()),
                                           textAlign: TextAlign.left,
                                           onChanged: (value) {
                                             mealName = value;
@@ -189,7 +190,7 @@ class _FoodListState extends State<FoodList> {
                                         TextFormField(
                                           controller: mealNoteCtrl,
                                           textCapitalization: TextCapitalization.sentences,
-                                          decoration: InputDecoration(labelText: 'Note'),
+                                          decoration: InputDecoration(labelText: 'Note'.tr()),
                                           textAlign: TextAlign.left,
                                           onChanged: (value) {
                                             mealNote = value;
@@ -204,7 +205,7 @@ class _FoodListState extends State<FoodList> {
                             actions: [
                               TextButton(
                                 child: Text(
-                                  'Cancel',
+                                  'Cancel'.tr(),
                                 ),
                                 onPressed: () {
                                   Navigator.of(context).pop();
@@ -215,7 +216,7 @@ class _FoodListState extends State<FoodList> {
                               ),
                               TextButton(
                                 child: Text(
-                                  'Save',
+                                  'Save'.tr(),
                                 ),
                                 onPressed: () {
                                   currentMeal.updateMealInDB(mealName, mealNote);
@@ -258,6 +259,8 @@ class _FoodListState extends State<FoodList> {
                                   onPressed: () {
                                     mealName = null;
                                     mealNote = null;
+                                    DateTime date = DateTime.now();
+                                    mealDate = DateTime(date.year, date.month, date.day).millisecondsSinceEpoch;
 
                                     showDialog(
                                         context: context,
@@ -268,12 +271,11 @@ class _FoodListState extends State<FoodList> {
                                             title: Row(
                                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                               children: [
-                                                Text('Plan Meal'),
+                                                Text('Plan Meal'.tr()),
                                               ],
                                             ),
                                             content: StatefulBuilder(
                                               builder: (BuildContext context, StateSetter setState) {
-                                                DateTime date = DateTime.now();
                                                 return Container(
                                                   height: 150,
                                                   child: Form(
@@ -313,19 +315,19 @@ class _FoodListState extends State<FoodList> {
                                                         ),
                                                         TextFormField(
                                                           readOnly: true,
-                                                          decoration: InputDecoration(labelText: 'Date'),
+                                                          decoration: InputDecoration(labelText: 'Date'.tr()),
                                                           controller: dateCtl,
                                                           onTap: () async {
                                                             FocusScope.of(context).requestFocus(FocusNode());
 
                                                             date = await showDatePicker(
                                                                 context: context,
-                                                                locale: const Locale('en', 'GB'),
                                                                 initialDate: DateTime.now(),
                                                                 firstDate: DateTime(1900),
                                                                 lastDate: DateTime(2100));
 
-                                                            dateCtl.text = '${date.day.toString()}.${date.month.toString()}.${date.year.toString()}';
+                                                            dateCtl.text =
+                                                                '${DateFormat('EE').format(date)} ${date.day.toString()}.${date.month.toString()}.${date.year.toString()}';
                                                             mealDate = DateTime(date.year, date.month, date.day).millisecondsSinceEpoch;
                                                           },
                                                         ),
@@ -338,7 +340,7 @@ class _FoodListState extends State<FoodList> {
                                             actions: [
                                               TextButton(
                                                 child: Text(
-                                                  'Cancel',
+                                                  'Cancel'.tr(),
                                                 ),
                                                 onPressed: () {
                                                   Navigator.of(context).pop();
@@ -349,24 +351,24 @@ class _FoodListState extends State<FoodList> {
                                               ),
                                               TextButton(
                                                 child: Text(
-                                                  'Save',
+                                                  'Save'.tr(),
                                                 ),
                                                 onPressed: () async {
                                                   try {
                                                     await _databaseHelper.db.insert(
-                                                        "meals",
-                                                        Meal(
-                                                          mealName: mealName ?? currentMeal.mealName,
-                                                          date: mealDate,
-                                                          dayTime: mealTime,
-                                                        ).toMapWithoutId(),
-                                                        conflictAlgorithm: ConflictAlgorithm.ignore);
+                                                      "meals",
+                                                      Meal(
+                                                        mealName: mealName ?? currentMeal.mealName,
+                                                        date: mealDate,
+                                                        dayTime: mealTime,
+                                                      ).toMapWithoutId(),
+                                                    );
 
                                                     Navigator.of(context).pop();
                                                   } catch (e) {
                                                     Navigator.of(context).pop();
                                                     ScaffoldMessenger.of(context)
-                                                        .showSnackBar(SnackBar(content: Text("Meal at this Date and Time already exists.")));
+                                                        .showSnackBar(SnackBar(content: Text("Duplicate Meal Message").tr()));
                                                   }
                                                 },
                                               ),

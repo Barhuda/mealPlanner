@@ -1,1 +1,17 @@
-{}
+{
+  "Breakfast": "Breakfast",
+  "Lunch": "Lunch",
+  "Dinner": "Dinner",
+  "Cancel": "Cancel",
+  "Save": "Save",
+  "Meal": "Meal",
+  "Date": "Date",
+  "Notes": "Notes",
+  "Duplicate Meal Message": "Meal at this Date and Time already exists.",
+  "Idea List \uD83C\uDF7D️": "Idea List \uD83C\uDF7D️",
+  "Mealplan": "Mealplan",
+  "Edit Meal": "Edit Meal",
+  "Plan Meal": "Plan Meal"
+
+
+}

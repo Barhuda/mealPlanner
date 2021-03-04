@@ -15,7 +15,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 # In iOS, build-name is used as CFBundleShortVersionString while build-number used as CFBundleVersion.
 # Read more about iOS versioning at
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
-version: 1.22.6
+version: 1.3.0
 
 environment:
   sdk: ">=2.7.0 <3.0.0"
@@ -28,17 +28,18 @@ dependencies:
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^0.1.3
-  intl: ^0.16.1
+  intl: ^0.17.0
   sqflite: ^1.1.0
   flutter_simple_dependency_injection: ^1.0.1
   path_provider: ^1.6.27
   screenshot: ^0.3.0
   share: ^0.6.5+4
+  easy_localization: ^2.3.3+1
   flutter_launcher_icons: "^0.9.0"
 
 
 dependency_overrides:
-  intl: ^0.16.1
+
 
 
 dev_dependencies:
@@ -50,6 +51,8 @@ flutter_icons:
   android: true
   ios: true
 
+
+
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
 
@@ -60,6 +63,9 @@ flutter:
   # included with your application, so that you can use the icons in
   # the material Icons class.
   uses-material-design: true
+
+  assets:
+    - assets/translations/
 
   # To add assets to your application, add an assets section, like this:
   # assets:

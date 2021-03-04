@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:intl/intl.dart';
 import 'package:mealpy/meal.dart';
 import 'package:mealpy/injection.dart';
@@ -14,6 +15,8 @@ import 'package:sqflite/sqflite.dart';
 import 'package:screenshot/screenshot.dart';
 import 'package:share/share.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:intl/intl.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class MainScreen extends StatefulWidget {
   MainScreen({Key key}) : super(key: key);
@@ -39,9 +42,9 @@ class _MainScreenState extends State<MainScreen> {
   FocusNode focusNode = FocusNode();
   ScreenshotController screenshotController = ScreenshotController();
   var mealTimeListDropdown = <String>[
-    'Breakfast',
-    'Lunch',
-    'Dinner',
+    'Breakfast'.tr(),
+    'Lunch'.tr(),
+    'Dinner'.tr(),
   ];
   String selectedLocalMealTime;
 
@@ -222,7 +225,7 @@ class _MainScreenState extends State<MainScreen> {
                   final directory = (await getApplicationDocumentsDirectory()).path;
                   screenshotController.captureAndSave(directory, fileName: "Mealplan.jpg").then((path) => Share.shareFiles([path],
                       text:
-                          "Look at my Mealplan from ${currentDate.day.toString()}.${currentDate.month.toString()}.${currentDate.year.toString()} to ${datePeriod.day.toString()}.${datePeriod.month.toString()}.${datePeriod.year.toString()}"));
+                          "Mealplan: ${currentDate.day.toString()}.${currentDate.month.toString()}.${currentDate.year.toString()} - ${datePeriod.day.toString()}.${datePeriod.month.toString()}.${datePeriod.year.toString()}"));
                 },
                 child: Icon(
                   Icons.share,
@@ -316,7 +319,7 @@ class _MainScreenState extends State<MainScreen> {
                                             keyboardType: TextInputType.text,
                                             controller: breakfastCtrl,
                                             decoration: InputDecoration(
-                                                labelText: 'Breakfast',
+                                                labelText: 'Breakfast'.tr(),
                                                 suffixIcon: IconButton(
                                                   onPressed: () {
                                                     breakfast.deleteMeal();
@@ -334,7 +337,7 @@ class _MainScreenState extends State<MainScreen> {
                                             keyboardType: TextInputType.text,
                                             controller: lunchCtrl,
                                             decoration: InputDecoration(
-                                              labelText: 'Lunch',
+                                              labelText: 'Lunch'.tr(),
                                               suffixIcon: IconButton(
                                                 onPressed: () {
                                                   lunch.deleteMeal();
@@ -353,7 +356,7 @@ class _MainScreenState extends State<MainScreen> {
                                             keyboardType: TextInputType.text,
                                             controller: dinnerCtrl,
                                             decoration: InputDecoration(
-                                              labelText: 'Dinner',
+                                              labelText: 'Dinner'.tr(),
                                               suffixIcon: IconButton(
                                                 onPressed: () {
                                                   evening.deleteMeal();
@@ -376,7 +379,7 @@ class _MainScreenState extends State<MainScreen> {
                                 actions: <Widget>[
                                   TextButton(
                                     child: Text(
-                                      'Cancel',
+                                      'Cancel'.tr(),
                                     ),
                                     onPressed: () {
                                       Navigator.of(context).pop();
@@ -387,10 +390,9 @@ class _MainScreenState extends State<MainScreen> {
                                   ),
                                   TextButton(
                                     child: Text(
-                                      'Save',
+                                      'Save'.tr(),
                                     ),
                                     onPressed: () {
-                                      print(weekMap.keys.elementAt(index));
                                       editDay(breakfast, lunch, evening, weekMap.keys.elementAt(index));
                                     },
                                   ),
@@ -436,10 +438,13 @@ class _MainScreenState extends State<MainScreen> {
                                           child: Column(
                                             children: [
                                               Text(
-                                                "Breakfast",
+                                                "Breakfast".tr(),
                                                 style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
                                               ),
-                                              Text(breakfast.mealName ?? "-"),
+                                              Text(
+                                                breakfast.mealName ?? "-",
+                                                textAlign: TextAlign.center,
+                                              ),
                                             ],
                                           ),
                                         ),
@@ -456,10 +461,13 @@ class _MainScreenState extends State<MainScreen> {
                                           child: Column(
                                             children: [
                                               Text(
-                                                "Lunch",
+                                                "Lunch".tr(),
                                                 style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
                                               ),
-                                              Text(lunch.mealName ?? "-"),
+                                              Text(
+                                                lunch.mealName ?? "-",
+                                                textAlign: TextAlign.center,
+                                              ),
                                             ],
                                           ),
                                         ),
@@ -476,10 +484,13 @@ class _MainScreenState extends State<MainScreen> {
                                           child: Column(
                                             children: [
                                               Text(
-                                                "Dinner",
+                                                "Dinner".tr(),
                                                 style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
                                               ),
-                                              Text(evening.mealName ?? "-"),
+                                              Text(
+                                                evening.mealName ?? "-",
+                                                textAlign: TextAlign.center,
+                                              ),
                                             ],
                                           ),
                                         ),
@@ -504,6 +515,7 @@ class _MainScreenState extends State<MainScreen> {
             DateTime date = DateTime.now();
             selectedLocalMealTime = mealTimeListDropdown[0];
             mealTime = "Breakfast";
+            mealDate = DateTime(date.year, date.month, date.day).millisecondsSinceEpoch;
             showDialog(
                 context: context,
                 builder: (BuildContext context) {
@@ -524,7 +536,7 @@ class _MainScreenState extends State<MainScreen> {
                             children: <Widget>[
                               TextFormField(
                                 textCapitalization: TextCapitalization.sentences,
-                                decoration: InputDecoration(labelText: 'Meal'),
+                                decoration: InputDecoration(labelText: 'Meal'.tr()),
                                 textAlign: TextAlign.left,
                                 onChanged: (value) {
                                   mealName = value;
@@ -532,19 +544,16 @@ class _MainScreenState extends State<MainScreen> {
                               ),
                               TextFormField(
                                 readOnly: true,
-                                decoration: InputDecoration(labelText: 'Date'),
+                                decoration: InputDecoration(labelText: 'Date'.tr()),
                                 controller: dateCtl,
                                 onTap: () async {
                                   FocusScope.of(context).requestFocus(FocusNode());
 
                                   date = await showDatePicker(
-                                      context: context,
-                                      locale: const Locale('en'),
-                                      initialDate: DateTime.now(),
-                                      firstDate: DateTime(1900),
-                                      lastDate: DateTime(2100));
+                                      context: context, initialDate: DateTime.now(), firstDate: DateTime(1900), lastDate: DateTime(2100));
 
-                                  dateCtl.text = '${date.day.toString()}.${date.month.toString()}.${date.year.toString()}';
+                                  dateCtl.text =
+                                      '${DateFormat('EE').format(date)} ${date.day.toString()}.${date.month.toString()}.${date.year.toString()}';
                                   mealDate = DateTime(date.year, date.month, date.day).millisecondsSinceEpoch;
                                 },
                               ),
@@ -588,7 +597,7 @@ class _MainScreenState extends State<MainScreen> {
                                 keyboardType: TextInputType.multiline,
                                 minLines: 2,
                                 maxLines: 5,
-                                decoration: InputDecoration(labelText: 'Notes'),
+                                decoration: InputDecoration(labelText: 'Notes'.tr()),
                               ),
                             ],
                           ),
@@ -598,7 +607,7 @@ class _MainScreenState extends State<MainScreen> {
                     actions: <Widget>[
                       FlatButton(
                         child: Text(
-                          'Cancel',
+                          'Cancel'.tr(),
                         ),
                         onPressed: () {
                           Navigator.of(context).pop();
@@ -606,25 +615,27 @@ class _MainScreenState extends State<MainScreen> {
                       ),
                       FlatButton(
                           child: Text(
-                            'Save',
+                            'Save'.tr(),
                           ),
                           onPressed: () async {
                             try {
                               await _databaseHelper.db.insert(
-                                  "meals",
-                                  Meal(
-                                    mealName: mealName,
-                                    date: mealDate,
-                                    dayTime: mealTime,
-                                  ).toMapWithoutId());
+                                "meals",
+                                Meal(
+                                  mealName: mealName,
+                                  date: mealDate,
+                                  dayTime: mealTime,
+                                ).toMapWithoutId(),
+                              );
 
                               Navigator.of(context).pop();
                               asyncMethod().then((value) {
                                 setState(() {});
                               });
                             } catch (e) {
+                              print("Duplikat");
                               Navigator.of(context).pop();
-                              ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Meal at this Date and Time already exists.")));
+                              ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Duplicate Meal Message").tr()));
                             }
                           }),
                     ],

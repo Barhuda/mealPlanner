@@ -7,12 +7,17 @@ import 'package:flutter_simple_dependency_injection/injector.dart';
 import 'package:mealpy/injection.dart';
 import 'package:mealpy/meal.dart';
 import 'package:intl/intl.dart';
-import 'package:sqflite/sqflite.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
+import 'package:firebase_analytics/observer.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class FoodList extends StatefulWidget {
-  FoodList({Key key}) : super(key: key);
+  FoodList({Key key, this.analytics, this.observer}) : super(key: key);
   static const String id = 'food_list';
+
+  final FirebaseAnalytics analytics;
+  final FirebaseAnalyticsObserver observer;
 
   @override
   _FoodListState createState() => _FoodListState();
@@ -36,6 +41,8 @@ class _FoodListState extends State<FoodList> {
       text:
           '${DateFormat('EE').format(DateTime.now())} ${DateTime.now().day.toString()}.${DateTime.now().month.toString()}.${DateTime.now().year.toString()}');
 
+  TextEditingController textEditingController = TextEditingController();
+
   @override
   void initState() {
     asyncMethod().then((value) {
@@ -46,6 +53,16 @@ class _FoodListState extends State<FoodList> {
 
   Future asyncMethod() async {
     meallist = await Meallist().generateMealList();
+  }
+
+  Future<void> _sendAnalyticsEvent(ideaName) async {
+    await widget.analytics.logEvent(
+      name: 'created_Idea',
+      parameters: <String, dynamic>{
+        'Idea': ideaName,
+      },
+    );
+    print('logEvent succeeded');
   }
 
   @override
@@ -73,7 +90,7 @@ class _FoodListState extends State<FoodList> {
                     ),
                     content: StatefulBuilder(builder: (BuildContext context, StateSetter setState) {
                       return Container(
-                        height: 200,
+                        height: 300,
                         child: Form(
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.start,
@@ -96,6 +113,30 @@ class _FoodListState extends State<FoodList> {
                                 onChanged: (value) {
                                   mealNote = value;
                                 },
+                              ),
+                              TextFormField(
+                                keyboardType: TextInputType.name,
+                                autofocus: false,
+                                controller: textEditingController,
+                                decoration: InputDecoration(
+                                  labelText: ' Link to recipe ',
+                                  hintText: 'Save your recipe here',
+                                  prefixIcon: IconButton(
+                                    onPressed: () async {
+                                      if (textEditingController.text.toString() == null || textEditingController.text.toString() == "") {
+                                        print("null data");
+                                      } else {
+                                        print(textEditingController.text.toString());
+                                        if (await canLaunch("https://" + textEditingController.text.toString())) {
+                                          await launch("https://" + textEditingController.text.toString());
+                                        } else {
+                                          throw 'Could not launch ${textEditingController.text.toString()}';
+                                        }
+                                      }
+                                    },
+                                    icon: Icon(Icons.open_in_browser),
+                                  ),
+                                ),
                               ),
                             ],
                           ),
@@ -121,8 +162,8 @@ class _FoodListState extends State<FoodList> {
                               mealName: mealName,
                               note: mealNote ?? "",
                             );
+                            _sendAnalyticsEvent(mealName);
                             mealToSave.saveMealtoDB();
-                            print(mealToSave);
                           }
 
                           Navigator.of(context).pop();

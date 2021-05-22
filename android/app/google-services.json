@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "697635097783",
+    "project_id": "mealpy-ca38a",
+    "storage_bucket": "mealpy-ca38a.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:697635097783:android:3ce695801fea6722d65132",
+        "android_client_info": {
+          "package_name": "com.mk.mealpy"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "697635097783-s84s15fp5hlseosqa9s98mp2mm0amujr.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBDCrK07bfPA0nRCxC_9y4Go87yU5SfWkQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "697635097783-s84s15fp5hlseosqa9s98mp2mm0amujr.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

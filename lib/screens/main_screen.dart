@@ -15,18 +15,25 @@ import 'package:sqflite/sqflite.dart';
 import 'package:screenshot/screenshot.dart';
 import 'package:share/share.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:intl/intl.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
+import 'package:firebase_analytics/observer.dart';
 
 class MainScreen extends StatefulWidget {
-  MainScreen({Key key}) : super(key: key);
+  MainScreen({Key key, this.analytics, this.observer}) : super(key: key);
   static const String id = 'main_screen';
+
+  final FirebaseAnalytics analytics;
+  final FirebaseAnalyticsObserver observer;
 
   @override
   _MainScreenState createState() => _MainScreenState();
 }
 
 class _MainScreenState extends State<MainScreen> {
+  bool _initialized = false;
+  bool _error = false;
   DatabaseHelper _databaseHelper = Injection.injector.get();
   DateTime currentDate;
   DateTime datePeriod = DateTime.now().add(Duration(days: 6));
@@ -57,9 +64,25 @@ class _MainScreenState extends State<MainScreen> {
       text:
           '${DateFormat('EE').format(DateTime.now())} ${DateTime.now().day.toString()}.${DateTime.now().month.toString()}.${DateTime.now().year.toString()}');
 
+  void initializeFlutterFire() async {
+    try {
+      // Wait for Firebase to initialize and set `_initialized` state to true
+      await Firebase.initializeApp();
+      setState(() {
+        _initialized = true;
+      });
+    } catch (e) {
+      // Set `_error` state to true if Firebase initialization fails
+      setState(() {
+        _error = true;
+      });
+    }
+  }
+
   @override
   void initState() {
     super.initState();
+    initializeFlutterFire();
     currentDate = DateTime.now();
     DatabaseHelper _databaseHelper = Injection.injector.get();
     asyncMethod().then((value) {
@@ -193,6 +216,16 @@ class _MainScreenState extends State<MainScreen> {
     asyncMethod().then((value) {
       setState(() {});
     });
+  }
+
+  Future<void> _sendAnalyticsEvent(mealName) async {
+    await widget.analytics.logEvent(
+      name: 'created_Meal',
+      parameters: <String, dynamic>{
+        'Meal': mealName,
+      },
+    );
+    print('logEvent succeeded');
   }
 
   @override
@@ -627,7 +660,7 @@ class _MainScreenState extends State<MainScreen> {
                                   dayTime: mealTime,
                                 ).toMapWithoutId(),
                               );
-
+                              _sendAnalyticsEvent(mealName);
                               Navigator.of(context).pop();
                               asyncMethod().then((value) {
                                 setState(() {});

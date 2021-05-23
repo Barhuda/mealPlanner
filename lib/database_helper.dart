@@ -43,5 +43,9 @@ class DatabaseHelper {
           'meal_name TEXT,'
           'note TEXT)');
     }
+    if (oldVersion < 5) {
+      await db.execute('ALTER TABLE meals ADD recipe TEXT');
+      await db.execute('ALTER TABLE meallist ADD recipe TEXT');
+    }
   }
 }

@@ -19,6 +19,8 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_analytics/observer.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:mealpy/buttons/buttonStyles.dart';
 
 class MainScreen extends StatefulWidget {
   MainScreen({Key key, this.analytics, this.observer}) : super(key: key);
@@ -228,6 +230,21 @@ class _MainScreenState extends State<MainScreen> {
     print('logEvent succeeded');
   }
 
+  double countLinks(breakfast, lunch, evening) {
+    double numberOfLinks = 0;
+    if (breakfast.recipe != null && breakfast.recipe != "") {
+      numberOfLinks++;
+    }
+    if (lunch.recipe != null && lunch.recipe != "") {
+      numberOfLinks++;
+    }
+    if (evening.recipe != null && evening.recipe != "") {
+      numberOfLinks++;
+    }
+    print(numberOfLinks);
+    return numberOfLinks;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Screenshot(
@@ -330,19 +347,21 @@ class _MainScreenState extends State<MainScreen> {
                         var breakfastCtrl = TextEditingController(text: breakfast.mealName);
                         var lunchCtrl = TextEditingController(text: lunch.mealName);
                         var dinnerCtrl = TextEditingController(text: evening.mealName);
+                        print(lunch.recipe);
                         showDialog(
                             context: context,
                             builder: (BuildContext context) {
                               return AlertDialog(
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(20.0))),
                                 backgroundColor: Constants.secondaryColor,
-                                scrollable: false,
+                                scrollable: true,
                                 title: Text(
                                   '${formatter.format(weekMap.keys.elementAt(index))} ${weekMap.keys.elementAt(index).day.toString()}.${weekMap.keys.elementAt(index).month.toString()}.${weekMap.keys.elementAt(index).year.toString()}',
                                   textAlign: TextAlign.center,
                                 ),
                                 content: StatefulBuilder(builder: (BuildContext context, StateSetter setState) {
                                   return Container(
-                                    height: 250,
+                                    height: 350 + (20 * (countLinks(breakfast, lunch, evening))),
                                     child: Form(
                                       child: Column(
                                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -359,12 +378,22 @@ class _MainScreenState extends State<MainScreen> {
                                                     breakfastCtrl.clear();
                                                     editBreakfast = null;
                                                   },
-                                                  icon: Icon(Icons.delete_forever),
+                                                  icon: Icon(Icons.delete),
                                                 )),
                                             textAlign: TextAlign.left,
                                             onChanged: (value) {
                                               editBreakfast = value;
                                             },
+                                          ),
+                                          Visibility(
+                                            visible: (breakfast.recipe != "" && breakfast.recipe != null),
+                                            child: ElevatedButton(
+                                              child: Text("Link to recipe").tr(),
+                                              onPressed: () {
+                                                launch("https://" + breakfast.recipe);
+                                              },
+                                              style: recipeButtonStyle,
+                                            ),
                                           ),
                                           TextFormField(
                                             keyboardType: TextInputType.text,
@@ -377,13 +406,23 @@ class _MainScreenState extends State<MainScreen> {
                                                   lunchCtrl.clear();
                                                   editLunch = null;
                                                 },
-                                                icon: Icon(Icons.delete_forever),
+                                                icon: Icon(Icons.delete),
                                               ),
                                             ),
                                             textAlign: TextAlign.left,
                                             onChanged: (value) {
                                               editLunch = value;
                                             },
+                                          ),
+                                          Visibility(
+                                            visible: (lunch.recipe != "" && lunch.recipe != null),
+                                            child: ElevatedButton(
+                                              child: Text("Link to recipe").tr(),
+                                              onPressed: () {
+                                                launch("https://" + lunch.recipe);
+                                              },
+                                              style: recipeButtonStyle,
+                                            ),
                                           ),
                                           TextFormField(
                                             keyboardType: TextInputType.text,
@@ -396,7 +435,7 @@ class _MainScreenState extends State<MainScreen> {
                                                   dinnerCtrl.clear();
                                                   editEvening = null;
                                                 },
-                                                icon: Icon(Icons.delete_forever),
+                                                icon: Icon(Icons.delete),
                                               ),
                                             ),
                                             textAlign: TextAlign.left,
@@ -404,13 +443,23 @@ class _MainScreenState extends State<MainScreen> {
                                               editEvening = value;
                                             },
                                           ),
+                                          Visibility(
+                                            visible: (evening.recipe != "" && evening.recipe != null),
+                                            child: ElevatedButton(
+                                              child: Text("Link to recipe").tr(),
+                                              onPressed: () {
+                                                launch("https://" + evening.recipe);
+                                              },
+                                              style: recipeButtonStyle,
+                                            ),
+                                          ),
                                         ],
                                       ),
                                     ),
                                   );
                                 }),
                                 actions: <Widget>[
-                                  TextButton(
+/*                                  TextButton(
                                     child: Text(
                                       'Cancel'.tr(),
                                     ),
@@ -420,14 +469,37 @@ class _MainScreenState extends State<MainScreen> {
                                         setState(() {});
                                       });
                                     },
+                                  ),*/
+                                  ElevatedButton(
+                                    child: Text(
+                                      "Cancel",
+                                      style: TextStyle(color: Colors.blue),
+                                    ).tr(),
+                                    onPressed: () {
+                                      Navigator.of(context).pop();
+                                      asyncMethod().then((value) {
+                                        setState(() {});
+                                      });
+                                    },
+                                    style: cancelButtonStyle,
                                   ),
-                                  TextButton(
+                                  SizedBox(
+                                    width: 10,
+                                  ),
+/*                                  TextButton(
                                     child: Text(
                                       'Save'.tr(),
                                     ),
                                     onPressed: () {
                                       editDay(breakfast, lunch, evening, weekMap.keys.elementAt(index));
                                     },
+                                  ),*/
+                                  ElevatedButton(
+                                    child: Text("Save").tr(),
+                                    onPressed: () {
+                                      editDay(breakfast, lunch, evening, weekMap.keys.elementAt(index));
+                                    },
+                                    style: saveButtonStyle,
                                   ),
                                 ],
                               );
@@ -553,6 +625,7 @@ class _MainScreenState extends State<MainScreen> {
                 context: context,
                 builder: (BuildContext context) {
                   return AlertDialog(
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(20.0))),
                     backgroundColor: Constants.secondaryColor,
                     scrollable: true,
                     title: Text(
@@ -561,7 +634,7 @@ class _MainScreenState extends State<MainScreen> {
                     ),
                     content: StatefulBuilder(builder: (BuildContext context, StateSetter setState) {
                       return Container(
-                        height: 400,
+                        height: 300,
                         child: Form(
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.start,
@@ -638,15 +711,50 @@ class _MainScreenState extends State<MainScreen> {
                       );
                     }),
                     actions: <Widget>[
-                      FlatButton(
+                      ElevatedButton(
+                        child: Text(
+                          "Cancel",
+                          style: TextStyle(color: Colors.blue),
+                        ).tr(),
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                        },
+                        style: cancelButtonStyle,
+                      ),
+                      /*FlatButton(
                         child: Text(
                           'Cancel'.tr(),
                         ),
                         onPressed: () {
                           Navigator.of(context).pop();
                         },
+                      ),*/
+                      ElevatedButton(
+                        child: Text("Save").tr(),
+                        onPressed: () async {
+                          try {
+                            await _databaseHelper.db.insert(
+                              "meals",
+                              Meal(
+                                mealName: mealName,
+                                date: mealDate,
+                                dayTime: mealTime,
+                              ).toMapWithoutId(),
+                            );
+                            _sendAnalyticsEvent(mealName);
+                            Navigator.of(context).pop();
+                            asyncMethod().then((value) {
+                              setState(() {});
+                            });
+                          } catch (e) {
+                            print("Duplikat");
+                            Navigator.of(context).pop();
+                            ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Duplicate Meal Message").tr()));
+                          }
+                        },
+                        style: saveButtonStyle,
                       ),
-                      FlatButton(
+                      /* FlatButton(
                           child: Text(
                             'Save'.tr(),
                           ),
@@ -670,7 +778,7 @@ class _MainScreenState extends State<MainScreen> {
                               Navigator.of(context).pop();
                               ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Duplicate Meal Message").tr()));
                             }
-                          }),
+                          }),*/
                     ],
                   );
                 });

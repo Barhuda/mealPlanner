@@ -6,12 +6,14 @@
   "Save": "Save",
   "Meal": "Meal",
   "Date": "Date",
-  "Notes": "Notes",
+  "Note": "Note",
   "Duplicate Meal Message": "Meal at this Date and Time already exists.",
   "Idea List \uD83C\uDF7D️": "Idea List \uD83C\uDF7D️",
   "Mealplan": "Mealplan",
   "Edit Meal": "Edit Meal",
-  "Plan Meal": "Plan Meal"
+  "Plan Meal": "Plan Meal",
+  "Link to recipe": "Link to recipe"
+
 
 
 }

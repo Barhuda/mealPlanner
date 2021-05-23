@@ -6,12 +6,14 @@
   "Save": "Speichern",
   "Meal": "Mahlzeit",
   "Date": "Datum",
-  "Notes": "Notiz",
+  "Note": "Notiz",
   "Duplicate Meal Message": "Es wurde bereits eine Mahlzeit mit diesem Datum und Tageszeit gespeichert.",
   "Idea List \uD83C\uDF7D️": "Mahlzeit Ideen \uD83C\uDF7D️",
   "Mealplan": "Essensplan",
   "Edit Meal": "Mahlzeit bearbeiten",
-  "Plan Meal": "Mahlzeit einplanen"
+  "Plan Meal": "Mahlzeit einplanen",
+  "Link to recipe": "Link zum Rezept"
+
 
 
 }

@@ -12,6 +12,7 @@ import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_analytics/observer.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:mealpy/buttons/buttonStyles.dart';
+import 'package:clipboard/clipboard.dart';
 
 class FoodList extends StatefulWidget {
   FoodList({Key key, this.analytics, this.observer}) : super(key: key);
@@ -138,6 +139,17 @@ class _FoodListState extends State<FoodList> {
                                   ),
                                 ),
                               ),
+                              ElevatedButton(
+                                onPressed: () {
+                                  FlutterClipboard.paste().then((value) {
+                                    setState(() {
+                                      textEditingController.text = value;
+                                    });
+                                  });
+                                },
+                                child: Text("Copy from Clipboard").tr(),
+                                style: recipeButtonStyle,
+                              )
                             ],
                           ),
                         ),
@@ -257,7 +269,7 @@ class _FoodListState extends State<FoodList> {
                                     builder: (BuildContext context, StateSetter setState) {
                                       DateTime date = DateTime.now();
                                       return Container(
-                                        height: 225,
+                                        height: 275,
                                         child: Form(
                                           child: Column(
                                             children: [
@@ -302,6 +314,17 @@ class _FoodListState extends State<FoodList> {
                                                     icon: Icon(Icons.open_in_browser),
                                                   ),
                                                 ),
+                                              ),
+                                              ElevatedButton(
+                                                onPressed: () {
+                                                  FlutterClipboard.paste().then((value) {
+                                                    setState(() {
+                                                      textEditingController.text = value;
+                                                    });
+                                                  });
+                                                },
+                                                child: Text("Copy from Clipboard").tr(),
+                                                style: recipeButtonStyle,
                                               ),
                                             ],
                                           ),

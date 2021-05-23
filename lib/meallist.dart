@@ -52,11 +52,8 @@ class Meallist {
         where: "id = ?", whereArgs: [this.id], conflictAlgorithm: ConflictAlgorithm.replace);
   }
 
-  factory Meallist.fromMap(Map<String, dynamic> data) => new Meallist(
-        id: data['id'],
-        mealName: data['meal_name'],
-        note: data['note'],
-      );
+  factory Meallist.fromMap(Map<String, dynamic> data) =>
+      new Meallist(id: data['id'], mealName: data['meal_name'], note: data['note'], recipe: data['recipe']);
 
   Future<List<Meallist>> generateMealList() async {
     final List<Map<String, dynamic>> maps = await _databaseHelper.db.query("meallist");

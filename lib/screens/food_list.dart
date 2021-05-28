@@ -121,7 +121,7 @@ class _FoodListState extends State<FoodList> {
                                 autofocus: false,
                                 controller: textEditingController,
                                 decoration: InputDecoration(
-                                  labelText: ' Link to recipe ',
+                                  labelText: 'Link to recipe'.tr(),
                                   prefixIcon: IconButton(
                                     onPressed: () async {
                                       if (textEditingController.text.toString() == null || textEditingController.text.toString() == "") {

@@ -9,7 +9,7 @@ import 'package:mealpy/meal.dart';
 import 'package:mealpy/injection.dart';
 import 'package:mealpy/database_helper.dart';
 import 'package:mealpy/screens/food_list.dart';
-import 'package:mealpy/day_meals.dart';
+import 'package:mealpy/meallist.dart';
 import 'package:mealpy/constants.dart' as Constants;
 import 'package:sqflite/sqflite.dart';
 import 'package:screenshot/screenshot.dart';
@@ -48,6 +48,7 @@ class _MainScreenState extends State<MainScreen> {
   String editLunch = null;
   String editEvening = null;
   List<Meal> mealList = [];
+  List<Meallist> ideaList = [];
   FocusNode focusNode = FocusNode();
   ScreenshotController screenshotController = ScreenshotController();
   var mealTimeListDropdown = <String>[
@@ -94,6 +95,7 @@ class _MainScreenState extends State<MainScreen> {
 
   Future asyncMethod() async {
     weekMap = await Meal().generateWeekList(currentDate);
+    ideaList = await Meallist().generateMealList();
   }
 
   void addWeek() {
@@ -369,6 +371,7 @@ class _MainScreenState extends State<MainScreen> {
                                         children: <Widget>[
                                           TextFormField(
                                             keyboardType: TextInputType.text,
+                                            textCapitalization: TextCapitalization.sentences,
                                             controller: breakfastCtrl,
                                             decoration: InputDecoration(
                                                 labelText: 'Breakfast'.tr(),
@@ -397,6 +400,7 @@ class _MainScreenState extends State<MainScreen> {
                                           ),
                                           TextFormField(
                                             keyboardType: TextInputType.text,
+                                            textCapitalization: TextCapitalization.sentences,
                                             controller: lunchCtrl,
                                             decoration: InputDecoration(
                                               labelText: 'Lunch'.tr(),
@@ -426,6 +430,7 @@ class _MainScreenState extends State<MainScreen> {
                                           ),
                                           TextFormField(
                                             keyboardType: TextInputType.text,
+                                            textCapitalization: TextCapitalization.sentences,
                                             controller: dinnerCtrl,
                                             decoration: InputDecoration(
                                               labelText: 'Dinner'.tr(),

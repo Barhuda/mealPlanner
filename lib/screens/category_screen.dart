@@ -186,14 +186,69 @@ class _CategoryScreenState extends State<CategoryScreen> {
         },
         child: Icon(Icons.add),
       ),
-      body: ListView.builder(
-          itemCount: categoryList.length,
-          itemBuilder: (context, int index) {
-            Category currentCategory = categoryList[index];
-            return Center(
-              child: Text(currentCategory.categoryName),
-            );
-          }),
+      body: Center(
+        child: Column(
+          children: [
+            Expanded(
+              child: ListView.builder(
+                  itemCount: categoryList.length,
+                  itemBuilder: (context, int index) {
+                    Category currentCategory = categoryList[index];
+                    String valueString = currentCategory.colorValue.split('(0x')[1].split(')')[0]; // kind of hacky..
+                    int value = int.parse(valueString, radix: 16);
+                    Color currentCategoryColor = new Color(value);
+                    return Center(
+                      child: GestureDetector(
+                          child: Card(
+                              color: Colors.white,
+                              margin: EdgeInsets.all(6),
+                              elevation: 6,
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Column(
+                                  children: [
+                                    Stack(
+                                      children: [
+                                        Align(
+                                          alignment: Alignment.centerLeft,
+                                          child: Padding(
+                                            padding: const EdgeInsets.only(left: 10),
+                                            child: Container(
+                                                height: 45,
+                                                width: 45,
+                                                decoration: BoxDecoration(
+                                                    borderRadius: BorderRadius.all(Radius.circular(32.0)), color: currentCategoryColor)),
+                                          ),
+                                        ),
+                                        Align(
+                                          alignment: Alignment.center,
+                                          child: Text(
+                                            currentCategory.categoryName,
+                                            textAlign: TextAlign.center,
+                                            style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+                                          ),
+                                        ),
+                                        Align(
+                                          alignment: Alignment.centerRight,
+                                          child: IconButton(
+                                            icon: Icon(
+                                              Icons.edit,
+                                              color: Colors.black,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              ))),
+                    );
+                  }),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

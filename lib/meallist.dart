@@ -11,14 +11,16 @@ class Meallist {
 
   String note;
   String recipe;
+  int categoryId;
 
-  Meallist({this.id, this.mealName, this.note, this.recipe});
+  Meallist({this.id, this.mealName, this.note, this.recipe, this.categoryId});
 
   Map<String, dynamic> toMapWithoutId() {
     final map = new Map<String, dynamic>();
     map["meal_name"] = mealName;
     map["note"] = note;
     map["recipe"] = recipe;
+    map["category"] = categoryId;
     return map;
   }
 
@@ -28,6 +30,7 @@ class Meallist {
     map["meal_name"] = mealName;
     map["note"] = note;
     map["recipe"] = recipe;
+    map["category"] = categoryId;
     return map;
   }
 
@@ -46,19 +49,20 @@ class Meallist {
     );
   }
 
-  Future<void> updateMealInDB(String newName, String newNote, String newRecipe) async {
-    await _databaseHelper.db.update(
-        "meallist", Meallist(id: this.id, mealName: newName ?? this.mealName, note: newNote ?? "", recipe: newRecipe ?? "").toMap(),
+  Future<void> updateMealInDB(String newName, String newNote, String newRecipe, int newCategory) async {
+    await _databaseHelper.db.update("meallist",
+        Meallist(id: this.id, mealName: newName ?? this.mealName, note: newNote ?? "", recipe: newRecipe ?? "", categoryId: newCategory).toMap(),
         where: "id = ?", whereArgs: [this.id], conflictAlgorithm: ConflictAlgorithm.replace);
   }
 
   factory Meallist.fromMap(Map<String, dynamic> data) =>
-      new Meallist(id: data['id'], mealName: data['meal_name'], note: data['note'], recipe: data['recipe']);
+      new Meallist(id: data['id'], mealName: data['meal_name'], note: data['note'], recipe: data['recipe'], categoryId: data["category"]);
 
   Future<List<Meallist>> generateMealList() async {
     final List<Map<String, dynamic>> maps = await _databaseHelper.db.query("meallist");
     return List.generate(maps.length, (i) {
-      return Meallist(id: maps[i]['id'], mealName: maps[i]['meal_name'], note: maps[i]['note'], recipe: maps[i]['recipe']);
+      return Meallist(
+          id: maps[i]['id'], mealName: maps[i]['meal_name'], note: maps[i]['note'], recipe: maps[i]['recipe'], categoryId: maps[i]["category"]);
     });
   }
 }

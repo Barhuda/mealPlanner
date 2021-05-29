@@ -1,3 +1,4 @@
+import 'package:category_picker/category_picker_item.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:mealpy/category.dart';
@@ -16,6 +17,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:mealpy/buttons/buttonStyles.dart';
 import 'package:clipboard/clipboard.dart';
 import 'package:mealpy/category.dart';
+import 'package:category_picker/category_picker.dart';
 
 class FoodList extends StatefulWidget {
   FoodList({Key key, this.analytics, this.observer}) : super(key: key);
@@ -32,6 +34,7 @@ class _FoodListState extends State<FoodList> {
   DatabaseHelper _databaseHelper = Injection.injector.get();
   List<Meallist> meallist = [];
   List<Category> categoryList = [];
+  List<CategoryPickerItem> categoryPickerItems = [];
   String mealName;
   String mealNote;
   String mealTime = 'Breakfast';
@@ -42,7 +45,12 @@ class _FoodListState extends State<FoodList> {
     'Lunch'.tr(),
     'Dinner'.tr(),
   ];
-  TextEditingController categorieCtrl;
+  var categoryDropDownItems = <DropdownMenuItem>[];
+
+  int selectedCategoryID;
+
+  TextEditingController categoryCtrl = TextEditingController();
+  TextEditingController categoryDropdownCtrl = TextEditingController();
 
   TextEditingController dateCtl = TextEditingController(
       text:
@@ -55,6 +63,8 @@ class _FoodListState extends State<FoodList> {
       setState(() {});
     });
     super.initState();
+    categoryPickerItems = Category().catPickerItems();
+    categoryDropDownItems = Category().createDropdownMenuItems();
   }
 
   Future asyncMethod() async {
@@ -70,6 +80,14 @@ class _FoodListState extends State<FoodList> {
       },
     );
     print('logEvent succeeded');
+  }
+
+  int saveCategoryId() {
+    if (selectedCategoryID == -1 || selectedCategoryID == null) {
+      return null;
+    } else {
+      return selectedCategoryID;
+    }
   }
 
   @override
@@ -102,6 +120,7 @@ class _FoodListState extends State<FoodList> {
             mealNote = null;
             mealDate = DateTime.now().millisecondsSinceEpoch;
             textEditingController.clear();
+            selectedCategoryID = -1;
             showDialog(
                 context: context,
                 builder: (BuildContext context) {
@@ -221,6 +240,13 @@ class _FoodListState extends State<FoodList> {
         body: Center(
           child: Column(
             children: [
+              CategoryPicker(
+                items: categoryPickerItems,
+                defaultSelected: 0,
+                onValueChanged: (value) {
+                  setState(() {});
+                },
+              ),
               Expanded(
                 child: ListView.builder(
                     itemCount: meallist.length,
@@ -234,6 +260,9 @@ class _FoodListState extends State<FoodList> {
                           print(textEditingController.text.toString());
                           var mealNameCtrl = TextEditingController(text: currentMeal.mealName);
                           var mealNoteCtrl = TextEditingController(text: currentMeal.note);
+
+                          print(categoryDropDownItems);
+                          print(categoryDropDownItems.length);
                           showDialog(
                               context: context,
                               builder: (BuildContext context) {
@@ -260,7 +289,7 @@ class _FoodListState extends State<FoodList> {
                                     builder: (BuildContext context, StateSetter setState) {
                                       DateTime date = DateTime.now();
                                       return Container(
-                                        height: 275,
+                                        height: 350,
                                         child: Form(
                                           child: Column(
                                             children: [
@@ -272,6 +301,15 @@ class _FoodListState extends State<FoodList> {
                                                 onChanged: (value) {
                                                   mealName = value;
                                                 },
+                                              ),
+                                              Container(
+                                                child: DropdownButton(
+                                                  items: categoryDropDownItems,
+                                                  onChanged: (newVal) => setState(() => selectedCategoryID = newVal),
+                                                  value: selectedCategoryID,
+                                                  isExpanded: true,
+                                                  hint: Text("Choose category"),
+                                                ),
                                               ),
                                               TextFormField(
                                                 maxLines: 3,
@@ -295,7 +333,7 @@ class _FoodListState extends State<FoodList> {
                                                       if (textEditingController.text.toString() == null ||
                                                           textEditingController.text.toString() == "") {
                                                       } else {
-                                                        if (await canLaunch("https://" + textEditingController.text.toString())) {
+                                                        if (await canLaunch(textEditingController.text.toString())) {
                                                           await launch(textEditingController.text.toString());
                                                         } else {
                                                           throw 'Could not launch ${textEditingController.text.toString()}';
@@ -341,7 +379,7 @@ class _FoodListState extends State<FoodList> {
                                       child: Text("Save").tr(),
                                       onPressed: () {
                                         print(textEditingController.value.toString());
-                                        currentMeal.updateMealInDB(mealName, mealNote, textEditingController.text);
+                                        currentMeal.updateMealInDB(mealName, mealNote, textEditingController.text, saveCategoryId());
                                         Navigator.of(context).pop();
                                         asyncMethod().then((value) {
                                           setState(() {});
@@ -360,6 +398,7 @@ class _FoodListState extends State<FoodList> {
                           child: Padding(
                             padding: const EdgeInsets.all(5.0),
                             child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 Stack(
                                   alignment: Alignment.center,
@@ -517,24 +556,6 @@ class _FoodListState extends State<FoodList> {
                         ),
                       );
                     }),
-              ),
-              Container(
-                height: 75,
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(30, 5, 0, 5),
-                  child: Align(
-                    alignment: AlignmentDirectional.centerStart,
-                    child: ElevatedButton(
-                      child: Text(
-                        "Categories".tr(),
-                      ),
-                      onPressed: () {
-                        print("Kategorien");
-                      },
-                      style: categorieButton,
-                    ),
-                  ),
-                ),
               ),
             ],
           ),

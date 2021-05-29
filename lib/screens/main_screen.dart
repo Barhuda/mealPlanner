@@ -112,7 +112,7 @@ class _MainScreenState extends State<MainScreen> {
 
   Future asyncMethod() async {
     weekMap = await Meal().generateWeekList(currentDate);
-    ideaList = await Meallist().generateMealList();
+    ideaList = await Meallist().generateMealList(0);
   }
 
   void addWeek() {

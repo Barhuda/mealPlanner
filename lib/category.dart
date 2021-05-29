@@ -4,6 +4,7 @@ import 'package:sqflite/sqflite.dart';
 import 'database_helper.dart';
 import 'injection.dart';
 import 'package:category_picker/category_picker_item.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class Category {
   DatabaseHelper _databaseHelper = Injection.injector.get();
@@ -59,10 +60,10 @@ class Category {
 
   List<CategoryPickerItem> catPickerItems() {
     List<CategoryPickerItem> resultWidgets = [];
-    resultWidgets.add(CategoryPickerItem(value: "All", label: "All"));
+    resultWidgets.add(CategoryPickerItem(value: 0, label: "All".tr()));
     generateCategoryList().then((categoryList) {
       for (var category in categoryList) {
-        resultWidgets.add(CategoryPickerItem(value: category, label: category.categoryName));
+        resultWidgets.add(CategoryPickerItem(value: category.id + 1, label: category.categoryName));
       }
     });
 
@@ -73,7 +74,7 @@ class Category {
     List<DropdownMenuItem> resultList = [];
     resultList.add(
       DropdownMenuItem(
-        child: Text("No category"),
+        child: Text("No category").tr(),
         value: -1,
       ),
     );

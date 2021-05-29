@@ -55,11 +55,24 @@ class Meallist {
         where: "id = ?", whereArgs: [this.id], conflictAlgorithm: ConflictAlgorithm.replace);
   }
 
+  Future<void> deleteCategoryId(int categoryId) async {
+    await _databaseHelper.db.rawUpdate('UPDATE meallist SET category = ? WHERE category = ?', [null, '${categoryId}']);
+  }
+
   factory Meallist.fromMap(Map<String, dynamic> data) =>
       new Meallist(id: data['id'], mealName: data['meal_name'], note: data['note'], recipe: data['recipe'], categoryId: data["category"]);
 
-  Future<List<Meallist>> generateMealList() async {
-    final List<Map<String, dynamic>> maps = await _databaseHelper.db.query("meallist");
+  Future<List<Meallist>> generateMealList(int id) async {
+    List<Map<String, dynamic>> maps = [];
+    print(id);
+    if (id == 0) {
+      maps = await _databaseHelper.db.query("meallist");
+    } else {
+      int newID = id - 1;
+      // id-1, weil 0 bereits durch den defaultwert besetzt ist. Mit -1 wird die korrekte Kategorie gewählt.
+      maps = await _databaseHelper.db.query("meallist", where: "category = ?", whereArgs: [newID]);
+    }
+
     return List.generate(maps.length, (i) {
       return Meallist(
           id: maps[i]['id'], mealName: maps[i]['meal_name'], note: maps[i]['note'], recipe: maps[i]['recipe'], categoryId: maps[i]["category"]);

@@ -45,6 +45,9 @@ class _FoodListState extends State<FoodList> {
     'Lunch'.tr(),
     'Dinner'.tr(),
   ];
+
+  int selectedCategoryFilterID;
+
   var categoryDropDownItems = <DropdownMenuItem>[];
 
   int selectedCategoryID;
@@ -59,16 +62,25 @@ class _FoodListState extends State<FoodList> {
 
   @override
   void initState() {
-    asyncMethod().then((value) {
-      setState(() {});
-    });
     super.initState();
     categoryPickerItems = Category().catPickerItems();
     categoryDropDownItems = Category().createDropdownMenuItems();
+    selectedCategoryID = -1;
+    selectedCategoryFilterID = 0;
+    firstLoad().then((value) {
+      setState(() {});
+    });
   }
 
-  Future asyncMethod() async {
-    meallist = await Meallist().generateMealList();
+  Future firstLoad() async {
+    meallist = await Meallist().generateMealList(0);
+    categoryList = await Category().generateCategoryList();
+  }
+
+  Future asyncMethod(int categoryID) async {
+    categoryPickerItems = Category().catPickerItems();
+    categoryDropDownItems = Category().createDropdownMenuItems();
+    meallist = await Meallist().generateMealList(selectedCategoryFilterID);
     categoryList = await Category().generateCategoryList();
   }
 
@@ -102,9 +114,10 @@ class _FoodListState extends State<FoodList> {
               padding: EdgeInsets.only(right: 20),
               child: GestureDetector(
                 onTap: () {
-                  Navigator.of(context).pushNamed(CategoryScreen.id).then((value) => setState(() {
-                        asyncMethod();
-                      }));
+                  Navigator.of(context).pushNamed(CategoryScreen.id).whenComplete(() async {
+                    await asyncMethod(0);
+                    setState(() {});
+                  });
                 },
                 child: Icon(
                   Icons.label,
@@ -146,6 +159,15 @@ class _FoodListState extends State<FoodList> {
                                 onChanged: (value) {
                                   mealName = value;
                                 },
+                              ),
+                              Container(
+                                child: DropdownButton(
+                                  items: categoryDropDownItems,
+                                  onChanged: (newVal) => setState(() => selectedCategoryID = newVal),
+                                  value: selectedCategoryID,
+                                  isExpanded: true,
+                                  hint: Text("Choose category"),
+                                ),
                               ),
                               TextFormField(
                                 textCapitalization: TextCapitalization.sentences,
@@ -214,10 +236,10 @@ class _FoodListState extends State<FoodList> {
                         onPressed: () async {
                           if (mealName != null) {
                             Meallist mealToSave = Meallist(
-                              mealName: mealName,
-                              note: mealNote ?? "",
-                              recipe: textEditingController.text.toString() ?? "",
-                            );
+                                mealName: mealName,
+                                note: mealNote ?? "",
+                                recipe: textEditingController.text.toString() ?? "",
+                                categoryId: saveCategoryId());
                             _sendAnalyticsEvent(mealName);
                             print(textEditingController.text.toString());
                             textEditingController.clear();
@@ -225,7 +247,7 @@ class _FoodListState extends State<FoodList> {
                           }
 
                           Navigator.of(context).pop();
-                          asyncMethod().then((value) {
+                          asyncMethod(selectedCategoryFilterID).then((value) {
                             setState(() {});
                           });
                         },
@@ -244,7 +266,10 @@ class _FoodListState extends State<FoodList> {
                 items: categoryPickerItems,
                 defaultSelected: 0,
                 onValueChanged: (value) {
-                  setState(() {});
+                  selectedCategoryFilterID = value.value;
+                  asyncMethod(selectedCategoryFilterID).then((value) {
+                    setState(() {});
+                  });
                 },
               ),
               Expanded(
@@ -256,13 +281,13 @@ class _FoodListState extends State<FoodList> {
                         onTap: () {
                           mealName = null;
                           mealNote = null;
+                          selectedCategoryID = -1;
                           textEditingController.text = currentMeal.recipe ?? "";
                           print(textEditingController.text.toString());
                           var mealNameCtrl = TextEditingController(text: currentMeal.mealName);
                           var mealNoteCtrl = TextEditingController(text: currentMeal.note);
-
-                          print(categoryDropDownItems);
-                          print(categoryDropDownItems.length);
+                          categoryDropDownItems = Category().createDropdownMenuItems();
+                          selectedCategoryID = currentMeal.categoryId ?? -1;
                           showDialog(
                               context: context,
                               builder: (BuildContext context) {
@@ -279,7 +304,7 @@ class _FoodListState extends State<FoodList> {
                                           onPressed: () {
                                             currentMeal.deleteMealFromDB();
                                             Navigator.of(context).pop();
-                                            asyncMethod().then((value) {
+                                            asyncMethod(selectedCategoryFilterID).then((value) {
                                               setState(() {});
                                             });
                                           })
@@ -369,7 +394,7 @@ class _FoodListState extends State<FoodList> {
                                       ).tr(),
                                       onPressed: () {
                                         Navigator.of(context).pop();
-                                        asyncMethod().then((value) {
+                                        asyncMethod(selectedCategoryFilterID).then((value) {
                                           setState(() {});
                                         });
                                       },
@@ -381,7 +406,7 @@ class _FoodListState extends State<FoodList> {
                                         print(textEditingController.value.toString());
                                         currentMeal.updateMealInDB(mealName, mealNote, textEditingController.text, saveCategoryId());
                                         Navigator.of(context).pop();
-                                        asyncMethod().then((value) {
+                                        asyncMethod(selectedCategoryFilterID).then((value) {
                                           setState(() {});
                                         });
                                       },
@@ -508,7 +533,7 @@ class _FoodListState extends State<FoodList> {
                                                       ).tr(),
                                                       onPressed: () {
                                                         Navigator.of(context).pop();
-                                                        asyncMethod().then((value) {
+                                                        asyncMethod(selectedCategoryFilterID).then((value) {
                                                           setState(() {});
                                                         });
                                                       },
@@ -556,6 +581,9 @@ class _FoodListState extends State<FoodList> {
                         ),
                       );
                     }),
+              ),
+              SizedBox(
+                height: 75,
               ),
             ],
           ),

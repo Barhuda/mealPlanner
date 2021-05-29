@@ -16,7 +16,7 @@ class DatabaseHelper {
     io.Directory documentsDirectory = await getApplicationDocumentsDirectory();
 
     String path = join(documentsDirectory.path, "meal_database.db");
-    _db = await openDatabase(path, version: 5, onCreate: _onCreate, onUpgrade: _onUpgrade);
+    _db = await openDatabase(path, version: 6, onCreate: _onCreate, onUpgrade: _onUpgrade);
   }
 
   Database get db {
@@ -35,6 +35,9 @@ class DatabaseHelper {
         'meal_name TEXT,'
         'note TEXT,'
         'recipe TEXT)');
+    await db.execute('CREATE TABLE category (id INTEGER PRIMARY KEY AUTOINCREMENT,'
+        'category_name TEXT,'
+        'color TEXT)');
   }
 
   void _onUpgrade(Database db, int oldVersion, int newVersion) async {
@@ -46,6 +49,12 @@ class DatabaseHelper {
     if (oldVersion < 5) {
       await db.execute('ALTER TABLE meals ADD recipe TEXT');
       await db.execute('ALTER TABLE meallist ADD recipe TEXT');
+    }
+    if (oldVersion < 6) {
+      await db.execute('CREATE TABLE category (id INTEGER PRIMARY KEY AUTOINCREMENT,'
+          'category_name TEXT,'
+          'color TEXT)');
+      await db.execute('ALTER TABLE meallist ADD COLUMN category INTEGER REFERENCES category(id)');
     }
   }
 }

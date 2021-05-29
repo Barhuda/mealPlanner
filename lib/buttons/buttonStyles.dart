@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:mealpy/constants.dart' as Constants;
 
@@ -15,3 +16,9 @@ final ButtonStyle cancelButtonStyle = ElevatedButton.styleFrom(
       width: 2.0,
       color: Colors.blue,
     ));
+
+final ButtonStyle categorieButton = ElevatedButton.styleFrom(
+  primary: Constants.fourthColor,
+  padding: EdgeInsets.all(20),
+  shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(12))),
+);

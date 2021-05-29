@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:mealpy/screens/category_screen.dart';
 import 'package:mealpy/screens/food_list.dart';
 import 'package:mealpy/screens/main_screen.dart';
 import 'injection.dart';
@@ -41,6 +42,7 @@ class MyApp extends StatelessWidget {
       routes: {
         MainScreen.id: (context) => MainScreen(analytics: analytics, observer: observer),
         FoodList.id: (context) => FoodList(analytics: analytics, observer: observer),
+        CategoryScreen.id: (context) => CategoryScreen(analytics: analytics, observer: observer),
       },
     );
   }

@@ -21,6 +21,7 @@ import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_analytics/observer.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:mealpy/buttons/buttonStyles.dart';
+import 'package:flutter_typeahead/flutter_typeahead.dart';
 
 class MainScreen extends StatefulWidget {
   MainScreen({Key key, this.analytics, this.observer}) : super(key: key);
@@ -47,8 +48,11 @@ class _MainScreenState extends State<MainScreen> {
   String editBreakfast = null;
   String editLunch = null;
   String editEvening = null;
+  String breakfastLink = "";
+  String lunchLink = "";
+  String eveningLink = "";
   List<Meal> mealList = [];
-  List<Meallist> ideaList = [];
+  static List<Meallist> ideaList = [];
   FocusNode focusNode = FocusNode();
   ScreenshotController screenshotController = ScreenshotController();
   var mealTimeListDropdown = <String>[
@@ -80,6 +84,19 @@ class _MainScreenState extends State<MainScreen> {
         _error = true;
       });
     }
+  }
+
+  static List<Map<String, String>> getIdeas(String query) {
+    List<Map<String, String>> resultList = [];
+    if (query != "") {
+      for (var idea in ideaList) {
+        if (idea.mealName.toLowerCase().contains(query.toLowerCase())) {
+          resultList.add({'mealName': idea.mealName, 'recipe': idea.recipe, 'id': idea.id.toString()});
+        }
+      }
+    }
+
+    return resultList;
   }
 
   @override
@@ -144,6 +161,7 @@ class _MainScreenState extends State<MainScreen> {
           mealName: editBreakfast,
           date: breakfast.date,
           dayTime: breakfast.dayTime,
+          recipe: breakfastLink,
         ).toMap(),
         where: "id = ?",
         whereArgs: [breakfast.id],
@@ -156,6 +174,7 @@ class _MainScreenState extends State<MainScreen> {
               mealName: editBreakfast,
               date: date.millisecondsSinceEpoch,
               dayTime: "Breakfast",
+              recipe: breakfastLink,
             ).toMapWithoutId(),
             conflictAlgorithm: ConflictAlgorithm.replace);
         print("neu Breakfast");
@@ -170,6 +189,7 @@ class _MainScreenState extends State<MainScreen> {
             mealName: editLunch,
             date: lunch.date,
             dayTime: lunch.dayTime,
+            recipe: lunchLink,
           ).toMap(),
           where: 'id = ?',
           whereArgs: [lunch.id]);
@@ -181,6 +201,7 @@ class _MainScreenState extends State<MainScreen> {
             mealName: editLunch,
             date: date.millisecondsSinceEpoch,
             dayTime: "Lunch",
+            recipe: lunchLink,
           ).toMapWithoutId(),
           conflictAlgorithm: ConflictAlgorithm.replace,
         );
@@ -196,6 +217,7 @@ class _MainScreenState extends State<MainScreen> {
             mealName: editEvening,
             date: evening.date,
             dayTime: evening.dayTime,
+            recipe: eveningLink,
           ).toMap(),
           where: "id = ?",
           whereArgs: [evening.id]);
@@ -207,6 +229,7 @@ class _MainScreenState extends State<MainScreen> {
               mealName: editEvening,
               date: date.millisecondsSinceEpoch,
               dayTime: "Dinner",
+              recipe: eveningLink,
             ).toMapWithoutId(),
             conflictAlgorithm: ConflictAlgorithm.replace);
         print("neu Dinner");
@@ -349,7 +372,9 @@ class _MainScreenState extends State<MainScreen> {
                         var breakfastCtrl = TextEditingController(text: breakfast.mealName);
                         var lunchCtrl = TextEditingController(text: lunch.mealName);
                         var dinnerCtrl = TextEditingController(text: evening.mealName);
-                        print(lunch.recipe);
+                        breakfastLink = "";
+                        lunchLink = "";
+                        eveningLink = "";
                         showDialog(
                             context: context,
                             builder: (BuildContext context) {
@@ -369,7 +394,47 @@ class _MainScreenState extends State<MainScreen> {
                                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                         crossAxisAlignment: CrossAxisAlignment.center,
                                         children: <Widget>[
-                                          TextFormField(
+                                          TypeAheadField(
+                                            textFieldConfiguration: TextFieldConfiguration(
+                                              keyboardType: TextInputType.text,
+                                              textCapitalization: TextCapitalization.sentences,
+                                              controller: breakfastCtrl,
+                                              decoration: InputDecoration(
+                                                  labelText: 'Breakfast'.tr(),
+                                                  suffixIcon: IconButton(
+                                                    onPressed: () {
+                                                      breakfast.deleteMeal();
+                                                      breakfastCtrl.clear();
+                                                      editBreakfast = null;
+                                                    },
+                                                    icon: Icon(Icons.delete),
+                                                  )),
+                                              textAlign: TextAlign.left,
+                                              onChanged: (value) {
+                                                editBreakfast = value;
+                                              },
+                                            ),
+                                            suggestionsCallback: (pattern) {
+                                              return getIdeas(pattern);
+                                            },
+                                            itemBuilder: (context, idea) {
+                                              return ListTile(
+                                                title: Text(idea["mealName"]),
+                                              );
+                                            },
+                                            hideOnEmpty: true,
+                                            hideOnError: true,
+                                            debounceDuration: Duration(milliseconds: 400),
+                                            onSuggestionSelected: (idea) {
+                                              editBreakfast = idea["mealName"];
+                                              breakfastLink = "";
+                                              breakfastCtrl.text = idea["mealName"];
+                                              if (idea["recipe"] != "" || idea["recipe"] != null) {
+                                                breakfastLink = idea["recipe"];
+                                              }
+                                            },
+                                          ),
+/*                                          TextFormField(
                                             keyboardType: TextInputType.text,
                                             textCapitalization: TextCapitalization.sentences,
                                             controller: breakfastCtrl,
@@ -387,35 +452,55 @@ class _MainScreenState extends State<MainScreen> {
                                             onChanged: (value) {
                                               editBreakfast = value;
                                             },
-                                          ),
+                                          )*/
                                           Visibility(
                                             visible: (breakfast.recipe != "" && breakfast.recipe != null),
                                             child: ElevatedButton(
                                               child: Text("Link to recipe").tr(),
                                               onPressed: () {
-                                                launch("https://" + breakfast.recipe);
+                                                launch(breakfast.recipe);
                                               },
                                               style: recipeButtonStyle,
                                             ),
                                           ),
-                                          TextFormField(
-                                            keyboardType: TextInputType.text,
-                                            textCapitalization: TextCapitalization.sentences,
-                                            controller: lunchCtrl,
-                                            decoration: InputDecoration(
-                                              labelText: 'Lunch'.tr(),
-                                              suffixIcon: IconButton(
-                                                onPressed: () {
-                                                  lunch.deleteMeal();
-                                                  lunchCtrl.clear();
-                                                  editLunch = null;
-                                                },
-                                                icon: Icon(Icons.delete),
-                                              ),
+                                          TypeAheadField(
+                                            textFieldConfiguration: TextFieldConfiguration(
+                                              keyboardType: TextInputType.text,
+                                              textCapitalization: TextCapitalization.sentences,
+                                              controller: lunchCtrl,
+                                              decoration: InputDecoration(
+                                                  labelText: 'Lunch'.tr(),
+                                                  suffixIcon: IconButton(
+                                                    onPressed: () {
+                                                      lunch.deleteMeal();
+                                                      lunchCtrl.clear();
+                                                      editLunch = null;
+                                                    },
+                                                    icon: Icon(Icons.delete),
+                                                  )),
+                                              textAlign: TextAlign.left,
+                                              onChanged: (value) {
+                                                editLunch = value;
+                                              },
                                             ),
-                                            textAlign: TextAlign.left,
-                                            onChanged: (value) {
-                                              editLunch = value;
+                                            suggestionsCallback: (pattern) {
+                                              return getIdeas(pattern);
+                                            },
+                                            hideOnEmpty: true,
+                                            hideOnError: true,
+                                            debounceDuration: Duration(milliseconds: 400),
+                                            itemBuilder: (context, idea) {
+                                              return ListTile(
+                                                title: Text(idea["mealName"]),
+                                              );
+                                            },
+                                            onSuggestionSelected: (idea) {
+                                              editLunch = idea["mealName"];
+                                              lunchLink = "";
+                                              lunchCtrl.text = idea["mealName"];
+                                              if (idea["recipe"] != "" || idea["recipe"] != null) {
+                                                lunchLink = idea["recipe"];
+                                              }
                                             },
                                           ),
                                           Visibility(
@@ -423,29 +508,49 @@ class _MainScreenState extends State<MainScreen> {
                                             child: ElevatedButton(
                                               child: Text("Link to recipe").tr(),
                                               onPressed: () {
-                                                launch("https://" + lunch.recipe);
+                                                launch(lunch.recipe);
                                               },
                                               style: recipeButtonStyle,
                                             ),
                                           ),
-                                          TextFormField(
-                                            keyboardType: TextInputType.text,
-                                            textCapitalization: TextCapitalization.sentences,
-                                            controller: dinnerCtrl,
-                                            decoration: InputDecoration(
-                                              labelText: 'Dinner'.tr(),
-                                              suffixIcon: IconButton(
-                                                onPressed: () {
-                                                  evening.deleteMeal();
-                                                  dinnerCtrl.clear();
-                                                  editEvening = null;
-                                                },
-                                                icon: Icon(Icons.delete),
-                                              ),
+                                          TypeAheadField(
+                                            textFieldConfiguration: TextFieldConfiguration(
+                                              keyboardType: TextInputType.text,
+                                              textCapitalization: TextCapitalization.sentences,
+                                              controller: dinnerCtrl,
+                                              decoration: InputDecoration(
+                                                  labelText: 'Dinner'.tr(),
+                                                  suffixIcon: IconButton(
+                                                    onPressed: () {
+                                                      evening.deleteMeal();
+                                                      dinnerCtrl.clear();
+                                                      editEvening = null;
+                                                    },
+                                                    icon: Icon(Icons.delete),
+                                                  )),
+                                              textAlign: TextAlign.left,
+                                              onChanged: (value) {
+                                                editEvening = value;
+                                              },
                                             ),
-                                            textAlign: TextAlign.left,
-                                            onChanged: (value) {
-                                              editEvening = value;
+                                            suggestionsCallback: (pattern) {
+                                              return getIdeas(pattern);
+                                            },
+                                            itemBuilder: (context, idea) {
+                                              return ListTile(
+                                                title: Text(idea["mealName"]),
+                                              );
+                                            },
+                                            hideOnEmpty: true,
+                                            hideOnError: true,
+                                            debounceDuration: Duration(milliseconds: 400),
+                                            onSuggestionSelected: (idea) {
+                                              editEvening = idea["mealName"];
+                                              eveningLink = "";
+                                              dinnerCtrl.text = idea["mealName"];
+                                              if (idea["recipe"] != "" || idea["recipe"] != null) {
+                                                eveningLink = idea["recipe"];
+                                              }
                                             },
                                           ),
                                           Visibility(
@@ -453,7 +558,7 @@ class _MainScreenState extends State<MainScreen> {
                                             child: ElevatedButton(
                                               child: Text("Link to recipe").tr(),
                                               onPressed: () {
-                                                launch("https://" + evening.recipe);
+                                                launch(evening.recipe);
                                               },
                                               style: recipeButtonStyle,
                                             ),
@@ -464,17 +569,6 @@ class _MainScreenState extends State<MainScreen> {
                                   );
                                 }),
                                 actions: <Widget>[
-/*                                  TextButton(
-                                    child: Text(
-                                      'Cancel'.tr(),
-                                    ),
-                                    onPressed: () {
-                                      Navigator.of(context).pop();
-                                      asyncMethod().then((value) {
-                                        setState(() {});
-                                      });
-                                    },
-                                  ),*/
                                   ElevatedButton(
                                     child: Text(
                                       "Cancel",
@@ -491,14 +585,6 @@ class _MainScreenState extends State<MainScreen> {
                                   SizedBox(
                                     width: 10,
                                   ),
-/*                                  TextButton(
-                                    child: Text(
-                                      'Save'.tr(),
-                                    ),
-                                    onPressed: () {
-                                      editDay(breakfast, lunch, evening, weekMap.keys.elementAt(index));
-                                    },
-                                  ),*/
                                   ElevatedButton(
                                     child: Text("Save").tr(),
                                     onPressed: () {
@@ -629,6 +715,8 @@ class _MainScreenState extends State<MainScreen> {
             showDialog(
                 context: context,
                 builder: (BuildContext context) {
+                  var mealCtrl = TextEditingController();
+                  var link = "";
                   return AlertDialog(
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(20.0))),
                     backgroundColor: Constants.secondaryColor,
@@ -645,12 +733,31 @@ class _MainScreenState extends State<MainScreen> {
                             mainAxisAlignment: MainAxisAlignment.start,
                             crossAxisAlignment: CrossAxisAlignment.center,
                             children: <Widget>[
-                              TextFormField(
-                                textCapitalization: TextCapitalization.sentences,
-                                decoration: InputDecoration(labelText: 'Meal'.tr()),
-                                textAlign: TextAlign.left,
-                                onChanged: (value) {
-                                  mealName = value;
+                              TypeAheadField(
+                                textFieldConfiguration: TextFieldConfiguration(
+                                  controller: mealCtrl,
+                                  textCapitalization: TextCapitalization.sentences,
+                                  decoration: InputDecoration(labelText: 'Meal'.tr()),
+                                  textAlign: TextAlign.left,
+                                  autofocus: false,
+                                ),
+                                hideOnEmpty: true,
+                                hideOnError: true,
+                                debounceDuration: Duration(milliseconds: 400),
+                                suggestionsCallback: (pattern) {
+                                  return getIdeas(pattern);
+                                },
+                                itemBuilder: (context, idea) {
+                                  return ListTile(
+                                    title: Text(idea["mealName"]),
+                                  );
+                                },
+                                onSuggestionSelected: (idea) {
+                                  link = "";
+                                  mealCtrl.text = idea["mealName"];
+                                  if (idea["recipe"] != "" || idea["recipe"] != null) {
+                                    link = idea["recipe"];
+                                  }
                                 },
                               ),
                               TextFormField(
@@ -703,13 +810,6 @@ class _MainScreenState extends State<MainScreen> {
                                   ).toList(),
                                 ),
                               ),
-                              TextFormField(
-                                textCapitalization: TextCapitalization.sentences,
-                                keyboardType: TextInputType.multiline,
-                                minLines: 2,
-                                maxLines: 5,
-                                decoration: InputDecoration(labelText: 'Notes'.tr()),
-                              ),
                             ],
                           ),
                         ),
@@ -726,14 +826,6 @@ class _MainScreenState extends State<MainScreen> {
                         },
                         style: cancelButtonStyle,
                       ),
-                      /*FlatButton(
-                        child: Text(
-                          'Cancel'.tr(),
-                        ),
-                        onPressed: () {
-                          Navigator.of(context).pop();
-                        },
-                      ),*/
                       ElevatedButton(
                         child: Text("Save").tr(),
                         onPressed: () async {
@@ -741,12 +833,13 @@ class _MainScreenState extends State<MainScreen> {
                             await _databaseHelper.db.insert(
                               "meals",
                               Meal(
-                                mealName: mealName,
+                                mealName: mealCtrl.text.toString(),
                                 date: mealDate,
                                 dayTime: mealTime,
+                                recipe: link,
                               ).toMapWithoutId(),
                             );
-                            _sendAnalyticsEvent(mealName);
+                            _sendAnalyticsEvent(mealCtrl.text.toString());
                             Navigator.of(context).pop();
                             asyncMethod().then((value) {
                               setState(() {});
@@ -759,31 +852,6 @@ class _MainScreenState extends State<MainScreen> {
                         },
                         style: saveButtonStyle,
                       ),
-                      /* FlatButton(
-                          child: Text(
-                            'Save'.tr(),
-                          ),
-                          onPressed: () async {
-                            try {
-                              await _databaseHelper.db.insert(
-                                "meals",
-                                Meal(
-                                  mealName: mealName,
-                                  date: mealDate,
-                                  dayTime: mealTime,
-                                ).toMapWithoutId(),
-                              );
-                              _sendAnalyticsEvent(mealName);
-                              Navigator.of(context).pop();
-                              asyncMethod().then((value) {
-                                setState(() {});
-                              });
-                            } catch (e) {
-                              print("Duplikat");
-                              Navigator.of(context).pop();
-                              ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Duplicate Meal Message").tr()));
-                            }
-                          }),*/
                     ],
                   );
                 });

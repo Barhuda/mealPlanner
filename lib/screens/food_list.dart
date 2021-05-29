@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:mealpy/category.dart';
 import 'package:mealpy/meallist.dart';
 import 'package:mealpy/constants.dart' as Constants;
 import 'package:mealpy/database_helper.dart';
@@ -10,9 +11,11 @@ import 'package:intl/intl.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_analytics/observer.dart';
+import 'package:mealpy/screens/category_screen.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:mealpy/buttons/buttonStyles.dart';
 import 'package:clipboard/clipboard.dart';
+import 'package:mealpy/category.dart';
 
 class FoodList extends StatefulWidget {
   FoodList({Key key, this.analytics, this.observer}) : super(key: key);
@@ -28,6 +31,7 @@ class FoodList extends StatefulWidget {
 class _FoodListState extends State<FoodList> {
   DatabaseHelper _databaseHelper = Injection.injector.get();
   List<Meallist> meallist = [];
+  List<Category> categoryList = [];
   String mealName;
   String mealNote;
   String mealTime = 'Breakfast';
@@ -38,6 +42,7 @@ class _FoodListState extends State<FoodList> {
     'Lunch'.tr(),
     'Dinner'.tr(),
   ];
+  TextEditingController categorieCtrl;
 
   TextEditingController dateCtl = TextEditingController(
       text:
@@ -54,6 +59,7 @@ class _FoodListState extends State<FoodList> {
 
   Future asyncMethod() async {
     meallist = await Meallist().generateMealList();
+    categoryList = await Category().generateCategoryList();
   }
 
   Future<void> _sendAnalyticsEvent(ideaName) async {
@@ -73,6 +79,22 @@ class _FoodListState extends State<FoodList> {
           backgroundColor: Constants.mainColor,
           centerTitle: true,
           title: Text('Idea List 🍽️'.tr()),
+          actions: [
+            Padding(
+              padding: EdgeInsets.only(right: 20),
+              child: GestureDetector(
+                onTap: () {
+                  Navigator.of(context).pushNamed(CategoryScreen.id).then((value) => setState(() {
+                        asyncMethod();
+                      }));
+                },
+                child: Icon(
+                  Icons.label,
+                  size: 30,
+                ),
+              ),
+            ),
+          ],
         ),
         floatingActionButton: FloatingActionButton(
           onPressed: () {
@@ -166,14 +188,6 @@ class _FoodListState extends State<FoodList> {
                         },
                         style: cancelButtonStyle,
                       ),
-/*                      TextButton(
-                        child: Text(
-                          'Cancel'.tr(),
-                        ),
-                        onPressed: () {
-                          Navigator.of(context).pop();
-                        },
-                      ),*/
                       ElevatedButton(
                         child: Text(
                           "Save",
@@ -198,29 +212,6 @@ class _FoodListState extends State<FoodList> {
                         },
                         style: saveButtonStyle,
                       ),
-                      /*TextButton(
-                        child: Text(
-                          'Save'.tr(),
-                        ),
-                        onPressed: () async {
-                          if (mealName != null) {
-                            Meallist mealToSave = Meallist(
-                              mealName: mealName,
-                              note: mealNote ?? "",
-                              recipe: textEditingController.text.toString() ?? "",
-                            );
-                            _sendAnalyticsEvent(mealName);
-                            print(textEditingController.text.toString());
-                            textEditingController.clear();
-                            mealToSave.saveMealtoDB();
-                          }
-
-                          Navigator.of(context).pop();
-                          asyncMethod().then((value) {
-                            setState(() {});
-                          });
-                        },
-                      ),*/
                     ],
                   );
                 });
@@ -305,7 +296,7 @@ class _FoodListState extends State<FoodList> {
                                                           textEditingController.text.toString() == "") {
                                                       } else {
                                                         if (await canLaunch("https://" + textEditingController.text.toString())) {
-                                                          await launch("https://" + textEditingController.text.toString());
+                                                          await launch(textEditingController.text.toString());
                                                         } else {
                                                           throw 'Could not launch ${textEditingController.text.toString()}';
                                                         }
@@ -346,17 +337,6 @@ class _FoodListState extends State<FoodList> {
                                       },
                                       style: cancelButtonStyle,
                                     ),
-                                    /*                                   TextButton(
-                                      child: Text(
-                                        'Cancel'.tr(),
-                                      ),
-                                      onPressed: () {
-                                        Navigator.of(context).pop();
-                                        asyncMethod().then((value) {
-                                          setState(() {});
-                                        });
-                                      },
-                                    ),*/
                                     ElevatedButton(
                                       child: Text("Save").tr(),
                                       onPressed: () {
@@ -369,19 +349,6 @@ class _FoodListState extends State<FoodList> {
                                       },
                                       style: saveButtonStyle,
                                     ),
-/*                                    TextButton(
-                                      child: Text(
-                                        'Save'.tr(),
-                                      ),
-                                      onPressed: () {
-                                        print(textEditingController.value.toString());
-                                        currentMeal.updateMealInDB(mealName, mealNote, textEditingController.text);
-                                        Navigator.of(context).pop();
-                                        asyncMethod().then((value) {
-                                          setState(() {});
-                                        });
-                                      },
-                                    ),*/
                                   ],
                                 );
                               });
@@ -508,17 +475,6 @@ class _FoodListState extends State<FoodList> {
                                                       },
                                                       style: cancelButtonStyle,
                                                     ),
-/*                                                    TextButton(
-                                                      child: Text(
-                                                        'Cancel'.tr(),
-                                                      ),
-                                                      onPressed: () {
-                                                        Navigator.of(context).pop();
-                                                        asyncMethod().then((value) {
-                                                          setState(() {});
-                                                        });
-                                                      },
-                                                    ),*/
                                                     ElevatedButton(
                                                       child: Text(
                                                         "Save",
@@ -543,29 +499,6 @@ class _FoodListState extends State<FoodList> {
                                                       },
                                                       style: saveButtonStyle,
                                                     ),
-/*                                                    TextButton(
-                                                      child: Text(
-                                                        'Save'.tr(),
-                                                      ),
-                                                      onPressed: () async {
-                                                        try {
-                                                          await _databaseHelper.db.insert(
-                                                            "meals",
-                                                            Meal(
-                                                                    mealName: mealName ?? currentMeal.mealName,
-                                                                    date: mealDate,
-                                                                    dayTime: mealTime,
-                                                                    recipe: currentMeal.recipe)
-                                                                .toMapWithoutId(),
-                                                          );
-                                                          Navigator.of(context).pop();
-                                                        } catch (e) {
-                                                          Navigator.of(context).pop();
-                                                          ScaffoldMessenger.of(context)
-                                                              .showSnackBar(SnackBar(content: Text("Duplicate Meal Message").tr()));
-                                                        }
-                                                      },
-                                                    ),*/
                                                   ],
                                                 );
                                               });
@@ -585,8 +518,23 @@ class _FoodListState extends State<FoodList> {
                       );
                     }),
               ),
-              SizedBox(
+              Container(
                 height: 75,
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(30, 5, 0, 5),
+                  child: Align(
+                    alignment: AlignmentDirectional.centerStart,
+                    child: ElevatedButton(
+                      child: Text(
+                        "Categories".tr(),
+                      ),
+                      onPressed: () {
+                        print("Kategorien");
+                      },
+                      style: categorieButton,
+                    ),
+                  ),
+                ),
               ),
             ],
           ),

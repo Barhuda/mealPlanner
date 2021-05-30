@@ -111,12 +111,15 @@ class _FoodListState extends State<FoodList> {
           title: Text('Idea List 🍽️'.tr()),
           actions: [
             Padding(
-              padding: EdgeInsets.only(right: 20),
+              padding: EdgeInsets.only(right: 30),
               child: GestureDetector(
                 onTap: () {
-                  Navigator.of(context).pushNamed(CategoryScreen.id).whenComplete(() async {
-                    await asyncMethod(0);
-                    setState(() {});
+                  Navigator.of(context).pushNamed(CategoryScreen.id).whenComplete(() {
+                    asyncMethod(0).then((value) {
+                      setState(() {});
+                      selectedCategoryID = -1;
+                      print(categoryDropDownItems.length);
+                    });
                   });
                 },
                 child: Icon(
@@ -241,7 +244,7 @@ class _FoodListState extends State<FoodList> {
                                 recipe: textEditingController.text.toString() ?? "",
                                 categoryId: saveCategoryId());
                             _sendAnalyticsEvent(mealName);
-                            print(textEditingController.text.toString());
+
                             textEditingController.clear();
                             mealToSave.saveMealtoDB();
                           }
@@ -265,6 +268,7 @@ class _FoodListState extends State<FoodList> {
               CategoryPicker(
                 items: categoryPickerItems,
                 defaultSelected: 0,
+                selectedItemColor: Constants.fourthColor,
                 onValueChanged: (value) {
                   selectedCategoryFilterID = value.value;
                   asyncMethod(selectedCategoryFilterID).then((value) {
@@ -283,7 +287,6 @@ class _FoodListState extends State<FoodList> {
                           mealNote = null;
                           selectedCategoryID = -1;
                           textEditingController.text = currentMeal.recipe ?? "";
-                          print(textEditingController.text.toString());
                           var mealNameCtrl = TextEditingController(text: currentMeal.mealName);
                           var mealNoteCtrl = TextEditingController(text: currentMeal.note);
                           categoryDropDownItems = Category().createDropdownMenuItems();
@@ -403,7 +406,6 @@ class _FoodListState extends State<FoodList> {
                                     ElevatedButton(
                                       child: Text("Save").tr(),
                                       onPressed: () {
-                                        print(textEditingController.value.toString());
                                         currentMeal.updateMealInDB(mealName, mealNote, textEditingController.text, saveCategoryId());
                                         Navigator.of(context).pop();
                                         asyncMethod(selectedCategoryFilterID).then((value) {

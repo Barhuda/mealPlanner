@@ -13,6 +13,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_analytics/observer.dart';
 import 'package:mealpy/screens/category_screen.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:mealpy/buttons/buttonStyles.dart';
 import 'package:clipboard/clipboard.dart';
@@ -45,6 +46,8 @@ class _FoodListState extends State<FoodList> {
     'Lunch'.tr(),
     'Dinner'.tr(),
   ];
+  SharedPreferences prefs;
+  bool sortAlphabetical = false;
 
   int selectedCategoryFilterID;
 
@@ -74,6 +77,11 @@ class _FoodListState extends State<FoodList> {
 
   Future firstLoad() async {
     meallist = await Meallist().generateMealList(0);
+    prefs = await SharedPreferences.getInstance();
+    sortAlphabetical = prefs.getBool('sort') ?? false;
+    if (sortAlphabetical) {
+      meallist.sort((a, b) => a.mealName.toLowerCase().compareTo(b.mealName.toLowerCase()));
+    }
     categoryList = await Category().generateCategoryList();
   }
 
@@ -81,6 +89,9 @@ class _FoodListState extends State<FoodList> {
     categoryPickerItems = Category().catPickerItems();
     categoryDropDownItems = Category().createDropdownMenuItems();
     meallist = await Meallist().generateMealList(selectedCategoryFilterID);
+    if (sortAlphabetical) {
+      meallist.sort((a, b) => a.mealName.toLowerCase().compareTo(b.mealName.toLowerCase()));
+    }
     categoryList = await Category().generateCategoryList();
   }
 

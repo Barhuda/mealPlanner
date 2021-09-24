@@ -23,6 +23,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   int selectedWeekDayAsFirstDay;
   var days;
   bool _isLoading = true;
+  bool sortAlphabetical = false;
   List<DropdownMenuItem<int>> dropDownList = [];
 
   int selectedValue = 0;
@@ -38,6 +39,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   _getSharedPrefs() async {
     prefs = await SharedPreferences.getInstance();
     selectedWeekDayAsFirstDay = prefs.getInt('selectedWeekDay') ?? 0;
+    sortAlphabetical = prefs.getBool('sort') ?? false;
     setState(() {
       selectedValue = selectedWeekDayAsFirstDay;
     });
@@ -78,6 +80,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       body: Padding(
         padding: const EdgeInsets.all(32.0),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text("Set your first Day of the week").tr(),
             _isLoading
@@ -95,6 +98,18 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       },
                     ),
                   ),
+            SizedBox(
+              height: 30,
+            ),
+            Text("Sort Lists in alphabetical order").tr(),
+            Switch(
+                value: sortAlphabetical,
+                onChanged: (value) {
+                  prefs.setBool('sort', value);
+                  setState(() {
+                    sortAlphabetical = value;
+                  });
+                })
           ],
         ),
       ),

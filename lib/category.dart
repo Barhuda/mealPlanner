@@ -5,6 +5,7 @@ import 'database_helper.dart';
 import 'injection.dart';
 import 'package:category_picker/category_picker_item.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Category {
   DatabaseHelper _databaseHelper = Injection.injector.get();
@@ -52,7 +53,9 @@ class Category {
   }
 
   Future<List<Category>> generateCategoryList() async {
-    final List<Map<String, dynamic>> maps = await _databaseHelper.db.query("category");
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    bool sortAlphabetical = prefs.getBool('sort') ?? false;
+    final List<Map<String, dynamic>> maps = await _databaseHelper.db.query("category", orderBy: sortAlphabetical ? "category_name ASC" : null);
     return List.generate(maps.length, (i) {
       return Category(id: maps[i]['id'], categoryName: maps[i]['category_name'], colorValue: maps[i]['color']);
     });

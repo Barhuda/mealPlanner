@@ -10,6 +10,7 @@ import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:mealpy/database_helper.dart';
 import 'package:mealpy/injection.dart';
 import 'package:mealpy/meallist.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class CategoryScreen extends StatefulWidget {
   CategoryScreen({Key key, this.analytics, this.observer}) : super(key: key);
@@ -28,6 +29,8 @@ class _CategoryScreenState extends State<CategoryScreen> {
   List<Category> categoryList = [];
   Color currentColor = Colors.blue;
   void changeColor(Color color) => setState(() => currentColor = color);
+  SharedPreferences prefs;
+  bool sortAlphabetical = false;
 
   TextEditingController categoryTxtCtrl = TextEditingController();
 
@@ -40,11 +43,21 @@ class _CategoryScreenState extends State<CategoryScreen> {
     updateList().then((value) {
       setState(() {});
     });
+    _getSharedPrefs();
     super.initState();
   }
 
   Future updateList() async {
     categoryList = await Category().generateCategoryList();
+    prefs = await SharedPreferences.getInstance();
+    sortAlphabetical = prefs.getBool('sort') ?? false;
+    if (sortAlphabetical) {
+      categoryList.sort((a, b) => a.categoryName.toLowerCase().compareTo(b.categoryName.toLowerCase()));
+    }
+  }
+
+  _getSharedPrefs() async {
+    prefs = await SharedPreferences.getInstance();
   }
 
   @override

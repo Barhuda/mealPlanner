@@ -19,7 +19,13 @@
   "Category Name": "Kategorie",
   "Please add a name": "Name muss gefüllt sein",
   "All": "Alle",
-  "No category": "Keine Kategorie"
+  "No category": "Keine Kategorie",
+  "First Day in Plan is current Day": "Erster Tag im Plan ist der aktuelle Tag",
+  "Always Current Day": "Immer der aktuelle Tag",
+  "Set your first Day of the week": "Wähle den ersten Tag der Woche für den Plan",
+  "Settings": "Einstellungen",
+  "Do you really want to delete this meal?": "Soll diese Mahlzeit an diesem Tag wirklich gelöscht werden?",
+  "Delete": "Löschen"
 
 
 

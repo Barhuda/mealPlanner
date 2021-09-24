@@ -9,6 +9,7 @@ import 'package:mealpy/meal.dart';
 import 'package:mealpy/injection.dart';
 import 'package:mealpy/database_helper.dart';
 import 'package:mealpy/screens/food_list.dart';
+import 'settings_screen.dart';
 import 'package:mealpy/meallist.dart';
 import 'package:mealpy/constants.dart' as Constants;
 import 'package:sqflite/sqflite.dart';
@@ -22,6 +23,8 @@ import 'package:firebase_analytics/observer.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:mealpy/buttons/buttonStyles.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:get/get.dart' hide Trans;
 
 class MainScreen extends StatefulWidget {
   MainScreen({Key key, this.analytics, this.observer}) : super(key: key);
@@ -61,6 +64,9 @@ class _MainScreenState extends State<MainScreen> {
     'Dinner'.tr(),
   ];
   String selectedLocalMealTime;
+
+  SharedPreferences prefs;
+  int selectedWeekDayAsFirstDay;
 
   Map<DateTime, Map<String, Meal>> weekMap = {};
   Meal defaultMeal = Meal(mealName: "-", date: DateTime.utc(2000, 1, 1).millisecondsSinceEpoch, dayTime: "Breakfast");
@@ -104,15 +110,36 @@ class _MainScreenState extends State<MainScreen> {
     super.initState();
     initializeFlutterFire();
     currentDate = DateTime.now();
+    _handleFirstDayOfWeek();
     DatabaseHelper _databaseHelper = Injection.injector.get();
+  }
+
+  _handleFirstDayOfWeek() async {
+    await _getSharedPrefs();
+    selectedWeekDayAsFirstDay = prefs.getInt('selectedWeekDay') ?? 0;
+    if (selectedWeekDayAsFirstDay == 0) {
+      currentDate = DateTime.now();
+    } else {
+      DateTime thisDateIs = DateTime.now();
+      currentDate = thisDateIs.subtract(Duration(days: (thisDateIs.weekday - selectedWeekDayAsFirstDay) % 7));
+    }
     asyncMethod().then((value) {
-      setState(() {});
+      setState(() {
+        print('fired');
+      });
     });
   }
 
+  _getSharedPrefs() async {
+    prefs = await SharedPreferences.getInstance();
+    selectedWeekDayAsFirstDay = prefs.getInt('selectedWeekDay');
+  }
+
   Future asyncMethod() async {
+    print(currentDate);
     weekMap = await Meal().generateWeekList(currentDate);
     ideaList = await Meallist().generateMealList(0);
+    setState(() {});
   }
 
   void addWeek() {
@@ -132,7 +159,8 @@ class _MainScreenState extends State<MainScreen> {
   }
 
   void backToCurrentDate() {
-    currentDate = DateTime.now();
+    DateTime thisDateIs = DateTime.now();
+    currentDate = thisDateIs.subtract(Duration(days: thisDateIs.weekday - selectedWeekDayAsFirstDay));
     datePeriod = currentDate.add(Duration(days: 6));
     asyncMethod().then((value) {
       setState(() {});
@@ -270,6 +298,23 @@ class _MainScreenState extends State<MainScreen> {
     return numberOfLinks;
   }
 
+  _showDeleteDialog(Meal mealToDelete, TextEditingController textCtrl) {
+    Get.defaultDialog(
+        title: "Delete Meal",
+        middleText: "Do you really want to delete this meal?".tr(),
+        textCancel: "Cancel".tr(),
+        textConfirm: "Delete".tr(),
+        confirmTextColor: Colors.red,
+        cancelTextColor: Colors.black,
+        buttonColor: Colors.white,
+        onConfirm: () {
+          mealToDelete.deleteMeal();
+          textCtrl.clear();
+          editBreakfast = null;
+          Get.back();
+        });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Screenshot(
@@ -312,11 +357,14 @@ class _MainScreenState extends State<MainScreen> {
               padding: EdgeInsets.only(right: 10),
               child: GestureDetector(
                 onTap: () async {
-                  Navigator.of(context).pushNamed(FoodList.id).then((value) => setState(() {
-                        asyncMethod();
+                  Navigator.of(context).pushNamed(SettingsScreen.id).then((value) => setState(() {
+                        _handleFirstDayOfWeek();
                       }));
                 },
-                child: Icon(Icons.list),
+                child: Icon(
+                  Icons.settings,
+                  size: 32,
+                ),
               ),
             ),
           ],
@@ -403,9 +451,7 @@ class _MainScreenState extends State<MainScreen> {
                                                   labelText: 'Breakfast'.tr(),
                                                   suffixIcon: IconButton(
                                                     onPressed: () {
-                                                      breakfast.deleteMeal();
-                                                      breakfastCtrl.clear();
-                                                      editBreakfast = null;
+                                                      _showDeleteDialog(breakfast, breakfastCtrl);
                                                     },
                                                     icon: Icon(Icons.delete),
                                                   )),
@@ -700,163 +746,180 @@ class _MainScreenState extends State<MainScreen> {
                   },
                 ),
               ),
-              SizedBox(
-                height: 75,
+              FractionallySizedBox(
+                widthFactor: 0.9,
+                child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(primary: Constants.mainColor),
+                    onPressed: () async {
+                      Navigator.of(context).pushNamed(FoodList.id).then((value) => setState(() {
+                            asyncMethod();
+                          }));
+                    },
+                    child: Padding(
+                      padding: const EdgeInsets.all(12.0),
+                      child: Text(
+                        "Idea List \uD83C\uDF7D️",
+                        style: TextStyle(fontSize: 18),
+                      ).tr(),
+                    )),
               ),
             ],
           ),
         ),
-        floatingActionButton: FloatingActionButton(
-          onPressed: () {
-            DateTime date = DateTime.now();
-            selectedLocalMealTime = mealTimeListDropdown[0];
-            mealTime = "Breakfast";
-            mealDate = DateTime(date.year, date.month, date.day).millisecondsSinceEpoch;
-            showDialog(
-                context: context,
-                builder: (BuildContext context) {
-                  var mealCtrl = TextEditingController();
-                  var link = "";
-                  return AlertDialog(
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(20.0))),
-                    backgroundColor: Constants.secondaryColor,
-                    scrollable: true,
-                    title: Text(
-                      'Mealplan',
-                      textAlign: TextAlign.center,
-                    ),
-                    content: StatefulBuilder(builder: (BuildContext context, StateSetter setState) {
-                      return Container(
-                        height: 300,
-                        child: Form(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: <Widget>[
-                              TypeAheadField(
-                                textFieldConfiguration: TextFieldConfiguration(
-                                  controller: mealCtrl,
-                                  textCapitalization: TextCapitalization.sentences,
-                                  decoration: InputDecoration(labelText: 'Meal'.tr()),
-                                  textAlign: TextAlign.left,
-                                  autofocus: false,
-                                ),
-                                hideOnEmpty: true,
-                                hideOnError: true,
-                                debounceDuration: Duration(milliseconds: 400),
-                                suggestionsCallback: (pattern) {
-                                  return getIdeas(pattern);
-                                },
-                                itemBuilder: (context, idea) {
-                                  return ListTile(
-                                    title: Text(idea["mealName"]),
-                                  );
-                                },
-                                onSuggestionSelected: (idea) {
-                                  link = "";
-                                  mealCtrl.text = idea["mealName"];
-                                  if (idea["recipe"] != "" || idea["recipe"] != null) {
-                                    link = idea["recipe"];
-                                  }
-                                },
-                              ),
-                              TextFormField(
-                                readOnly: true,
-                                decoration: InputDecoration(labelText: 'Date'.tr()),
-                                controller: dateCtl,
-                                onTap: () async {
-                                  FocusScope.of(context).requestFocus(FocusNode());
-
-                                  date = await showDatePicker(
-                                      context: context, initialDate: DateTime.now(), firstDate: DateTime(1900), lastDate: DateTime(2100));
-
-                                  dateCtl.text =
-                                      '${DateFormat('EE').format(date)} ${date.day.toString()}.${date.month.toString()}.${date.year.toString()}';
-                                  mealDate = DateTime(date.year, date.month, date.day).millisecondsSinceEpoch;
-                                },
-                              ),
-                              SizedBox(
-                                height: 10,
-                              ),
-                              Container(
-                                alignment: Alignment.centerLeft,
-                                child: DropdownButton(
-                                  value: selectedLocalMealTime ?? mealTimeListDropdown[0],
-                                  icon: Icon(Icons.local_dining),
-                                  elevation: 16,
-                                  onChanged: (String newValue) {
-                                    setState(() {
-                                      if (mealTimeListDropdown.indexOf(newValue) == 0) {
-                                        mealTime = "Breakfast";
-                                        selectedLocalMealTime = mealTimeListDropdown[0];
-                                      }
-                                      if (mealTimeListDropdown.indexOf(newValue) == 1) {
-                                        mealTime = "Lunch";
-                                        selectedLocalMealTime = mealTimeListDropdown[1];
-                                      }
-                                      if (mealTimeListDropdown.indexOf(newValue) == 2) {
-                                        mealTime = "Dinner";
-                                        selectedLocalMealTime = mealTimeListDropdown[2];
-                                      }
-                                    });
+        floatingActionButton: Padding(
+          padding: const EdgeInsets.only(bottom: 24.0),
+          child: FloatingActionButton(
+            onPressed: () {
+              DateTime date = DateTime.now();
+              selectedLocalMealTime = mealTimeListDropdown[0];
+              mealTime = "Breakfast";
+              mealDate = DateTime(date.year, date.month, date.day).millisecondsSinceEpoch;
+              showDialog(
+                  context: context,
+                  builder: (BuildContext context) {
+                    var mealCtrl = TextEditingController();
+                    var link = "";
+                    return AlertDialog(
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(20.0))),
+                      backgroundColor: Constants.secondaryColor,
+                      scrollable: true,
+                      title: Text(
+                        'Mealplan',
+                        textAlign: TextAlign.center,
+                      ),
+                      content: StatefulBuilder(builder: (BuildContext context, StateSetter setState) {
+                        return Container(
+                          height: 300,
+                          child: Form(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: <Widget>[
+                                TypeAheadField(
+                                  textFieldConfiguration: TextFieldConfiguration(
+                                    controller: mealCtrl,
+                                    textCapitalization: TextCapitalization.sentences,
+                                    decoration: InputDecoration(labelText: 'Meal'.tr()),
+                                    textAlign: TextAlign.left,
+                                    autofocus: false,
+                                  ),
+                                  hideOnEmpty: true,
+                                  hideOnError: true,
+                                  debounceDuration: Duration(milliseconds: 400),
+                                  suggestionsCallback: (pattern) {
+                                    return getIdeas(pattern);
                                   },
-                                  items: mealTimeListDropdown.map<DropdownMenuItem<String>>(
-                                    (String value) {
-                                      return DropdownMenuItem<String>(
-                                        value: value,
-                                        child: Text(value),
-                                      );
-                                    },
-                                  ).toList(),
+                                  itemBuilder: (context, idea) {
+                                    return ListTile(
+                                      title: Text(idea["mealName"]),
+                                    );
+                                  },
+                                  onSuggestionSelected: (idea) {
+                                    link = "";
+                                    mealCtrl.text = idea["mealName"];
+                                    if (idea["recipe"] != "" || idea["recipe"] != null) {
+                                      link = idea["recipe"];
+                                    }
+                                  },
                                 ),
-                              ),
-                            ],
+                                TextFormField(
+                                  readOnly: true,
+                                  decoration: InputDecoration(labelText: 'Date'.tr()),
+                                  controller: dateCtl,
+                                  onTap: () async {
+                                    FocusScope.of(context).requestFocus(FocusNode());
+
+                                    date = await showDatePicker(
+                                        context: context, initialDate: DateTime.now(), firstDate: DateTime(1900), lastDate: DateTime(2100));
+
+                                    dateCtl.text =
+                                        '${DateFormat('EE').format(date)} ${date.day.toString()}.${date.month.toString()}.${date.year.toString()}';
+                                    mealDate = DateTime(date.year, date.month, date.day).millisecondsSinceEpoch;
+                                  },
+                                ),
+                                SizedBox(
+                                  height: 10,
+                                ),
+                                Container(
+                                  alignment: Alignment.centerLeft,
+                                  child: DropdownButton(
+                                    value: selectedLocalMealTime ?? mealTimeListDropdown[0],
+                                    icon: Icon(Icons.local_dining),
+                                    elevation: 16,
+                                    onChanged: (String newValue) {
+                                      setState(() {
+                                        if (mealTimeListDropdown.indexOf(newValue) == 0) {
+                                          mealTime = "Breakfast";
+                                          selectedLocalMealTime = mealTimeListDropdown[0];
+                                        }
+                                        if (mealTimeListDropdown.indexOf(newValue) == 1) {
+                                          mealTime = "Lunch";
+                                          selectedLocalMealTime = mealTimeListDropdown[1];
+                                        }
+                                        if (mealTimeListDropdown.indexOf(newValue) == 2) {
+                                          mealTime = "Dinner";
+                                          selectedLocalMealTime = mealTimeListDropdown[2];
+                                        }
+                                      });
+                                    },
+                                    items: mealTimeListDropdown.map<DropdownMenuItem<String>>(
+                                      (String value) {
+                                        return DropdownMenuItem<String>(
+                                          value: value,
+                                          child: Text(value),
+                                        );
+                                      },
+                                    ).toList(),
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
+                        );
+                      }),
+                      actions: <Widget>[
+                        ElevatedButton(
+                          child: Text(
+                            "Cancel",
+                            style: TextStyle(color: Colors.blue),
+                          ).tr(),
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                          },
+                          style: cancelButtonStyle,
                         ),
-                      );
-                    }),
-                    actions: <Widget>[
-                      ElevatedButton(
-                        child: Text(
-                          "Cancel",
-                          style: TextStyle(color: Colors.blue),
-                        ).tr(),
-                        onPressed: () {
-                          Navigator.of(context).pop();
-                        },
-                        style: cancelButtonStyle,
-                      ),
-                      ElevatedButton(
-                        child: Text("Save").tr(),
-                        onPressed: () async {
-                          try {
-                            await _databaseHelper.db.insert(
-                              "meals",
-                              Meal(
-                                mealName: mealCtrl.text.toString(),
-                                date: mealDate,
-                                dayTime: mealTime,
-                                recipe: link,
-                              ).toMapWithoutId(),
-                            );
-                            _sendAnalyticsEvent(mealCtrl.text.toString());
-                            Navigator.of(context).pop();
-                            asyncMethod().then((value) {
-                              setState(() {});
-                            });
-                          } catch (e) {
-                            print("Duplikat");
-                            Navigator.of(context).pop();
-                            ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Duplicate Meal Message").tr()));
-                          }
-                        },
-                        style: saveButtonStyle,
-                      ),
-                    ],
-                  );
-                });
-          },
-          child: Icon(Icons.add),
+                        ElevatedButton(
+                          child: Text("Save").tr(),
+                          onPressed: () async {
+                            try {
+                              await _databaseHelper.db.insert(
+                                "meals",
+                                Meal(
+                                  mealName: mealCtrl.text.toString(),
+                                  date: mealDate,
+                                  dayTime: mealTime,
+                                  recipe: link,
+                                ).toMapWithoutId(),
+                              );
+                              _sendAnalyticsEvent(mealCtrl.text.toString());
+                              Navigator.of(context).pop();
+                              asyncMethod().then((value) {
+                                setState(() {});
+                              });
+                            } catch (e) {
+                              print("Duplikat");
+                              Navigator.of(context).pop();
+                              ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Duplicate Meal Message").tr()));
+                            }
+                          },
+                          style: saveButtonStyle,
+                        ),
+                      ],
+                    );
+                  });
+            },
+            child: Icon(Icons.add),
+          ),
         ), // This trailing comma makes auto-formatting nicer for build methods.
       ),
     );

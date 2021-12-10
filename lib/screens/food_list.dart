@@ -40,6 +40,8 @@ class _FoodListState extends State<FoodList> {
   String mealTime = 'Breakfast';
   String selectedLocalMealTime;
   int mealDate;
+  
+  //TODO: ADD Snack to Dropdown
   var mealTimeListDropdown = <String>[
     'Breakfast'.tr(),
     'Lunch'.tr(),

@@ -55,6 +55,8 @@ class _MainScreenState extends State<MainScreen> {
   static List<Meallist> ideaList = [];
   FocusNode focusNode = FocusNode();
   ScreenshotController screenshotController = ScreenshotController();
+  
+  //TODO: Snack hinzufügen
   var mealTimeListDropdown = <String>[
     'Breakfast'.tr(),
     'Lunch'.tr(),

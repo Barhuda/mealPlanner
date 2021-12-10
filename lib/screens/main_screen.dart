@@ -139,6 +139,8 @@ class _MainScreenState extends State<MainScreen> {
     });
   }
 
+  
+  //TODO: Check auch Snack für AllEntriesEmpty
   bool allEntriesEmpty(Map mapToCheck) {
     if (mapToCheck["Breakfast"] == null && mapToCheck["Lunch"] == null && mapToCheck["Dinner"] == null) {
       return true;
@@ -147,6 +149,9 @@ class _MainScreenState extends State<MainScreen> {
     }
   }
 
+  
+  //TODO: Speichern in der Klasse Meal handlen
+  //Snack ebenfalls speichern
   Future<void> editDay(Meal breakfast, Meal lunch, Meal evening, DateTime date) async {
     print(editBreakfast);
     print(editEvening);
@@ -255,6 +260,8 @@ class _MainScreenState extends State<MainScreen> {
     print('logEvent succeeded');
   }
 
+  
+  //TODO: Snack Links zählen
   double countLinks(breakfast, lunch, evening) {
     double numberOfLinks = 0;
     if (breakfast.recipe != null && breakfast.recipe != "") {
@@ -359,6 +366,7 @@ class _MainScreenState extends State<MainScreen> {
                   scrollDirection: Axis.vertical,
                   itemCount: weekMap.length ?? 1,
                   itemBuilder: (context, int index) {
+                    //TODO: Snack hinzufügen und anzeigen
                     DateTime key = weekMap.keys.elementAt(index);
                     Map currentMap = weekMap[key];
                     Meal breakfast = currentMap["Breakfast"] ?? Meal();
@@ -786,6 +794,7 @@ class _MainScreenState extends State<MainScreen> {
                                   elevation: 16,
                                   onChanged: (String newValue) {
                                     setState(() {
+                                      //TODO: Snack als Auswahl hinzufügen
                                       if (mealTimeListDropdown.indexOf(newValue) == 0) {
                                         mealTime = "Breakfast";
                                         selectedLocalMealTime = mealTimeListDropdown[0];

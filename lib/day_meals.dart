@@ -4,9 +4,10 @@ class DayMeal {
   String mealMorning;
   String mealLunch;
   String mealEvening;
+  String snack;
 
   DayMeal(
-      {this.id, this.date, this.mealMorning, this.mealLunch, this.mealEvening});
+      {this.id, this.date, this.mealMorning, this.mealLunch, this.mealEvening, this.snack});
 
   Map<String, dynamic> toMapWithoutId() {
     final map = new Map<String, dynamic>();
@@ -14,6 +15,7 @@ class DayMeal {
     map["mealMorning"] = mealMorning;
     map["mealLunch"] = mealLunch;
     map["mealEvening"] = mealEvening;
+    map["snack"] = snack;
     return map;
   }
 
@@ -24,6 +26,7 @@ class DayMeal {
     map["mealMorning"] = mealMorning;
     map["mealLunch"] = mealLunch;
     map["mealEvening"] = mealEvening;
+    map["snack"] = snack;
     return map;
   }
 
@@ -32,5 +35,6 @@ class DayMeal {
       date: data['date'],
       mealMorning: data['mealMorning'],
       mealLunch: data['mealLunch'],
-      mealEvening: data['mealEvening']);
+      mealEvening: data['mealEvening'],
+      snack: data['snack]);
 }

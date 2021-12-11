@@ -851,42 +851,9 @@ class _MainScreenState extends State<MainScreen> {
                                     date = await showDatePicker(
                                         context: context, initialDate: DateTime.now(), firstDate: DateTime(1900), lastDate: DateTime(2100));
 
-<<<<<<< HEAD
                                     dateCtl.text =
                                         '${DateFormat('EE').format(date)} ${date.day.toString()}.${date.month.toString()}.${date.year.toString()}';
                                     mealDate = DateTime(date.year, date.month, date.day).millisecondsSinceEpoch;
-=======
-                                  dateCtl.text =
-                                      '${DateFormat('EE').format(date)} ${date.day.toString()}.${date.month.toString()}.${date.year.toString()}';
-                                  mealDate = DateTime(date.year, date.month, date.day).millisecondsSinceEpoch;
-                                },
-                              ),
-                              SizedBox(
-                                height: 10,
-                              ),
-                              Container(
-                                alignment: Alignment.centerLeft,
-                                child: DropdownButton(
-                                  value: selectedLocalMealTime ?? mealTimeListDropdown[0],
-                                  icon: Icon(Icons.local_dining),
-                                  elevation: 16,
-                                  onChanged: (String newValue) {
-                                    setState(() {
-                                      //TODO: Snack als Auswahl hinzufügen
-                                      if (mealTimeListDropdown.indexOf(newValue) == 0) {
-                                        mealTime = "Breakfast";
-                                        selectedLocalMealTime = mealTimeListDropdown[0];
-                                      }
-                                      if (mealTimeListDropdown.indexOf(newValue) == 1) {
-                                        mealTime = "Lunch";
-                                        selectedLocalMealTime = mealTimeListDropdown[1];
-                                      }
-                                      if (mealTimeListDropdown.indexOf(newValue) == 2) {
-                                        mealTime = "Dinner";
-                                        selectedLocalMealTime = mealTimeListDropdown[2];
-                                      }
-                                    });
->>>>>>> b62ec314c096ca427d28748bf77afb291d566349
                                   },
                                 ),
                                 SizedBox(

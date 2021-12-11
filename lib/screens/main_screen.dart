@@ -444,7 +444,9 @@ class _MainScreenState extends State<MainScreen> {
                                         children: <Widget>[
                                           TypeAheadField(
                                             textFieldConfiguration: TextFieldConfiguration(
-                                              keyboardType: TextInputType.text,
+                                              maxLines: 4,
+                                              minLines: 1,
+                                              keyboardType: TextInputType.multiline,
                                               textCapitalization: TextCapitalization.sentences,
                                               controller: breakfastCtrl,
                                               decoration: InputDecoration(
@@ -511,7 +513,9 @@ class _MainScreenState extends State<MainScreen> {
                                           ),
                                           TypeAheadField(
                                             textFieldConfiguration: TextFieldConfiguration(
-                                              keyboardType: TextInputType.text,
+                                              maxLines: 4,
+                                              minLines: 1,
+                                              keyboardType: TextInputType.multiline,
                                               textCapitalization: TextCapitalization.sentences,
                                               controller: lunchCtrl,
                                               decoration: InputDecoration(
@@ -561,7 +565,9 @@ class _MainScreenState extends State<MainScreen> {
                                           ),
                                           TypeAheadField(
                                             textFieldConfiguration: TextFieldConfiguration(
-                                              keyboardType: TextInputType.text,
+                                              maxLines: 4,
+                                              minLines: 1,
+                                              keyboardType: TextInputType.multiline,
                                               textCapitalization: TextCapitalization.sentences,
                                               controller: dinnerCtrl,
                                               decoration: InputDecoration(
@@ -763,6 +769,9 @@ class _MainScreenState extends State<MainScreen> {
                       ).tr(),
                     )),
               ),
+              SizedBox(
+                height: 10,
+              )
             ],
           ),
         ),

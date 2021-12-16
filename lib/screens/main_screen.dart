@@ -413,6 +413,7 @@ class _MainScreenState extends State<MainScreen> {
                                                   labelText: 'Breakfast'.tr(),
                                                   suffixIcon: IconButton(
                                                     onPressed: () {
+                                                      //TODO: Nach dem Delete kann nicht direkt ein neuer Wert gespeichert werden, ohne vorher zu speicher
                                                       breakfast.deleteMeal();
                                                       breakfastCtrl.clear();
                                                       editBreakfast = null;

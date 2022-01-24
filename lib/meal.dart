@@ -1,3 +1,5 @@
+import 'package:sqflite/sqflite.dart';
+
 import 'database_helper.dart';
 import 'injection.dart';
 
@@ -31,8 +33,12 @@ class Meal {
     return map;
   }
 
-  factory Meal.fromMap(Map<String, dynamic> data) =>
-      new Meal(id: data['id'], mealName: data['meal_name'], date: data['date'], dayTime: data['daytime'], recipe: data['recipe']);
+  factory Meal.fromMap(Map<String, dynamic> data) => new Meal(
+      id: data['id'],
+      mealName: data['meal_name'],
+      date: data['date'],
+      dayTime: data['daytime'],
+      recipe: data['recipe']);
 
   Future<List<Meal>> getWeekList(DateTime firstWeekDay) async {
     List<Map> dbResult = await _databaseHelper.db.rawQuery(
@@ -63,19 +69,37 @@ class Meal {
     );
   }
 
-  Future<Map<DateTime, Map<String, Meal>>> generateWeekList(DateTime firstWeekDay) async {
+  Future<void> saveMeal(
+      String mealName, DateTime date, String dayTime, String link) async {
+    await _databaseHelper.db.insert(
+        "meals",
+        Meal(
+          mealName: mealName,
+          date: date.millisecondsSinceEpoch,
+          dayTime: dayTime,
+          recipe: link,
+        ).toMapWithoutId(),
+        conflictAlgorithm: ConflictAlgorithm.replace);
+    print(mealName + " " + date.microsecondsSinceEpoch.toString());
+  }
+
+  Future<Map<DateTime, Map<String, Meal>>> generateWeekList(
+      DateTime firstWeekDay) async {
     List<Meal> weekList = [];
     Map<DateTime, Map<String, Meal>> resultMap = {};
     for (int i = 0; i < 7; i++) {
       DateTime defaultDate = firstWeekDay.add(Duration(days: i));
-      DateTime formattedDefaultDate = new DateTime(defaultDate.year, defaultDate.month, defaultDate.day);
+      DateTime formattedDefaultDate =
+          new DateTime(defaultDate.year, defaultDate.month, defaultDate.day);
       resultMap[formattedDefaultDate] = <String, Meal>{};
     }
-    await getWeekList(firstWeekDay).then((value) => Future.forEach(value, (element) => weekList.add(element)));
+    await getWeekList(firstWeekDay).then(
+        (value) => Future.forEach(value, (element) => weekList.add(element)));
     for (int i = 0; i < weekList.length; i++) {
       Meal meal = weekList[i];
       DateTime inputDate = DateTime.fromMillisecondsSinceEpoch(meal.date);
-      DateTime formattedDate = new DateTime(inputDate.year, inputDate.month, inputDate.day);
+      DateTime formattedDate =
+          new DateTime(inputDate.year, inputDate.month, inputDate.day);
       Map<String, Meal> mapToAdd = {};
       mapToAdd[meal.dayTime] = meal;
       if (resultMap.containsKey(formattedDate)) {

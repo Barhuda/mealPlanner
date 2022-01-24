@@ -4,6 +4,7 @@ import 'package:firebase_analytics/observer.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:intl/intl.dart';
+import 'package:multi_select_flutter/multi_select_flutter.dart';
 
 class SettingsScreen extends StatefulWidget {
   SettingsScreen({Key key, this.analytics, this.observer}) : super(key: key);
@@ -28,6 +29,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   int selectedValue = 0;
 
+  List<String> mulitSelectMealTimesFullList = [
+    "Breakfast",
+    "Lunch",
+    "Dinner",
+    "Snack"
+  ];
+  List<String> selectedMultiselectMealTimes = [];
+
   @override
   void initState() {
     super.initState();
@@ -40,6 +49,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
     prefs = await SharedPreferences.getInstance();
     selectedWeekDayAsFirstDay = prefs.getInt('selectedWeekDay') ?? 0;
     sortAlphabetical = prefs.getBool('sort') ?? false;
+    selectedMultiselectMealTimes = prefs.getStringList('mealTimes') ??
+        ["Breakfast", "Lunch", "Dinner", "Snack"];
+    if (selectedMultiselectMealTimes == []) {
+      selectedMultiselectMealTimes = ["Breakfast", "Lunch", "Dinner", "Snack"];
+    }
     setState(() {
       selectedValue = selectedWeekDayAsFirstDay;
     });
@@ -108,8 +122,26 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   prefs.setBool('sort', value);
                   setState(() {
                     sortAlphabetical = value;
+                    print(selectedMultiselectMealTimes);
                   });
-                })
+                }),
+            MultiSelectChipField(
+              headerColor: Colors.red,
+              scroll: false,
+              title: Text(
+                "Meals to show".tr(),
+                style: TextStyle(color: Colors.white70),
+              ),
+              items: mulitSelectMealTimesFullList
+                  .map((e) => MultiSelectItem(e, e.tr()))
+                  .toList(),
+              initialValue: selectedMultiselectMealTimes,
+              icon: Icon(Icons.check),
+              onTap: (values) {
+                selectedMultiselectMealTimes = values;
+                prefs.setStringList('mealTimes', selectedMultiselectMealTimes);
+              },
+            ),
           ],
         ),
       ),

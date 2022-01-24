@@ -61,7 +61,7 @@ class _MainScreenState extends State<MainScreen> {
   FocusNode focusNode = FocusNode();
   ScreenshotController screenshotController = ScreenshotController();
 
-  List<String> selectedMealTimes = ['Breakfast', 'Lunch', 'Dinner', 'Snack'];
+  List<String> selectedMealTimes = [];
 
   // var mealTimeListDropdown = <String>[
   //   'Breakfast'.tr(),
@@ -151,6 +151,8 @@ class _MainScreenState extends State<MainScreen> {
   _getSharedPrefs() async {
     prefs = await SharedPreferences.getInstance();
     selectedWeekDayAsFirstDay = prefs.getInt('selectedWeekDay');
+    selectedMealTimes = prefs.getStringList('mealTimes') ??
+        ["Breakfast", "Lunch", "Dinner", "Snack"];
   }
 
   Future asyncMethod() async {
@@ -200,105 +202,105 @@ class _MainScreenState extends State<MainScreen> {
 
   //TODO: Speichern in der Klasse Meal handlen
   //Snack ebenfalls speichern
-  Future<void> editDay(
-      Meal breakfast, Meal lunch, Meal evening, DateTime date) async {
-    print(editBreakfast);
-    print(editEvening);
-    print(editLunch);
-    Batch batch = _databaseHelper.db.batch();
-    if (breakfast.id != null && editBreakfast != null) {
-      print("updated Breakfast");
-      batch.update(
-        "meals",
-        Meal(
-          id: breakfast.id,
-          mealName: editBreakfast,
-          date: breakfast.date,
-          dayTime: breakfast.dayTime,
-          recipe: breakfastLink,
-        ).toMap(),
-        where: "id = ?",
-        whereArgs: [breakfast.id],
-      );
-    } else {
-      if (editBreakfast != null) {
-        await _databaseHelper.db.insert(
-            "meals",
-            Meal(
-              mealName: editBreakfast,
-              date: date.millisecondsSinceEpoch,
-              dayTime: "Breakfast",
-              recipe: breakfastLink,
-            ).toMapWithoutId(),
-            conflictAlgorithm: ConflictAlgorithm.replace);
-        print("neu Breakfast");
-      }
-    }
-    if (lunch.id != null && editLunch != null) {
-      print("updated Lunch");
-      batch.update(
-          "meals",
-          Meal(
-            id: lunch.id,
-            mealName: editLunch,
-            date: lunch.date,
-            dayTime: lunch.dayTime,
-            recipe: lunchLink,
-          ).toMap(),
-          where: 'id = ?',
-          whereArgs: [lunch.id]);
-    } else {
-      if (editLunch != null) {
-        await _databaseHelper.db.insert(
-          "meals",
-          Meal(
-            mealName: editLunch,
-            date: date.millisecondsSinceEpoch,
-            dayTime: "Lunch",
-            recipe: lunchLink,
-          ).toMapWithoutId(),
-          conflictAlgorithm: ConflictAlgorithm.replace,
-        );
-        print("neu Lunch");
-      }
-    }
-    if (evening.id != null && editEvening != null) {
-      print("updated Dinner");
-      batch.update(
-          "meals",
-          Meal(
-            id: evening.id,
-            mealName: editEvening,
-            date: evening.date,
-            dayTime: evening.dayTime,
-            recipe: eveningLink,
-          ).toMap(),
-          where: "id = ?",
-          whereArgs: [evening.id]);
-    } else {
-      if (editEvening != null) {
-        await _databaseHelper.db.insert(
-            "meals",
-            Meal(
-              mealName: editEvening,
-              date: date.millisecondsSinceEpoch,
-              dayTime: "Dinner",
-              recipe: eveningLink,
-            ).toMapWithoutId(),
-            conflictAlgorithm: ConflictAlgorithm.replace);
-        print("neu Dinner");
-      }
-    }
-    await batch.commit(noResult: true, continueOnError: true);
-    editBreakfast = null;
-    editLunch = null;
-    editEvening = null;
-    editSnack = null;
-    Navigator.of(context).pop();
-    asyncMethod().then((value) {
-      setState(() {});
-    });
-  }
+  // Future<void> editDay(
+  //     Meal breakfast, Meal lunch, Meal evening, DateTime date) async {
+  //   print(editBreakfast);
+  //   print(editEvening);
+  //   print(editLunch);
+  //   Batch batch = _databaseHelper.db.batch();
+  //   if (breakfast.id != null && editBreakfast != null) {
+  //     print("updated Breakfast");
+  //     batch.update(
+  //       "meals",
+  //       Meal(
+  //         id: breakfast.id,
+  //         mealName: editBreakfast,
+  //         date: breakfast.date,
+  //         dayTime: breakfast.dayTime,
+  //         recipe: breakfastLink,
+  //       ).toMap(),
+  //       where: "id = ?",
+  //       whereArgs: [breakfast.id],
+  //     );
+  //   } else {
+  //     if (editBreakfast != null) {
+  //       await _databaseHelper.db.insert(
+  //           "meals",
+  //           Meal(
+  //             mealName: editBreakfast,
+  //             date: date.millisecondsSinceEpoch,
+  //             dayTime: "Breakfast",
+  //             recipe: breakfastLink,
+  //           ).toMapWithoutId(),
+  //           conflictAlgorithm: ConflictAlgorithm.replace);
+  //       print("neu Breakfast");
+  //     }
+  //   }
+  //   if (lunch.id != null && editLunch != null) {
+  //     print("updated Lunch");
+  //     batch.update(
+  //         "meals",
+  //         Meal(
+  //           id: lunch.id,
+  //           mealName: editLunch,
+  //           date: lunch.date,
+  //           dayTime: lunch.dayTime,
+  //           recipe: lunchLink,
+  //         ).toMap(),
+  //         where: 'id = ?',
+  //         whereArgs: [lunch.id]);
+  //   } else {
+  //     if (editLunch != null) {
+  //       await _databaseHelper.db.insert(
+  //         "meals",
+  //         Meal(
+  //           mealName: editLunch,
+  //           date: date.millisecondsSinceEpoch,
+  //           dayTime: "Lunch",
+  //           recipe: lunchLink,
+  //         ).toMapWithoutId(),
+  //         conflictAlgorithm: ConflictAlgorithm.replace,
+  //       );
+  //       print("neu Lunch");
+  //     }
+  //   }
+  //   if (evening.id != null && editEvening != null) {
+  //     print("updated Dinner");
+  //     batch.update(
+  //         "meals",
+  //         Meal(
+  //           id: evening.id,
+  //           mealName: editEvening,
+  //           date: evening.date,
+  //           dayTime: evening.dayTime,
+  //           recipe: eveningLink,
+  //         ).toMap(),
+  //         where: "id = ?",
+  //         whereArgs: [evening.id]);
+  //   } else {
+  //     if (editEvening != null) {
+  //       await _databaseHelper.db.insert(
+  //           "meals",
+  //           Meal(
+  //             mealName: editEvening,
+  //             date: date.millisecondsSinceEpoch,
+  //             dayTime: "Dinner",
+  //             recipe: eveningLink,
+  //           ).toMapWithoutId(),
+  //           conflictAlgorithm: ConflictAlgorithm.replace);
+  //       print("neu Dinner");
+  //     }
+  //   }
+  //   await batch.commit(noResult: true, continueOnError: true);
+  //   editBreakfast = null;
+  //   editLunch = null;
+  //   editEvening = null;
+  //   editSnack = null;
+  //   Navigator.of(context).pop();
+  //   asyncMethod().then((value) {
+  //     setState(() {});
+  //   });
+  // }
 
   Future<void> _sendAnalyticsEvent(mealName) async {
     await widget.analytics.logEvent(

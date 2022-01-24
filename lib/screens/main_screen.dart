@@ -636,146 +636,6 @@ class _MainScreenState extends State<MainScreen> {
                                                 ),
                                               ],
                                             ),
-
-/*                                          TextFormField(
-                                            keyboardType: TextInputType.text,
-                                            textCapitalization: TextCapitalization.sentences,
-                                            controller: breakfastCtrl,
-                                            decoration: InputDecoration(
-                                                labelText: 'Breakfast'.tr(),
-                                                suffixIcon: IconButton(
-                                                  onPressed: () {
-                                                    breakfast.deleteMeal();
-                                                    breakfastCtrl.clear();
-                                                    editBreakfast = null;
-                                                  },
-                                                  icon: Icon(Icons.delete),
-                                                )),
-                                            textAlign: TextAlign.left,
-                                            onChanged: (value) {
-                                              editBreakfast = value;
-                                            },
-                                          )*/
-
-                                          // TypeAheadField(
-                                          //   textFieldConfiguration:
-                                          //       TextFieldConfiguration(
-                                          //     maxLines: 4,
-                                          //     minLines: 1,
-                                          //     keyboardType:
-                                          //         TextInputType.multiline,
-                                          //     textCapitalization:
-                                          //         TextCapitalization.sentences,
-                                          //     controller: lunchCtrl,
-                                          //     decoration: InputDecoration(
-                                          //         labelText: 'Lunch'.tr(),
-                                          //         suffixIcon: IconButton(
-                                          //           onPressed: () {
-                                          //             lunch.deleteMeal();
-                                          //             lunchCtrl.clear();
-                                          //             editLunch = null;
-                                          //           },
-                                          //           icon: Icon(Icons.delete),
-                                          //         )),
-                                          //     textAlign: TextAlign.left,
-                                          //     onChanged: (value) {
-                                          //       editLunch = value;
-                                          //     },
-                                          //   ),
-                                          //   suggestionsCallback: (pattern) {
-                                          //     return getIdeas(pattern);
-                                          //   },
-                                          //   hideOnEmpty: true,
-                                          //   hideOnError: true,
-                                          //   debounceDuration:
-                                          //       Duration(milliseconds: 400),
-                                          //   itemBuilder: (context, idea) {
-                                          //     return ListTile(
-                                          //       title: Text(idea["mealName"]),
-                                          //     );
-                                          //   },
-                                          //   onSuggestionSelected: (idea) {
-                                          //     editLunch = idea["mealName"];
-                                          //     lunchLink = "";
-                                          //     lunchCtrl.text = idea["mealName"];
-                                          //     if (idea["recipe"] != "" ||
-                                          //         idea["recipe"] != null) {
-                                          //       lunchLink = idea["recipe"];
-                                          //     }
-                                          //   },
-                                          // ),
-                                          // Visibility(
-                                          //   visible: (lunch.recipe != "" &&
-                                          //       lunch.recipe != null),
-                                          //   child: ElevatedButton(
-                                          //     child:
-                                          //         Text("Link to recipe").tr(),
-                                          //     onPressed: () {
-                                          //       launch(lunch.recipe);
-                                          //     },
-                                          //     style: recipeButtonStyle,
-                                          //   ),
-                                          // ),
-                                          // TypeAheadField(
-                                          //   textFieldConfiguration:
-                                          //       TextFieldConfiguration(
-                                          //     maxLines: 4,
-                                          //     minLines: 1,
-                                          //     keyboardType:
-                                          //         TextInputType.multiline,
-                                          //     textCapitalization:
-                                          //         TextCapitalization.sentences,
-                                          //     controller: dinnerCtrl,
-                                          //     decoration: InputDecoration(
-                                          //         labelText: 'Dinner'.tr(),
-                                          //         suffixIcon: IconButton(
-                                          //           onPressed: () {
-                                          //             evening.deleteMeal();
-                                          //             dinnerCtrl.clear();
-                                          //             editEvening = null;
-                                          //           },
-                                          //           icon: Icon(Icons.delete),
-                                          //         )),
-                                          //     textAlign: TextAlign.left,
-                                          //     onChanged: (value) {
-                                          //       editEvening = value;
-                                          //     },
-                                          //   ),
-                                          //   suggestionsCallback: (pattern) {
-                                          //     return getIdeas(pattern);
-                                          //   },
-                                          //   itemBuilder: (context, idea) {
-                                          //     return ListTile(
-                                          //       title: Text(idea["mealName"]),
-                                          //     );
-                                          //   },
-                                          //   hideOnEmpty: true,
-                                          //   hideOnError: true,
-                                          //   debounceDuration:
-                                          //       Duration(milliseconds: 400),
-                                          //   onSuggestionSelected: (idea) {
-                                          //     editEvening = idea["mealName"];
-                                          //     eveningLink = "";
-                                          //     dinnerCtrl.text =
-                                          //         idea["mealName"];
-                                          //     if (idea["recipe"] != "" ||
-                                          //         idea["recipe"] != null) {
-                                          //       eveningLink = idea["recipe"];
-                                          //     }
-                                          //   },
-                                          // ),
-                                          // Visibility(
-                                          //   visible: (evening.recipe != "" &&
-                                          //       evening.recipe != null),
-                                          //   child: ElevatedButton(
-                                          //     child:
-                                          //         Text("Link to recipe").tr(),
-                                          //     onPressed: () {
-                                          //       launch(evening.recipe);
-                                          //     },
-                                          //     style: recipeButtonStyle,
-                                          //   ),
-                                          // ),
                                         ],
                                       ),
                                     ),
@@ -859,81 +719,61 @@ class _MainScreenState extends State<MainScreen> {
                                             fontWeight: FontWeight.bold)),
                                   ),
                                   Row(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceEvenly,
                                     children: [
-                                      Expanded(
-                                        child: Padding(
-                                          padding: const EdgeInsets.only(
-                                              left: 8.0, bottom: 4),
-                                          child: Column(
-                                            children: [
-                                              Text(
-                                                "Breakfast".tr(),
-                                                style: TextStyle(
-                                                    fontWeight: FontWeight.bold,
-                                                    fontSize: 14),
-                                              ),
-                                              Text(
-                                                breakfast.mealName ?? "-",
-                                                textAlign: TextAlign.center,
-                                              ),
-                                            ],
+                                      for (int i = 0;
+                                          i < selectedMealTimes.length;
+                                          i++)
+                                        Expanded(
+                                          child: Padding(
+                                            padding: const EdgeInsets.all(4.0),
+                                            child: Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.spaceEvenly,
+                                              children: [
+                                                Expanded(
+                                                  child: Column(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment.start,
+                                                    children: [
+                                                      Text(
+                                                        selectedMealTimes[i]
+                                                            .tr(),
+                                                        style: TextStyle(
+                                                            fontWeight:
+                                                                FontWeight.bold,
+                                                            fontSize: 14),
+                                                      ),
+                                                      Text(
+                                                        mealsInCurrentDayList[i]
+                                                                .mealName ??
+                                                            "-",
+                                                        textAlign:
+                                                            TextAlign.center,
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+                                                SizedBox(
+                                                  width: 8,
+                                                ),
+                                                Visibility(
+                                                  visible: i !=
+                                                      selectedMealTimes.length -
+                                                          1,
+                                                  child: Container(
+                                                    color:
+                                                        Constants.fourthColor,
+                                                    height: 30,
+                                                    width: 1,
+                                                    margin: EdgeInsets.all(4),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
                                           ),
                                         ),
-                                      ),
-                                      Container(
-                                        color: Constants.fourthColor,
-                                        height: 30,
-                                        width: 1,
-                                        margin: EdgeInsets.all(4),
-                                      ),
-                                      Expanded(
-                                        child: Padding(
-                                          padding: const EdgeInsets.only(
-                                              bottom: 4.0),
-                                          child: Column(
-                                            children: [
-                                              Text(
-                                                "Lunch".tr(),
-                                                style: TextStyle(
-                                                    fontWeight: FontWeight.bold,
-                                                    fontSize: 14),
-                                              ),
-                                              Text(
-                                                lunch.mealName ?? "-",
-                                                textAlign: TextAlign.center,
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      ),
-                                      Container(
-                                        color: Constants.fourthColor,
-                                        height: 30,
-                                        width: 1,
-                                        margin: EdgeInsets.all(4),
-                                      ),
-                                      Expanded(
-                                        child: Padding(
-                                          padding: const EdgeInsets.only(
-                                              bottom: 4.0),
-                                          child: Column(
-                                            children: [
-                                              Text(
-                                                "Dinner".tr(),
-                                                style: TextStyle(
-                                                    fontWeight: FontWeight.bold,
-                                                    fontSize: 14),
-                                              ),
-                                              Text(
-                                                evening.mealName ?? "-",
-                                                textAlign: TextAlign.center,
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      ),
                                     ],
                                   ),
                                 ],
@@ -969,170 +809,170 @@ class _MainScreenState extends State<MainScreen> {
             ],
           ),
         ),
-        floatingActionButton: Padding(
-          padding: const EdgeInsets.only(bottom: 24.0),
-          child: FloatingActionButton(
-            onPressed: () {
-              DateTime date = DateTime.now();
-              selectedLocalMealTime = selectedMealTimes[0];
-              mealTime = "Breakfast";
-              mealDate = DateTime(date.year, date.month, date.day)
-                  .millisecondsSinceEpoch;
-              showDialog(
-                  context: context,
-                  builder: (BuildContext context) {
-                    var mealCtrl = TextEditingController();
-                    var link = "";
-                    return AlertDialog(
-                      shape: RoundedRectangleBorder(
-                          borderRadius:
-                              BorderRadius.all(Radius.circular(20.0))),
-                      backgroundColor: Constants.secondaryColor,
-                      scrollable: true,
-                      title: Text(
-                        'Mealplan',
-                        textAlign: TextAlign.center,
-                      ),
-                      content: StatefulBuilder(builder:
-                          (BuildContext context, StateSetter setState) {
-                        return Container(
-                          height: 300,
-                          child: Form(
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: <Widget>[
-                                TypeAheadField(
-                                  textFieldConfiguration:
-                                      TextFieldConfiguration(
-                                    controller: mealCtrl,
-                                    textCapitalization:
-                                        TextCapitalization.sentences,
-                                    decoration:
-                                        InputDecoration(labelText: 'Meal'.tr()),
-                                    textAlign: TextAlign.left,
-                                    autofocus: false,
-                                  ),
-                                  hideOnEmpty: true,
-                                  hideOnError: true,
-                                  debounceDuration: Duration(milliseconds: 400),
-                                  suggestionsCallback: (pattern) {
-                                    return getIdeas(pattern);
-                                  },
-                                  itemBuilder: (context, idea) {
-                                    return ListTile(
-                                      title: Text(idea["mealName"]),
-                                    );
-                                  },
-                                  onSuggestionSelected: (idea) {
-                                    link = "";
-                                    mealCtrl.text = idea["mealName"];
-                                    if (idea["recipe"] != "" ||
-                                        idea["recipe"] != null) {
-                                      link = idea["recipe"];
-                                    }
-                                  },
-                                ),
-                                TextFormField(
-                                  readOnly: true,
-                                  decoration:
-                                      InputDecoration(labelText: 'Date'.tr()),
-                                  controller: dateCtl,
-                                  onTap: () async {
-                                    FocusScope.of(context)
-                                        .requestFocus(FocusNode());
+        // floatingActionButton: Padding(
+        //   padding: const EdgeInsets.only(bottom: 24.0),
+        //   child: FloatingActionButton(
+        //     onPressed: () {
+        //       DateTime date = DateTime.now();
+        //       selectedLocalMealTime = selectedMealTimes[0];
+        //       mealTime = "Breakfast";
+        //       mealDate = DateTime(date.year, date.month, date.day)
+        //           .millisecondsSinceEpoch;
+        //       showDialog(
+        //           context: context,
+        //           builder: (BuildContext context) {
+        //             var mealCtrl = TextEditingController();
+        //             var link = "";
+        //             return AlertDialog(
+        //               shape: RoundedRectangleBorder(
+        //                   borderRadius:
+        //                       BorderRadius.all(Radius.circular(20.0))),
+        //               backgroundColor: Constants.secondaryColor,
+        //               scrollable: true,
+        //               title: Text(
+        //                 'Mealplan',
+        //                 textAlign: TextAlign.center,
+        //               ),
+        //               content: StatefulBuilder(builder:
+        //                   (BuildContext context, StateSetter setState) {
+        //                 return Container(
+        //                   height: 300,
+        //                   child: Form(
+        //                     child: Column(
+        //                       mainAxisAlignment: MainAxisAlignment.start,
+        //                       crossAxisAlignment: CrossAxisAlignment.center,
+        //                       children: <Widget>[
+        //                         TypeAheadField(
+        //                           textFieldConfiguration:
+        //                               TextFieldConfiguration(
+        //                             controller: mealCtrl,
+        //                             textCapitalization:
+        //                                 TextCapitalization.sentences,
+        //                             decoration:
+        //                                 InputDecoration(labelText: 'Meal'.tr()),
+        //                             textAlign: TextAlign.left,
+        //                             autofocus: false,
+        //                           ),
+        //                           hideOnEmpty: true,
+        //                           hideOnError: true,
+        //                           debounceDuration: Duration(milliseconds: 400),
+        //                           suggestionsCallback: (pattern) {
+        //                             return getIdeas(pattern);
+        //                           },
+        //                           itemBuilder: (context, idea) {
+        //                             return ListTile(
+        //                               title: Text(idea["mealName"]),
+        //                             );
+        //                           },
+        //                           onSuggestionSelected: (idea) {
+        //                             link = "";
+        //                             mealCtrl.text = idea["mealName"];
+        //                             if (idea["recipe"] != "" ||
+        //                                 idea["recipe"] != null) {
+        //                               link = idea["recipe"];
+        //                             }
+        //                           },
+        //                         ),
+        //                         TextFormField(
+        //                           readOnly: true,
+        //                           decoration:
+        //                               InputDecoration(labelText: 'Date'.tr()),
+        //                           controller: dateCtl,
+        //                           onTap: () async {
+        //                             FocusScope.of(context)
+        //                                 .requestFocus(FocusNode());
 
-                                    date = await showDatePicker(
-                                        context: context,
-                                        initialDate: DateTime.now(),
-                                        firstDate: DateTime(1900),
-                                        lastDate: DateTime(2100));
+        //                             date = await showDatePicker(
+        //                                 context: context,
+        //                                 initialDate: DateTime.now(),
+        //                                 firstDate: DateTime(1900),
+        //                                 lastDate: DateTime(2100));
 
-                                    dateCtl.text =
-                                        '${DateFormat('EE').format(date)} ${date.day.toString()}.${date.month.toString()}.${date.year.toString()}';
-                                    mealDate = DateTime(
-                                            date.year, date.month, date.day)
-                                        .millisecondsSinceEpoch;
-                                  },
-                                ),
-                                SizedBox(
-                                  height: 10,
-                                ),
-                                Container(
-                                  alignment: Alignment.centerLeft,
-                                  child: DropdownButton(
-                                    value: selectedLocalMealTime ??
-                                        selectedMealTimes[0].tr(),
-                                    icon: Icon(Icons.local_dining),
-                                    elevation: 16,
-                                    onChanged: (String newValue) {
-                                      setState(() {
-                                        selectedLocalMealTime = newValue;
-                                      });
-                                    },
-                                    items: selectedMealTimes
-                                        .map<DropdownMenuItem<String>>(
-                                      (String value) {
-                                        return DropdownMenuItem<String>(
-                                          value: value,
-                                          child: Text(value.tr()),
-                                        );
-                                      },
-                                    ).toList(),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        );
-                      }),
-                      actions: <Widget>[
-                        ElevatedButton(
-                          child: Text(
-                            "Cancel",
-                            style: TextStyle(color: Colors.blue),
-                          ).tr(),
-                          onPressed: () {
-                            Navigator.of(context).pop();
-                          },
-                          style: cancelButtonStyle,
-                        ),
-                        ElevatedButton(
-                          child: Text("Save").tr(),
-                          onPressed: () async {
-                            try {
-                              await _databaseHelper.db.insert(
-                                "meals",
-                                Meal(
-                                  mealName: mealCtrl.text.toString(),
-                                  date: mealDate,
-                                  dayTime: mealTime,
-                                  recipe: link,
-                                ).toMapWithoutId(),
-                              );
-                              _sendAnalyticsEvent(mealCtrl.text.toString());
-                              Navigator.of(context).pop();
-                              asyncMethod().then((value) {
-                                setState(() {});
-                              });
-                            } catch (e) {
-                              print("Duplikat");
-                              Navigator.of(context).pop();
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                      content:
-                                          Text("Duplicate Meal Message").tr()));
-                            }
-                          },
-                          style: saveButtonStyle,
-                        ),
-                      ],
-                    );
-                  });
-            },
-            child: Icon(Icons.add),
-          ),
-        ), // This trailing comma makes auto-formatting nicer for build methods.
+        //                             dateCtl.text =
+        //                                 '${DateFormat('EE').format(date)} ${date.day.toString()}.${date.month.toString()}.${date.year.toString()}';
+        //                             mealDate = DateTime(
+        //                                     date.year, date.month, date.day)
+        //                                 .millisecondsSinceEpoch;
+        //                           },
+        //                         ),
+        //                         SizedBox(
+        //                           height: 10,
+        //                         ),
+        //                         Container(
+        //                           alignment: Alignment.centerLeft,
+        //                           child: DropdownButton(
+        //                             value: selectedLocalMealTime ??
+        //                                 selectedMealTimes[0].tr(),
+        //                             icon: Icon(Icons.local_dining),
+        //                             elevation: 16,
+        //                             onChanged: (String newValue) {
+        //                               setState(() {
+        //                                 selectedLocalMealTime = newValue;
+        //                               });
+        //                             },
+        //                             items: selectedMealTimes
+        //                                 .map<DropdownMenuItem<String>>(
+        //                               (String value) {
+        //                                 return DropdownMenuItem<String>(
+        //                                   value: value,
+        //                                   child: Text(value.tr()),
+        //                                 );
+        //                               },
+        //                             ).toList(),
+        //                           ),
+        //                         ),
+        //                       ],
+        //                     ),
+        //                   ),
+        //                 );
+        //               }),
+        //               actions: <Widget>[
+        //                 ElevatedButton(
+        //                   child: Text(
+        //                     "Cancel",
+        //                     style: TextStyle(color: Colors.blue),
+        //                   ).tr(),
+        //                   onPressed: () {
+        //                     Navigator.of(context).pop();
+        //                   },
+        //                   style: cancelButtonStyle,
+        //                 ),
+        //                 ElevatedButton(
+        //                   child: Text("Save").tr(),
+        //                   onPressed: () async {
+        //                     try {
+        //                       await _databaseHelper.db.insert(
+        //                         "meals",
+        //                         Meal(
+        //                           mealName: mealCtrl.text.toString(),
+        //                           date: mealDate,
+        //                           dayTime: mealTime,
+        //                           recipe: link,
+        //                         ).toMapWithoutId(),
+        //                       );
+        //                       _sendAnalyticsEvent(mealCtrl.text.toString());
+        //                       Navigator.of(context).pop();
+        //                       asyncMethod().then((value) {
+        //                         setState(() {});
+        //                       });
+        //                     } catch (e) {
+        //                       print("Duplikat");
+        //                       Navigator.of(context).pop();
+        //                       ScaffoldMessenger.of(context).showSnackBar(
+        //                           SnackBar(
+        //                               content:
+        //                                   Text("Duplicate Meal Message").tr()));
+        //                     }
+        //                   },
+        //                   style: saveButtonStyle,
+        //                 ),
+        //               ],
+        //             );
+        //           });
+        //     },
+        //     child: Icon(Icons.add),
+        //   ),
+        // This trailing comma makes auto-formatting nicer for build methods.
       ),
     );
   }

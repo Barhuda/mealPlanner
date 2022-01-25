@@ -63,6 +63,13 @@ class _MainScreenState extends State<MainScreen> {
 
   List<String> selectedMealTimes = [];
 
+  List<String> mulitSelectMealTimesFullList = [
+    "Breakfast",
+    "Lunch",
+    "Dinner",
+    "Snack"
+  ];
+
   // var mealTimeListDropdown = <String>[
   //   'Breakfast'.tr(),
   //   'Lunch'.tr(),
@@ -500,189 +507,203 @@ class _MainScreenState extends State<MainScreen> {
                         showDialog(
                             context: context,
                             builder: (BuildContext context) {
-                              return AlertDialog(
-                                shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.all(
-                                        Radius.circular(20.0))),
-                                backgroundColor: Constants.secondaryColor,
-                                scrollable: true,
-                                title: Text(
-                                  '${formatter.format(weekMap.keys.elementAt(index))} ${weekMap.keys.elementAt(index).day.toString()}.${weekMap.keys.elementAt(index).month.toString()}.${weekMap.keys.elementAt(index).year.toString()}',
-                                  textAlign: TextAlign.center,
-                                ),
-                                content: StatefulBuilder(builder:
-                                    (BuildContext context,
-                                        StateSetter setState) {
-                                  return Container(
-                                    height: 350 +
-                                        (20 *
-                                            (countLinks(breakfast, lunch,
-                                                evening, snack))),
-                                    child: Form(
-                                      child: Column(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.center,
-                                        children: <Widget>[
-                                          for (var mealTimes
-                                              in selectedMealTimes)
-                                            Column(
-                                              children: [
-                                                TypeAheadField(
-                                                  textFieldConfiguration:
-                                                      TextFieldConfiguration(
-                                                    maxLines: 4,
-                                                    minLines: 1,
-                                                    keyboardType:
-                                                        TextInputType.multiline,
-                                                    textCapitalization:
-                                                        TextCapitalization
-                                                            .sentences,
-                                                    controller:
-                                                        txtControllersList[
-                                                            selectedMealTimes
+                              return Container(
+                                child: AlertDialog(
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.all(
+                                          Radius.circular(20.0))),
+                                  backgroundColor: Constants.secondaryColor,
+                                  scrollable: true,
+                                  title: Text(
+                                    '${formatter.format(weekMap.keys.elementAt(index))} ${weekMap.keys.elementAt(index).day.toString()}.${weekMap.keys.elementAt(index).month.toString()}.${weekMap.keys.elementAt(index).year.toString()}',
+                                    textAlign: TextAlign.center,
+                                  ),
+                                  content: StatefulBuilder(builder:
+                                      (BuildContext context,
+                                          StateSetter setState) {
+                                    return Container(
+                                      height: 100 +
+                                          (20 *
+                                              (countLinks(breakfast, lunch,
+                                                  evening, snack))) +
+                                          (50 * selectedMealTimes.length),
+                                      child: Form(
+                                        child: Column(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.center,
+                                          children: <Widget>[
+                                            for (var mealTimes
+                                                in selectedMealTimes)
+                                              Column(
+                                                children: [
+                                                  TypeAheadField(
+                                                    textFieldConfiguration:
+                                                        TextFieldConfiguration(
+                                                      maxLines: 4,
+                                                      minLines: 1,
+                                                      keyboardType:
+                                                          TextInputType
+                                                              .multiline,
+                                                      textCapitalization:
+                                                          TextCapitalization
+                                                              .sentences,
+                                                      controller: txtControllersList[
+                                                          mulitSelectMealTimesFullList
+                                                              .indexOf(
+                                                                  mealTimes)],
+                                                      decoration:
+                                                          InputDecoration(
+                                                              labelText:
+                                                                  mealTimes
+                                                                      .tr(),
+                                                              suffixIcon:
+                                                                  IconButton(
+                                                                onPressed: () {
+                                                                  _showDeleteDialog(
+                                                                      mealsInCurrentDayList[
+                                                                          mulitSelectMealTimesFullList.indexOf(
+                                                                              mealTimes)],
+                                                                      txtControllersList[
+                                                                          mulitSelectMealTimesFullList
+                                                                              .indexOf(mealTimes)]);
+                                                                },
+                                                                icon: Icon(Icons
+                                                                    .delete),
+                                                              )),
+                                                      textAlign: TextAlign.left,
+                                                      onChanged: (value) {
+                                                        editMealStringList[
+                                                            mulitSelectMealTimesFullList
                                                                 .indexOf(
-                                                                    mealTimes)],
-                                                    decoration: InputDecoration(
-                                                        labelText:
-                                                            mealTimes.tr(),
-                                                        suffixIcon: IconButton(
-                                                          onPressed: () {
-                                                            _showDeleteDialog(
-                                                                mealsInCurrentDayList[
-                                                                    selectedMealTimes
-                                                                        .indexOf(
-                                                                            mealTimes)],
-                                                                txtControllersList[
-                                                                    selectedMealTimes
-                                                                        .indexOf(
-                                                                            mealTimes)]);
-                                                          },
-                                                          icon: Icon(
-                                                              Icons.delete),
-                                                        )),
-                                                    textAlign: TextAlign.left,
-                                                    onChanged: (value) {
+                                                                    mealTimes)] = value;
+                                                      },
+                                                    ),
+                                                    suggestionsCallback:
+                                                        (pattern) {
+                                                      return getIdeas(pattern);
+                                                    },
+                                                    itemBuilder:
+                                                        (context, idea) {
+                                                      return ListTile(
+                                                        title: Text(
+                                                            idea["mealName"]),
+                                                      );
+                                                    },
+                                                    hideOnEmpty: true,
+                                                    hideOnError: true,
+                                                    debounceDuration: Duration(
+                                                        milliseconds: 400),
+                                                    onSuggestionSelected:
+                                                        (idea) {
                                                       editMealStringList[
                                                               selectedMealTimes
                                                                   .indexOf(
                                                                       mealTimes)] =
-                                                          value;
-                                                    },
-                                                  ),
-                                                  suggestionsCallback:
-                                                      (pattern) {
-                                                    return getIdeas(pattern);
-                                                  },
-                                                  itemBuilder: (context, idea) {
-                                                    return ListTile(
-                                                      title: Text(
-                                                          idea["mealName"]),
-                                                    );
-                                                  },
-                                                  hideOnEmpty: true,
-                                                  hideOnError: true,
-                                                  debounceDuration: Duration(
-                                                      milliseconds: 400),
-                                                  onSuggestionSelected: (idea) {
-                                                    editMealStringList[
-                                                            selectedMealTimes
-                                                                .indexOf(
-                                                                    mealTimes)] =
-                                                        idea["mealName"];
-                                                    mealLinks[selectedMealTimes
-                                                        .indexOf(
-                                                            mealTimes)] = "";
-                                                    txtControllersList[
-                                                            selectedMealTimes
-                                                                .indexOf(
-                                                                    mealTimes)]
-                                                        .text = idea["mealName"];
-                                                    if (idea["recipe"] != "" ||
-                                                        idea["recipe"] !=
-                                                            null) {
+                                                          idea["mealName"];
                                                       mealLinks[selectedMealTimes
-                                                              .indexOf(
-                                                                  mealTimes)] =
-                                                          idea["recipe"];
-                                                    }
-                                                  },
-                                                ),
-                                                Visibility(
-                                                  visible: (mealsInCurrentDayList[
-                                                                  selectedMealTimes
-                                                                      .indexOf(
-                                                                          mealTimes)]
-                                                              .recipe !=
-                                                          "" &&
-                                                      mealsInCurrentDayList[
-                                                                  selectedMealTimes
-                                                                      .indexOf(
-                                                                          mealTimes)]
-                                                              .recipe !=
-                                                          null),
-                                                  child: ElevatedButton(
-                                                    child:
-                                                        Text("Link to recipe")
-                                                            .tr(),
-                                                    onPressed: () {
-                                                      launch(mealsInCurrentDayList[
+                                                          .indexOf(
+                                                              mealTimes)] = "";
+                                                      txtControllersList[
                                                               selectedMealTimes
                                                                   .indexOf(
                                                                       mealTimes)]
-                                                          .recipe);
+                                                          .text = idea["mealName"];
+                                                      if (idea["recipe"] !=
+                                                              "" ||
+                                                          idea["recipe"] !=
+                                                              null) {
+                                                        mealLinks[selectedMealTimes
+                                                                .indexOf(
+                                                                    mealTimes)] =
+                                                            idea["recipe"];
+                                                      }
                                                     },
-                                                    style: recipeButtonStyle,
                                                   ),
-                                                ),
-                                              ],
-                                            ),
-                                        ],
+                                                  Visibility(
+                                                    visible: (mealsInCurrentDayList[
+                                                                    selectedMealTimes
+                                                                        .indexOf(
+                                                                            mealTimes)]
+                                                                .recipe !=
+                                                            "" &&
+                                                        mealsInCurrentDayList[
+                                                                    selectedMealTimes
+                                                                        .indexOf(
+                                                                            mealTimes)]
+                                                                .recipe !=
+                                                            null),
+                                                    child: ElevatedButton(
+                                                      child:
+                                                          Text("Link to recipe")
+                                                              .tr(),
+                                                      onPressed: () {
+                                                        launch(mealsInCurrentDayList[
+                                                                selectedMealTimes
+                                                                    .indexOf(
+                                                                        mealTimes)]
+                                                            .recipe);
+                                                      },
+                                                      style: recipeButtonStyle,
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                          ],
+                                        ),
                                       ),
+                                    );
+                                  }),
+                                  actions: <Widget>[
+                                    ElevatedButton(
+                                      child: Text(
+                                        "Cancel",
+                                        style: TextStyle(color: Colors.blue),
+                                      ).tr(),
+                                      onPressed: () {
+                                        Navigator.of(context).pop();
+                                        asyncMethod().then((value) {
+                                          setState(() {});
+                                        });
+                                      },
+                                      style: cancelButtonStyle,
                                     ),
-                                  );
-                                }),
-                                actions: <Widget>[
-                                  ElevatedButton(
-                                    child: Text(
-                                      "Cancel",
-                                      style: TextStyle(color: Colors.blue),
-                                    ).tr(),
-                                    onPressed: () {
-                                      Navigator.of(context).pop();
-                                      asyncMethod().then((value) {
-                                        setState(() {});
-                                      });
-                                    },
-                                    style: cancelButtonStyle,
-                                  ),
-                                  SizedBox(
-                                    width: 10,
-                                  ),
-                                  ElevatedButton(
-                                    child: Text("Save").tr(),
-                                    onPressed: () {
-                                      for (int i = 0;
-                                          i < selectedMealTimes.length;
-                                          i++) {
-                                        mealsInCurrentDayList[i].saveMeal(
-                                            txtControllersList[i].text,
-                                            weekMap.keys.elementAt(index),
-                                            selectedMealTimes[i],
-                                            mealLinks[i]);
-                                        editMealStringList[i] = null;
-                                      }
-                                      Navigator.of(context).pop();
-                                      asyncMethod().then((value) {
-                                        setState(() {});
-                                      });
-                                      // editDay(breakfast, lunch, evening,
-                                      //     weekMap.keys.elementAt(index));
-                                    },
-                                    style: saveButtonStyle,
-                                  ),
-                                ],
+                                    SizedBox(
+                                      width: 10,
+                                    ),
+                                    ElevatedButton(
+                                      child: Text("Save").tr(),
+                                      onPressed: () {
+                                        for (int i = 0;
+                                            i < selectedMealTimes.length;
+                                            i++) {
+                                          int correctIndex =
+                                              mulitSelectMealTimesFullList
+                                                  .indexOf(
+                                                      selectedMealTimes[i]);
+                                          mealsInCurrentDayList[correctIndex]
+                                              .saveMeal(
+                                                  txtControllersList[
+                                                          correctIndex]
+                                                      .text,
+                                                  weekMap.keys.elementAt(index),
+                                                  selectedMealTimes[i],
+                                                  mealLinks[correctIndex]);
+                                          editMealStringList[correctIndex] =
+                                              null;
+                                        }
+                                        Navigator.of(context).pop();
+                                        asyncMethod().then((value) {
+                                          setState(() {});
+                                        });
+                                        // editDay(breakfast, lunch, evening,
+                                        //     weekMap.keys.elementAt(index));
+                                      },
+                                      style: saveButtonStyle,
+                                    ),
+                                  ],
+                                ),
                               );
                             });
                       },
@@ -748,7 +769,10 @@ class _MainScreenState extends State<MainScreen> {
                                                             fontSize: 14),
                                                       ),
                                                       Text(
-                                                        mealsInCurrentDayList[i]
+                                                        mealsInCurrentDayList[
+                                                                    mulitSelectMealTimesFullList
+                                                                        .indexOf(
+                                                                            selectedMealTimes[i])]
                                                                 .mealName ??
                                                             "-",
                                                         textAlign:

@@ -775,7 +775,7 @@ class _MainScreenState extends State<MainScreen> {
                                                         child: Column(
                                                           mainAxisAlignment:
                                                               MainAxisAlignment
-                                                                  .spaceEvenly,
+                                                                  .center,
                                                           children: [
                                                             Text(
                                                               selectedMealTimes[
@@ -834,31 +834,30 @@ class _MainScreenState extends State<MainScreen> {
                                     ],
                                   ),
                                   selectedMealTimes.contains("Snack")
-                                      ? Column(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.start,
-                                          children: [
-                                            // Container(
-                                            //   color: Constants.fourthColor,
-                                            //   height: 1,
-                                            //   width: 150,
-                                            //   margin: EdgeInsets.all(4),
-                                            // ),
-                                            Text(
-                                              "Snack".tr(),
-                                              style: TextStyle(
-                                                  fontWeight: FontWeight.bold,
-                                                  fontSize: 14),
-                                            ),
-                                            Text(
-                                              mealsInCurrentDayList[
-                                                          mulitSelectMealTimesFullList
-                                                              .indexOf("Snack")]
-                                                      .mealName ??
-                                                  "-",
-                                              textAlign: TextAlign.center,
-                                            ),
-                                          ],
+                                      ? Padding(
+                                          padding:
+                                              const EdgeInsets.only(right: 15),
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.center,
+                                            children: [
+                                              Text(
+                                                "Snack".tr(),
+                                                style: TextStyle(
+                                                    fontWeight: FontWeight.bold,
+                                                    fontSize: 14),
+                                              ),
+                                              Text(
+                                                mealsInCurrentDayList[
+                                                            mulitSelectMealTimesFullList
+                                                                .indexOf(
+                                                                    "Snack")]
+                                                        .mealName ??
+                                                    "-",
+                                                textAlign: TextAlign.center,
+                                              ),
+                                            ],
+                                          ),
                                         )
                                       : SizedBox(),
                                 ],

@@ -135,7 +135,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
               items: mulitSelectMealTimesFullList
                   .map((e) => MultiSelectItem(e, e.tr()))
                   .toList(),
-              initialValue: selectedMultiselectMealTimes,
+              initialValue: selectedMultiselectMealTimes
+                  .map((e) => MultiSelectItem(e, e.tr()))
+                  .toList(),
               icon: Icon(Icons.check),
               onTap: (values) {
                 selectedMultiselectMealTimes = values;

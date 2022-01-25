@@ -504,6 +504,7 @@ class _MainScreenState extends State<MainScreen> {
                           eveningLink,
                           snackLink
                         ];
+                        print(evening.recipe);
                         showDialog(
                             context: context,
                             builder: (BuildContext context) {
@@ -701,7 +702,9 @@ class _MainScreenState extends State<MainScreen> {
                                                       .text,
                                                   weekMap.keys.elementAt(index),
                                                   selectedMealTimes[i],
-                                                  mealLinks[correctIndex]);
+                                                  mealsInCurrentDayList[
+                                                          correctIndex]
+                                                      .recipe);
                                           editMealStringList[correctIndex] =
                                               null;
                                         }

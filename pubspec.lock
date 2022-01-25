@@ -301,13 +301,15 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.9.7"
-  multi_select_flutter:
+  multiselect:
     dependency: "direct main"
     description:
-      name: multi_select_flutter
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "4.0.0"
+      path: "."
+      ref: HEAD
+      resolved-ref: "3cfb6a2a0a588010949a98989d602687828a2a0d"
+      url: "https://github.com/Barhuda/multiselect"
+    source: git
+    version: "0.0.4"
   path:
     dependency: transitive
     description:
@@ -474,6 +476,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.10.0"
+  states_rebuilder:
+    dependency: transitive
+    description:
+      name: states_rebuilder
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "4.4.0"
   stream_channel:
     dependency: transitive
     description:

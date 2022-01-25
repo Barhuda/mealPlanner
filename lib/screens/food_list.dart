@@ -42,6 +42,8 @@ class _FoodListState extends State<FoodList> {
   String selectedLocalMealTime;
   int mealDate;
 
+  List<String> selectedMealTimes = [];
+
   //TODO: ADD Snack to Dropdown
   var mealTimeListDropdown = <String>[
     'Breakfast'.tr(),
@@ -82,6 +84,7 @@ class _FoodListState extends State<FoodList> {
     meallist = await Meallist().generateMealList(0);
     prefs = await SharedPreferences.getInstance();
     sortAlphabetical = prefs.getBool('sort') ?? false;
+    selectedMealTimes = prefs.getStringList('mealTimes');
     if (sortAlphabetical) {
       meallist.sort((a, b) =>
           a.mealName.toLowerCase().compareTo(b.mealName.toLowerCase()));
@@ -570,7 +573,7 @@ class _FoodListState extends State<FoodList> {
                                                                 child:
                                                                     DropdownButton(
                                                                   value: selectedLocalMealTime ??
-                                                                      mealTimeListDropdown[
+                                                                      selectedMealTimes[
                                                                           0],
                                                                   icon: Icon(Icons
                                                                       .local_dining),
@@ -579,41 +582,13 @@ class _FoodListState extends State<FoodList> {
                                                                       newValue) {
                                                                     setState(
                                                                         () {
-                                                                      if (mealTimeListDropdown
-                                                                              .indexOf(newValue) ==
-                                                                          0) {
-                                                                        mealTime =
-                                                                            "Breakfast";
-                                                                        selectedLocalMealTime =
-                                                                            mealTimeListDropdown[0];
-                                                                      }
-                                                                      if (mealTimeListDropdown
-                                                                              .indexOf(newValue) ==
-                                                                          1) {
-                                                                        mealTime =
-                                                                            "Lunch";
-                                                                        selectedLocalMealTime =
-                                                                            mealTimeListDropdown[1];
-                                                                      }
-                                                                      if (mealTimeListDropdown
-                                                                              .indexOf(newValue) ==
-                                                                          2) {
-                                                                        mealTime =
-                                                                            "Dinner";
-                                                                        selectedLocalMealTime =
-                                                                            mealTimeListDropdown[2];
-                                                                      }
-                                                                      if (mealTimeListDropdown
-                                                                              .indexOf(newValue) ==
-                                                                          3) {
-                                                                        mealTime =
-                                                                            "Snack";
-                                                                        selectedLocalMealTime =
-                                                                            mealTimeListDropdown[3];
-                                                                      }
+                                                                      mealTime =
+                                                                          newValue;
+                                                                      selectedLocalMealTime =
+                                                                          mealTime;
                                                                     });
                                                                   },
-                                                                  items: mealTimeListDropdown.map<
+                                                                  items: selectedMealTimes.map<
                                                                       DropdownMenuItem<
                                                                           String>>(
                                                                     (String
@@ -623,7 +598,7 @@ class _FoodListState extends State<FoodList> {
                                                                         value:
                                                                             value,
                                                                         child: Text(
-                                                                            value),
+                                                                            value.tr()),
                                                                       );
                                                                     },
                                                                   ).toList(),

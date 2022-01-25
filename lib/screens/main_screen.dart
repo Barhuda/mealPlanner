@@ -365,7 +365,7 @@ class _MainScreenState extends State<MainScreen> {
           backgroundColor: Constants.mainColor,
           actionsIconTheme: IconThemeData(size: 40),
           title: Text(
-            'Mealplaner',
+            'Meal planner'.tr(),
           ),
           centerTitle: true,
           leading: Padding(
@@ -598,15 +598,16 @@ class _MainScreenState extends State<MainScreen> {
                                                     onSuggestionSelected:
                                                         (idea) {
                                                       editMealStringList[
-                                                              selectedMealTimes
-                                                                  .indexOf(
-                                                                      mealTimes)] =
-                                                          idea["mealName"];
-                                                      mealLinks[selectedMealTimes
-                                                          .indexOf(
-                                                              mealTimes)] = "";
+                                                          mulitSelectMealTimesFullList
+                                                              .indexOf(
+                                                                  mealTimes)] = idea[
+                                                          "mealName"];
+                                                      mealLinks[
+                                                          mulitSelectMealTimesFullList
+                                                              .indexOf(
+                                                                  mealTimes)] = "";
                                                       txtControllersList[
-                                                              selectedMealTimes
+                                                              mulitSelectMealTimesFullList
                                                                   .indexOf(
                                                                       mealTimes)]
                                                           .text = idea["mealName"];
@@ -614,7 +615,7 @@ class _MainScreenState extends State<MainScreen> {
                                                               "" ||
                                                           idea["recipe"] !=
                                                               null) {
-                                                        mealLinks[selectedMealTimes
+                                                        mealLinks[mulitSelectMealTimesFullList
                                                                 .indexOf(
                                                                     mealTimes)] =
                                                             idea["recipe"];
@@ -623,13 +624,13 @@ class _MainScreenState extends State<MainScreen> {
                                                   ),
                                                   Visibility(
                                                     visible: (mealsInCurrentDayList[
-                                                                    selectedMealTimes
+                                                                    mulitSelectMealTimesFullList
                                                                         .indexOf(
                                                                             mealTimes)]
                                                                 .recipe !=
                                                             "" &&
                                                         mealsInCurrentDayList[
-                                                                    selectedMealTimes
+                                                                    mulitSelectMealTimesFullList
                                                                         .indexOf(
                                                                             mealTimes)]
                                                                 .recipe !=
@@ -639,11 +640,22 @@ class _MainScreenState extends State<MainScreen> {
                                                           Text("Link to recipe")
                                                               .tr(),
                                                       onPressed: () {
-                                                        launch(mealsInCurrentDayList[
-                                                                selectedMealTimes
-                                                                    .indexOf(
-                                                                        mealTimes)]
-                                                            .recipe);
+                                                        String recipeLink =
+                                                            mealsInCurrentDayList[
+                                                                    mulitSelectMealTimesFullList
+                                                                        .indexOf(
+                                                                            mealTimes)]
+                                                                .recipe;
+                                                        if (recipeLink.startsWith(
+                                                                "https://") ||
+                                                            recipeLink
+                                                                .startsWith(
+                                                                    "http://")) {
+                                                          launch(recipeLink);
+                                                        } else {
+                                                          launch("https://" +
+                                                              recipeLink);
+                                                        }
                                                       },
                                                       style: recipeButtonStyle,
                                                     ),

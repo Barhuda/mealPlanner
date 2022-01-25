@@ -80,11 +80,6 @@ class Meal {
           recipe: link,
         ).toMapWithoutId(),
         conflictAlgorithm: ConflictAlgorithm.replace);
-    print(mealName +
-        " " +
-        dayTime +
-        " " +
-        date.microsecondsSinceEpoch.toString());
   }
 
   Future<Map<DateTime, Map<String, Meal>>> generateWeekList(

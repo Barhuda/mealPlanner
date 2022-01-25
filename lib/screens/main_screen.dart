@@ -748,60 +748,107 @@ class _MainScreenState extends State<MainScreen> {
                                       for (int i = 0;
                                           i < selectedMealTimes.length;
                                           i++)
-                                        Expanded(
-                                          child: Padding(
-                                            padding: const EdgeInsets.all(4.0),
-                                            child: Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.spaceEvenly,
-                                              children: [
-                                                Expanded(
-                                                  child: Column(
+                                        selectedMealTimes[i] == "Snack"
+                                            ? SizedBox()
+                                            : Expanded(
+                                                child: Padding(
+                                                  padding:
+                                                      const EdgeInsets.all(4.0),
+                                                  child: Row(
                                                     mainAxisAlignment:
-                                                        MainAxisAlignment.start,
+                                                        MainAxisAlignment
+                                                            .spaceEvenly,
                                                     children: [
-                                                      Text(
-                                                        selectedMealTimes[i]
-                                                            .tr(),
-                                                        style: TextStyle(
-                                                            fontWeight:
-                                                                FontWeight.bold,
-                                                            fontSize: 14),
+                                                      Expanded(
+                                                        child: Column(
+                                                          mainAxisAlignment:
+                                                              MainAxisAlignment
+                                                                  .spaceEvenly,
+                                                          children: [
+                                                            Text(
+                                                              selectedMealTimes[
+                                                                      i]
+                                                                  .tr(),
+                                                              textAlign:
+                                                                  TextAlign
+                                                                      .start,
+                                                              style: TextStyle(
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .bold,
+                                                                  fontSize: 14),
+                                                            ),
+                                                            Text(
+                                                              mealsInCurrentDayList[
+                                                                          mulitSelectMealTimesFullList
+                                                                              .indexOf(selectedMealTimes[i])]
+                                                                      .mealName ??
+                                                                  "-",
+                                                              textAlign:
+                                                                  TextAlign
+                                                                      .center,
+                                                            ),
+                                                          ],
+                                                        ),
                                                       ),
-                                                      Text(
-                                                        mealsInCurrentDayList[
-                                                                    mulitSelectMealTimesFullList
-                                                                        .indexOf(
-                                                                            selectedMealTimes[i])]
-                                                                .mealName ??
-                                                            "-",
-                                                        textAlign:
-                                                            TextAlign.center,
+                                                      SizedBox(
+                                                        width: 8,
+                                                      ),
+                                                      Visibility(
+                                                        visible: selectedMealTimes
+                                                                .contains(
+                                                                    "Snack")
+                                                            ? i <
+                                                                selectedMealTimes
+                                                                        .length -
+                                                                    2
+                                                            : i <
+                                                                selectedMealTimes
+                                                                        .length -
+                                                                    1,
+                                                        child: Container(
+                                                          color: Constants
+                                                              .fourthColor,
+                                                          height: 30,
+                                                          width: 1,
+                                                          margin:
+                                                              EdgeInsets.all(4),
+                                                        ),
                                                       ),
                                                     ],
                                                   ),
                                                 ),
-                                                SizedBox(
-                                                  width: 8,
-                                                ),
-                                                Visibility(
-                                                  visible: i !=
-                                                      selectedMealTimes.length -
-                                                          1,
-                                                  child: Container(
-                                                    color:
-                                                        Constants.fourthColor,
-                                                    height: 30,
-                                                    width: 1,
-                                                    margin: EdgeInsets.all(4),
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        ),
+                                              ),
                                     ],
                                   ),
+                                  selectedMealTimes.contains("Snack")
+                                      ? Column(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.start,
+                                          children: [
+                                            // Container(
+                                            //   color: Constants.fourthColor,
+                                            //   height: 1,
+                                            //   width: 150,
+                                            //   margin: EdgeInsets.all(4),
+                                            // ),
+                                            Text(
+                                              "Snack".tr(),
+                                              style: TextStyle(
+                                                  fontWeight: FontWeight.bold,
+                                                  fontSize: 14),
+                                            ),
+                                            Text(
+                                              mealsInCurrentDayList[
+                                                          mulitSelectMealTimesFullList
+                                                              .indexOf("Snack")]
+                                                      .mealName ??
+                                                  "-",
+                                              textAlign: TextAlign.center,
+                                            ),
+                                          ],
+                                        )
+                                      : SizedBox(),
                                 ],
                               ),
                       ),

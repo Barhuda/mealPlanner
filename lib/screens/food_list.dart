@@ -603,6 +603,14 @@ class _FoodListState extends State<FoodList> {
                                                                         selectedLocalMealTime =
                                                                             mealTimeListDropdown[2];
                                                                       }
+                                                                      if (mealTimeListDropdown
+                                                                              .indexOf(newValue) ==
+                                                                          3) {
+                                                                        mealTime =
+                                                                            "Snack";
+                                                                        selectedLocalMealTime =
+                                                                            mealTimeListDropdown[3];
+                                                                      }
                                                                     });
                                                                   },
                                                                   items: mealTimeListDropdown.map<
@@ -688,25 +696,22 @@ class _FoodListState extends State<FoodList> {
                                                       ).tr(),
                                                       onPressed: () async {
                                                         try {
-                                                          await _databaseHelper
-                                                              .db
-                                                              .insert(
-                                                            "meals",
-                                                            Meal(
-                                                                    mealName: mealName ??
-                                                                        currentMeal
-                                                                            .mealName,
-                                                                    date:
-                                                                        mealDate,
-                                                                    dayTime:
-                                                                        mealTime,
-                                                                    recipe: currentMeal
-                                                                        .recipe)
-                                                                .toMapWithoutId(),
-                                                          );
+                                                          Meal().saveMeal(
+                                                              mealName ??
+                                                                  currentMeal
+                                                                      .mealName,
+                                                              DateTime(
+                                                                  date.year,
+                                                                  date.month,
+                                                                  date.day),
+                                                              mealTime,
+                                                              currentMeal
+                                                                  .recipe);
+
                                                           Navigator.of(context)
                                                               .pop();
                                                         } catch (e) {
+                                                          print(mealTime);
                                                           Navigator.of(context)
                                                               .pop();
                                                           ScaffoldMessenger.of(

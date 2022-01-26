@@ -46,7 +46,7 @@ android {
     defaultConfig {
         applicationId "com.mk.mealpy"
         minSdkVersion 16
-        targetSdkVersion 29
+        targetSdkVersion 30
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
     }

@@ -1,9 +1,9 @@
-class User {
+class MyUser {
   String UID;
   bool isLoggedIn;
   List<String> allowedDbs;
 
-  User({this.isLoggedIn = false, this.allowedDbs, this.UID});
+  MyUser({this.isLoggedIn = false, this.allowedDbs, this.UID});
 
   userLoggedIn(String UID) {
     this.isLoggedIn = true;
@@ -12,5 +12,6 @@ class User {
 
   userLoggedOut() {
     this.isLoggedIn = false;
+    this.UID = null;
   }
 }

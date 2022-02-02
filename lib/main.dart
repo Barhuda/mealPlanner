@@ -14,7 +14,9 @@ import 'package:get/get.dart' hide Trans;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'my_user.dart';
 
+MyUser myUser = MyUser();
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Injection.initInjection();
@@ -50,11 +52,11 @@ class _MyAppState extends State<MyApp> {
     final FirebaseAuth _auth = FirebaseAuth.instance;
     _auth.authStateChanges().listen((User user) {
       if (user == null) {
+        
+        myUser.userLoggedOut();
         print('User is currently signed out!');
       } else {
-        print('User is signed in!');
-        print("User UID:::::::: " + user.uid);
-        print(user.displayName);
+        myUser.userLoggedIn(user.uid);
         _getUsersDB(user);
       }
     });
@@ -96,6 +98,9 @@ class _MyAppState extends State<MyApp> {
       supportedLocales: context.supportedLocales,
       locale: context.locale,
       navigatorObservers: [MyApp.observer],
+      initialBinding: BindingsBuilder(() {
+        Get.put(myUser);
+      }),
       routes: {
         MainScreen.id: (context) =>
             MainScreen(analytics: MyApp.analytics, observer: MyApp.observer),

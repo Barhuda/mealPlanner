@@ -3,12 +3,14 @@ import 'package:flutter/material.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_analytics/observer.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:mealpy/my_user.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:intl/intl.dart';
 import 'package:multiselect/multiselect.dart';
 import 'package:auth_buttons/auth_buttons.dart'
     show GoogleAuthButton, EmailAuthButton, AuthButtonType, AuthIconType;
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:get/get.dart' hide Trans;
 
 class SettingsScreen extends StatefulWidget {
   SettingsScreen({Key key, this.analytics, this.observer, this.database})
@@ -32,6 +34,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   bool _isLoading = true;
   bool sortAlphabetical = false;
   List<DropdownMenuItem<int>> dropDownList = [];
+  MyUser myUser = Get.find();
 
   int selectedValue = 0;
 
@@ -47,13 +50,17 @@ class _SettingsScreenState extends State<SettingsScreen> {
   @override
   void initState() {
     super.initState();
-    _getUserInfo();
+    if (myUser.isLoggedIn) {
+      _getUserInfo();
+    }
+
     _getSharedPrefs();
     _generateWeekDayList();
   }
 
   _getUserInfo() async {
-    DatabaseReference ref = FirebaseDatabase.instance.ref("Users");
+    DatabaseReference ref =
+        FirebaseDatabase.instance.ref("Users/${myUser.UID}");
     DatabaseEvent event = await ref.once();
     print(event.snapshot.value);
   }
@@ -96,6 +103,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
     setState(() {
       _isLoading = false;
     });
+  }
+
+  _addData() {
+    if (myUser.UID != null) {
+      print("USER UID:::" + myUser.UID);
+    } else {
+      print("UID Leer");
+    }
   }
 
   _registerWithMail() async {
@@ -217,7 +232,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     Padding(
                       padding: const EdgeInsets.only(top: 16.0, bottom: 34),
                       child: GoogleAuthButton(
-                        onPressed: () {},
+                        onPressed: () {
+                          _addData();
+                        },
                         darkMode: false, // if true second example
                       ),
                     ),

@@ -1,3 +1,4 @@
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_analytics/observer.dart';
@@ -7,8 +8,10 @@ import 'package:intl/intl.dart';
 import 'package:multiselect/multiselect.dart';
 
 class SettingsScreen extends StatefulWidget {
-  SettingsScreen({Key key, this.analytics, this.observer}) : super(key: key);
+  SettingsScreen({Key key, this.analytics, this.observer, this.database})
+      : super(key: key);
 
+  final FirebaseDatabase database;
   final FirebaseAnalytics analytics;
   final FirebaseAnalyticsObserver observer;
 
@@ -41,9 +44,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
   @override
   void initState() {
     super.initState();
-
+    _getUserInfo();
     _getSharedPrefs();
     _generateWeekDayList();
+  }
+
+  _getUserInfo() async {
+    DatabaseReference ref = FirebaseDatabase.instance.ref("Users");
+    DatabaseEvent event = await ref.once();
+    print(event.snapshot.value);
   }
 
   _getSharedPrefs() async {

@@ -45,6 +45,7 @@ dependencies:
   category_picker: ^1.0.1
   get: ^4.3.8
   shared_preferences: ^2.0.8
+  firebase_database: ^9.0.6
   multiselect: 
     git: https://github.com/Barhuda/multiselect
 

@@ -1,6 +1,7 @@
 {
   "project_info": {
     "project_number": "697635097783",
+    "firebase_url": "https://mealpy-ca38a-default-rtdb.europe-west1.firebasedatabase.app",
     "project_id": "mealpy-ca38a",
     "storage_bucket": "mealpy-ca38a.appspot.com"
   },
@@ -13,6 +14,14 @@
         }
       },
       "oauth_client": [
+        {
+          "client_id": "697635097783-ps4pss3hmbji63spddvo6dq7kmfup4l7.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.mk.mealpy",
+            "certificate_hash": "e549fe0d0a14f79dbe8fb26c71c7a3b141ba7d6f"
+          }
+        },
         {
           "client_id": "697635097783-s84s15fp5hlseosqa9s98mp2mm0amujr.apps.googleusercontent.com",
           "client_type": 3

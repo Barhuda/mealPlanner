@@ -51,10 +51,35 @@ class _MyAppState extends State<MyApp> {
     _auth.authStateChanges().listen((User user) {
       if (user == null) {
         print('User is currently signed out!');
-        print(user.uid);
       } else {
         print('User is signed in!');
+        print("User UID:::::::: " + user.uid);
+        print(user.displayName);
+        _getUsersDB(user);
       }
+    });
+  }
+
+  _getUsersDB(User user) async {
+    DatabaseReference ref = FirebaseDatabase.instance.ref("Users/${user.uid}");
+
+    DatabaseEvent event = await ref.once();
+
+    if (event.snapshot.value == null) {
+      _createNewUserInDB(user, ref);
+    }
+  }
+
+  _createNewUserInDB(User user, DatabaseReference ref) async {
+    String userUid = user.uid;
+    await ref.parent.update({
+      userUid: {
+        "name": "KevKev",
+        "allowedDbs": {userUid: true}
+      }
+    });
+    await ref.root.child("mealDbs").update({
+      userUid: {"name": "TestMealDB", "weekdays": {}}
     });
   }
 

@@ -6,6 +6,9 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:intl/intl.dart';
 import 'package:multiselect/multiselect.dart';
+import 'package:auth_buttons/auth_buttons.dart'
+    show GoogleAuthButton, EmailAuthButton, AuthButtonType, AuthIconType;
+import 'package:firebase_auth/firebase_auth.dart';
 
 class SettingsScreen extends StatefulWidget {
   SettingsScreen({Key key, this.analytics, this.observer, this.database})
@@ -95,6 +98,42 @@ class _SettingsScreenState extends State<SettingsScreen> {
     });
   }
 
+  _registerWithMail() async {
+    try {
+      UserCredential userCredential = await FirebaseAuth.instance
+          .createUserWithEmailAndPassword(
+              email: "barry.allen@example.com",
+              password: "SuperSecretPassword!");
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'weak-password') {
+        print('The password provided is too weak.');
+      } else if (e.code == 'email-already-in-use') {
+        print('The account already exists for that email.');
+      }
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  _signOut() async {
+    await FirebaseAuth.instance.signOut();
+  }
+
+  _loginWithMail() async {
+    try {
+      UserCredential userCredential = await FirebaseAuth.instance
+          .signInWithEmailAndPassword(
+              email: "barry.allen@example.com",
+              password: "SuperSecretPassword!");
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'user-not-found') {
+        print('No user found for that email.');
+      } else if (e.code == 'wrong-password') {
+        print('Wrong password provided for that user.');
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -155,7 +194,57 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         'mealTimes', selectedMultiselectMealTimes);
                   });
                 },
-                whenEmpty: "Chose meals to show".tr())
+                whenEmpty: "Chose meals to show".tr()),
+            Divider(
+              thickness: 4,
+            ),
+            Center(
+              child: Padding(
+                padding: const EdgeInsets.only(top: 24.0),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    Align(
+                      alignment: AlignmentDirectional.centerStart,
+                      child: Text(
+                        "Login for sync and share".tr(),
+                        style: TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.blueGrey),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(top: 16.0, bottom: 34),
+                      child: GoogleAuthButton(
+                        onPressed: () {},
+                        darkMode: false, // if true second example
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 16.0),
+                      child: EmailAuthButton(onPressed: () {
+                        _registerWithMail();
+                      }),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 16.0),
+                      child: EmailAuthButton(
+                        onPressed: () {
+                          _loginWithMail();
+                        },
+                        text: "Erneuter Login",
+                      ),
+                    ),
+                    IconButton(
+                        onPressed: () {
+                          _signOut();
+                        },
+                        icon: Icon(Icons.logout)),
+                  ],
+                ),
+              ),
+            )
           ],
         ),
       ),

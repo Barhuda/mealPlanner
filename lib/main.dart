@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:mealpy/screens/category_screen.dart';
@@ -75,7 +77,9 @@ class _MyAppState extends State<MyApp> {
 
   _getAvailableDbs(User user, DatabaseReference ref) async {
     DatabaseEvent event = await ref.child("allowedDbs").once();
+    Map decoded = jsonDecode(event.snapshot.value);
     myUser.setAllowedDbs(event.snapshot.value);
+    print(event.snapshot.value);
   }
 
   _createNewUserInDB(User user, DatabaseReference ref) async {

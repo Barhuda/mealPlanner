@@ -11,14 +11,15 @@ import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_analytics/observer.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:get/get.dart' hide Trans;
-import 'package:mealpy/user.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  _setUser();
   await Injection.initInjection();
   await EasyLocalization.ensureInitialized();
+  await Firebase.initializeApp();
   runApp(EasyLocalization(
     useOnlyLangCode: true,
     supportedLocales: [Locale('en'), Locale('de')],
@@ -28,20 +29,35 @@ void main() async {
   ));
 }
 
-_setUser() async {
-  SharedPreferences prefs = await SharedPreferences.getInstance();
-  String userID = prefs.getString('user');
-  if (userID != null) {
-    FirebaseDatabase.instance.ref("Users/$userID");
-  }
-}
-
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   static FirebaseAnalytics analytics = FirebaseAnalytics();
   static FirebaseAnalyticsObserver observer =
       FirebaseAnalyticsObserver(analytics: analytics);
   static FirebaseDatabase database = FirebaseDatabase.instance;
-  // This widget is the root of your application.
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  @override
+  void initState() {
+    _getFireBaseStream();
+    super.initState();
+  }
+
+  _getFireBaseStream() {
+    final FirebaseAuth _auth = FirebaseAuth.instance;
+    _auth.authStateChanges().listen((User user) {
+      if (user == null) {
+        print('User is currently signed out!');
+        print(user.uid);
+      } else {
+        print('User is signed in!');
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return GetMaterialApp(
@@ -54,16 +70,16 @@ class MyApp extends StatelessWidget {
       localizationsDelegates: context.localizationDelegates,
       supportedLocales: context.supportedLocales,
       locale: context.locale,
-      navigatorObservers: [observer],
+      navigatorObservers: [MyApp.observer],
       routes: {
         MainScreen.id: (context) =>
-            MainScreen(analytics: analytics, observer: observer),
+            MainScreen(analytics: MyApp.analytics, observer: MyApp.observer),
         FoodList.id: (context) =>
-            FoodList(analytics: analytics, observer: observer),
-        CategoryScreen.id: (context) =>
-            CategoryScreen(analytics: analytics, observer: observer),
-        SettingsScreen.id: (context) =>
-            SettingsScreen(analytics: analytics, observer: observer),
+            FoodList(analytics: MyApp.analytics, observer: MyApp.observer),
+        CategoryScreen.id: (context) => CategoryScreen(
+            analytics: MyApp.analytics, observer: MyApp.observer),
+        SettingsScreen.id: (context) => SettingsScreen(
+            analytics: MyApp.analytics, observer: MyApp.observer),
       },
     );
   }

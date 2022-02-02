@@ -46,6 +46,7 @@ dependencies:
   get: ^4.3.8
   shared_preferences: ^2.0.8
   firebase_database: ^9.0.6
+  firebase_auth: ^3.3.6
   multiselect: 
     git: https://github.com/Barhuda/multiselect
 

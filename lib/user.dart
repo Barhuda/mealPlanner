@@ -5,8 +5,12 @@ class User {
 
   User({this.isLoggedIn = false, this.allowedDbs, this.UID});
 
-  getUserData() {
+  userLoggedIn(String UID) {
+    this.isLoggedIn = true;
+    this.UID = UID;
+  }
 
-    
+  userLoggedOut() {
+    this.isLoggedIn = false;
   }
 }

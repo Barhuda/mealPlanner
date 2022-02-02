@@ -179,6 +179,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
         content = "Wrong password provided for that user.".tr();
         print('Wrong password provided for that user.');
         hasError = true;
+      } else {
+        title = e.code;
+        content = e.message;
+        hasError = true;
       }
     }
     Navigator.of(context).pop();

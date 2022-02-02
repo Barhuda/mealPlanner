@@ -14,4 +14,8 @@ class MyUser {
     this.isLoggedIn = false;
     this.UID = null;
   }
+
+  setAllowedDbs(List allowedDbscoming) {
+    allowedDbs = allowedDbscoming;
+  }
 }

@@ -52,7 +52,6 @@ class _MyAppState extends State<MyApp> {
     final FirebaseAuth _auth = FirebaseAuth.instance;
     _auth.authStateChanges().listen((User user) {
       if (user == null) {
-        
         myUser.userLoggedOut();
         print('User is currently signed out!');
       } else {
@@ -69,7 +68,14 @@ class _MyAppState extends State<MyApp> {
 
     if (event.snapshot.value == null) {
       _createNewUserInDB(user, ref);
+    } else {
+      _getAvailableDbs(user, ref);
     }
+  }
+
+  _getAvailableDbs(User user, DatabaseReference ref) async {
+    DatabaseEvent event = await ref.child("allowedDbs").once();
+    myUser.setAllowedDbs(event.snapshot.value);
   }
 
   _createNewUserInDB(User user, DatabaseReference ref) async {

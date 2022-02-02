@@ -19,6 +19,7 @@ import 'package:mealpy/buttons/buttonStyles.dart';
 import 'package:clipboard/clipboard.dart';
 import 'package:mealpy/category.dart';
 import 'package:category_picker/category_picker.dart';
+import 'package:get/get.dart' hide Trans;
 
 class FoodList extends StatefulWidget {
   FoodList({Key key, this.analytics, this.observer}) : super(key: key);
@@ -121,6 +122,10 @@ class _FoodListState extends State<FoodList> {
     }
   }
 
+  _changeScene(int index) {
+     Get.offAndToNamed(Constants.bottomNavigationRoutes[index]);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -150,6 +155,31 @@ class _FoodListState extends State<FoodList> {
               ),
             ),
           ],
+        ),
+        bottomNavigationBar: BottomNavigationBar(
+          unselectedItemColor: Colors.red,
+          showUnselectedLabels: true,
+          selectedItemColor: Constants.fourthColor,
+          items: <BottomNavigationBarItem>[
+            BottomNavigationBarItem(
+              icon: Icon(Icons.settings),
+              label: 'Settings'.tr(),
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.person),
+              label: 'Profile'.tr(),
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.restaurant),
+              label: 'Meal Plan'.tr(),
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.menu_book),
+              label: 'Ideas'.tr(),
+            ),
+          ],
+          onTap: _changeScene,
+          currentIndex: 3,
         ),
         floatingActionButton: FloatingActionButton(
           onPressed: () {

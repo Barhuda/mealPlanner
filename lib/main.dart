@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:mealpy/screens/category_screen.dart';
 import 'package:mealpy/screens/food_list.dart';
 import 'package:mealpy/screens/main_screen.dart';
+import 'package:mealpy/screens/profile_screen.dart';
 import 'package:mealpy/screens/settings_screen.dart';
 import 'injection.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -52,7 +53,6 @@ class _MyAppState extends State<MyApp> {
     final FirebaseAuth _auth = FirebaseAuth.instance;
     _auth.authStateChanges().listen((User user) {
       if (user == null) {
-        
         myUser.userLoggedOut();
         print('User is currently signed out!');
       } else {
@@ -101,6 +101,28 @@ class _MyAppState extends State<MyApp> {
       initialBinding: BindingsBuilder(() {
         Get.put(myUser);
       }),
+      getPages: [
+        GetPage(
+            name: "/",
+            page: () => MainScreen(
+                analytics: MyApp.analytics, observer: MyApp.observer)),
+        GetPage(
+            name: "/idea",
+            page: () =>
+                FoodList(analytics: MyApp.analytics, observer: MyApp.observer)),
+        GetPage(
+            name: "/settings",
+            page: () => SettingsScreen(
+                analytics: MyApp.analytics, observer: MyApp.observer)),
+        GetPage(
+            name: "/category",
+            page: () => CategoryScreen(
+                analytics: MyApp.analytics, observer: MyApp.observer)),
+        GetPage(
+            name: "/profile",
+            page: () => ProfileScreen(
+                analytics: MyApp.analytics, observer: MyApp.observer))
+      ],
       routes: {
         MainScreen.id: (context) =>
             MainScreen(analytics: MyApp.analytics, observer: MyApp.observer),
@@ -110,6 +132,8 @@ class _MyAppState extends State<MyApp> {
             analytics: MyApp.analytics, observer: MyApp.observer),
         SettingsScreen.id: (context) => SettingsScreen(
             analytics: MyApp.analytics, observer: MyApp.observer),
+        ProfileScreen.id: (context) =>
+            ProfileScreen(analytics: MyApp.analytics, observer: MyApp.observer),
       },
     );
   }

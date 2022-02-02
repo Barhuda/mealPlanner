@@ -76,7 +76,7 @@ class _MyAppState extends State<MyApp> {
     String userUid = user.uid;
     await ref.parent.update({
       userUid: {
-        "name": "KevKev",
+        "name": user.email,
         "allowedDbs": {userUid: true}
       }
     });

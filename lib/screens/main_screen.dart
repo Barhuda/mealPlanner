@@ -63,7 +63,7 @@ class _MainScreenState extends State<MainScreen> {
   FocusNode focusNode = FocusNode();
   ScreenshotController screenshotController = ScreenshotController();
   MyUser myUser = Get.find();
-  DatabaseReference dbRef;
+  Stream<DatabaseEvent> dbStream;
 
   List<String> selectedMealTimes = [];
 
@@ -74,12 +74,6 @@ class _MainScreenState extends State<MainScreen> {
     "Snack"
   ];
 
-  // var mealTimeListDropdown = <String>[
-  //   'Breakfast'.tr(),
-  //   'Lunch'.tr(),
-  //   'Dinner'.tr(),
-  //   'Snack'.tr()
-  // ];
   String selectedLocalMealTime;
 
   SharedPreferences prefs;
@@ -184,7 +178,9 @@ class _MainScreenState extends State<MainScreen> {
     currentDate = currentDate.add(Duration(days: 7));
     datePeriod = currentDate.add(Duration(days: 6));
     asyncMethod().then((value) {
-      setState(() {});
+      setState(() {
+        if (myUser.isLoggedIn) _getDbRef();
+      });
     });
   }
 
@@ -192,7 +188,9 @@ class _MainScreenState extends State<MainScreen> {
     currentDate = currentDate.subtract(Duration(days: 7));
     datePeriod = currentDate.add(Duration(days: 6));
     asyncMethod().then((value) {
-      setState(() {});
+      setState(() {
+        if (myUser.isLoggedIn) _getDbRef();
+      });
     });
   }
 
@@ -201,12 +199,14 @@ class _MainScreenState extends State<MainScreen> {
     currentDate = thisDateIs.subtract(
         Duration(days: thisDateIs.weekday - selectedWeekDayAsFirstDay));
     datePeriod = currentDate.add(Duration(days: 6));
+    _handleFirstDayOfWeek();
     asyncMethod().then((value) {
-      setState(() {});
+      setState(() {
+        if (myUser.isLoggedIn) _getDbRef();
+      });
     });
   }
 
-  //TODO: Check auch Snack für AllEntriesEmpty
   bool allEntriesEmpty(Map mapToCheck) {
     if (mapToCheck["Breakfast"] == null &&
         mapToCheck["Lunch"] == null &&
@@ -269,13 +269,22 @@ class _MainScreenState extends State<MainScreen> {
   }
 
   _getDbRef() {
+    final DateTime now = currentDate;
+    final DateFormat formatter = DateFormat('yyyy-MM-dd');
+    final String formatted = formatter.format(now);
+    final String endDate = formatter.format(now.add(Duration(days: 6)));
+    print("Enddatum" + endDate);
+    print("Formatiert" + formatted);
     if (myUser.UID != null) {
-      dbRef = FirebaseDatabase.instance
+      dbStream = FirebaseDatabase.instance
           .ref()
           .child("mealDbs")
-          .child(myUser.UID)
-          .child("weekdays");
-      setState(() {});
+          .child("123")
+          .child("weekdays")
+          .orderByKey()
+          .startAt(formatted)
+          .endAt(endDate)
+          .onValue;
     }
   }
 
@@ -434,7 +443,7 @@ class _MainScreenState extends State<MainScreen> {
 
   StreamBuilder<dynamic> onlineWidget() {
     return StreamBuilder(
-        stream: dbRef.onValue,
+        stream: dbStream,
         builder: (BuildContext context, snapshot) {
           if (snapshot.hasData) {
             DataSnapshot dataValues = snapshot.data.snapshot;
@@ -446,6 +455,7 @@ class _MainScreenState extends State<MainScreen> {
               });
               return Text("Data");
             } else {
+              print("Alles leer");
               return Text("All Entries Empty");
             }
           } else {

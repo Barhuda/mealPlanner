@@ -25,6 +25,8 @@ import 'package:mealpy/buttons/buttonStyles.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:get/get.dart' hide Trans;
+import 'package:mealpy/my_user.dart';
+import 'package:firebase_database/firebase_database.dart';
 
 class MainScreen extends StatefulWidget {
   MainScreen({Key key, this.analytics, this.observer}) : super(key: key);
@@ -60,6 +62,8 @@ class _MainScreenState extends State<MainScreen> {
   static List<Meallist> ideaList = [];
   FocusNode focusNode = FocusNode();
   ScreenshotController screenshotController = ScreenshotController();
+  MyUser myUser = Get.find();
+  DatabaseReference dbRef;
 
   List<String> selectedMealTimes = [];
 
@@ -132,10 +136,17 @@ class _MainScreenState extends State<MainScreen> {
   @override
   void initState() {
     super.initState();
+
     initializeFlutterFire();
     currentDate = DateTime.now();
     _handleFirstDayOfWeek();
     DatabaseHelper _databaseHelper = Injection.injector.get();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _getDbRef();
   }
 
   _handleFirstDayOfWeek() async {
@@ -257,8 +268,20 @@ class _MainScreenState extends State<MainScreen> {
     Get.offAllNamed(Constants.bottomNavigationRoutes[index]);
   }
 
+  _getDbRef() {
+    if (myUser.UID != null) {
+      dbRef = FirebaseDatabase.instance
+          .ref()
+          .child("mealDbs")
+          .child(myUser.UID)
+          .child("weekdays");
+      setState(() {});
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    print(myUser.isLoggedIn);
     return Screenshot(
       controller: screenshotController,
       child: Scaffold(
@@ -352,425 +375,7 @@ class _MainScreenState extends State<MainScreen> {
                 ),
               ),
               Expanded(
-                child: ListView.builder(
-                  scrollDirection: Axis.vertical,
-                  itemCount: weekMap.length ?? 1,
-                  itemBuilder: (context, int index) {
-                    DateTime key = weekMap.keys.elementAt(index);
-                    Map currentMap = weekMap[key];
-                    Meal breakfast = currentMap["Breakfast"] ?? Meal();
-                    Meal lunch = currentMap["Lunch"] ?? Meal();
-                    Meal evening = currentMap["Dinner"] ?? Meal();
-                    Meal snack = currentMap["Snack"] ?? Meal();
-                    List<Meal> mealsInCurrentDayList = [
-                      breakfast,
-                      lunch,
-                      evening,
-                      snack
-                    ];
-                    return GestureDetector(
-                      onTap: () {
-                        editBreakfast = null;
-                        editLunch = null;
-                        editEvening = null;
-                        editSnack = null;
-                        List<String> editMealStringList = [
-                          editBreakfast,
-                          editLunch,
-                          editEvening,
-                          editSnack
-                        ];
-                        var breakfastCtrl =
-                            TextEditingController(text: breakfast.mealName);
-                        var lunchCtrl =
-                            TextEditingController(text: lunch.mealName);
-                        var dinnerCtrl =
-                            TextEditingController(text: evening.mealName);
-                        var snackCtrl =
-                            TextEditingController(text: snack.mealName);
-
-                        List<TextEditingController> txtControllersList = [
-                          breakfastCtrl,
-                          lunchCtrl,
-                          dinnerCtrl,
-                          snackCtrl
-                        ];
-
-                        breakfastLink = "";
-                        lunchLink = "";
-                        eveningLink = "";
-                        snackLink = "";
-                        List<String> mealLinks = [
-                          breakfastLink,
-                          lunchLink,
-                          eveningLink,
-                          snackLink
-                        ];
-                        print(evening.recipe);
-                        showDialog(
-                            context: context,
-                            builder: (BuildContext context) {
-                              return Container(
-                                child: AlertDialog(
-                                  shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.all(
-                                          Radius.circular(20.0))),
-                                  backgroundColor: Constants.secondaryColor,
-                                  scrollable: true,
-                                  title: Text(
-                                    '${formatter.format(weekMap.keys.elementAt(index))} ${weekMap.keys.elementAt(index).day.toString()}.${weekMap.keys.elementAt(index).month.toString()}.${weekMap.keys.elementAt(index).year.toString()}',
-                                    textAlign: TextAlign.center,
-                                  ),
-                                  content: StatefulBuilder(builder:
-                                      (BuildContext context,
-                                          StateSetter setState) {
-                                    return Container(
-                                      height: 100 +
-                                          (20 *
-                                              (countLinks(breakfast, lunch,
-                                                  evening, snack))) +
-                                          (50 * selectedMealTimes.length),
-                                      child: Form(
-                                        child: Column(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceBetween,
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.center,
-                                          children: <Widget>[
-                                            for (var mealTimes
-                                                in selectedMealTimes)
-                                              Column(
-                                                children: [
-                                                  TypeAheadField(
-                                                    textFieldConfiguration:
-                                                        TextFieldConfiguration(
-                                                      maxLines: 4,
-                                                      minLines: 1,
-                                                      keyboardType:
-                                                          TextInputType
-                                                              .multiline,
-                                                      textCapitalization:
-                                                          TextCapitalization
-                                                              .sentences,
-                                                      controller: txtControllersList[
-                                                          mulitSelectMealTimesFullList
-                                                              .indexOf(
-                                                                  mealTimes)],
-                                                      decoration:
-                                                          InputDecoration(
-                                                              labelText:
-                                                                  mealTimes
-                                                                      .tr(),
-                                                              suffixIcon:
-                                                                  IconButton(
-                                                                onPressed: () {
-                                                                  _showDeleteDialog(
-                                                                      mealsInCurrentDayList[
-                                                                          mulitSelectMealTimesFullList.indexOf(
-                                                                              mealTimes)],
-                                                                      txtControllersList[
-                                                                          mulitSelectMealTimesFullList
-                                                                              .indexOf(mealTimes)]);
-                                                                },
-                                                                icon: Icon(Icons
-                                                                    .delete),
-                                                              )),
-                                                      textAlign: TextAlign.left,
-                                                      onChanged: (value) {
-                                                        editMealStringList[
-                                                            mulitSelectMealTimesFullList
-                                                                .indexOf(
-                                                                    mealTimes)] = value;
-                                                      },
-                                                    ),
-                                                    suggestionsCallback:
-                                                        (pattern) {
-                                                      return getIdeas(pattern);
-                                                    },
-                                                    itemBuilder:
-                                                        (context, idea) {
-                                                      return ListTile(
-                                                        title: Text(
-                                                            idea["mealName"]),
-                                                      );
-                                                    },
-                                                    hideOnEmpty: true,
-                                                    hideOnError: true,
-                                                    debounceDuration: Duration(
-                                                        milliseconds: 400),
-                                                    onSuggestionSelected:
-                                                        (idea) {
-                                                      editMealStringList[
-                                                          mulitSelectMealTimesFullList
-                                                              .indexOf(
-                                                                  mealTimes)] = idea[
-                                                          "mealName"];
-                                                      mealLinks[
-                                                          mulitSelectMealTimesFullList
-                                                              .indexOf(
-                                                                  mealTimes)] = "";
-                                                      txtControllersList[
-                                                              mulitSelectMealTimesFullList
-                                                                  .indexOf(
-                                                                      mealTimes)]
-                                                          .text = idea["mealName"];
-                                                      if (idea["recipe"] !=
-                                                              "" ||
-                                                          idea["recipe"] !=
-                                                              null) {
-                                                        mealLinks[mulitSelectMealTimesFullList
-                                                                .indexOf(
-                                                                    mealTimes)] =
-                                                            idea["recipe"];
-                                                      }
-                                                    },
-                                                  ),
-                                                  Visibility(
-                                                    visible: (mealsInCurrentDayList[
-                                                                    mulitSelectMealTimesFullList
-                                                                        .indexOf(
-                                                                            mealTimes)]
-                                                                .recipe !=
-                                                            "" &&
-                                                        mealsInCurrentDayList[
-                                                                    mulitSelectMealTimesFullList
-                                                                        .indexOf(
-                                                                            mealTimes)]
-                                                                .recipe !=
-                                                            null),
-                                                    child: ElevatedButton(
-                                                      child:
-                                                          Text("Link to recipe")
-                                                              .tr(),
-                                                      onPressed: () {
-                                                        String recipeLink =
-                                                            mealsInCurrentDayList[
-                                                                    mulitSelectMealTimesFullList
-                                                                        .indexOf(
-                                                                            mealTimes)]
-                                                                .recipe;
-                                                        if (recipeLink.startsWith(
-                                                                "https://") ||
-                                                            recipeLink
-                                                                .startsWith(
-                                                                    "http://")) {
-                                                          launch(recipeLink);
-                                                        } else {
-                                                          launch("https://" +
-                                                              recipeLink);
-                                                        }
-                                                      },
-                                                      style: recipeButtonStyle,
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                          ],
-                                        ),
-                                      ),
-                                    );
-                                  }),
-                                  actions: <Widget>[
-                                    ElevatedButton(
-                                      child: Text(
-                                        "Cancel",
-                                        style: TextStyle(color: Colors.blue),
-                                      ).tr(),
-                                      onPressed: () {
-                                        Navigator.of(context).pop();
-                                        asyncMethod().then((value) {
-                                          setState(() {});
-                                        });
-                                      },
-                                      style: cancelButtonStyle,
-                                    ),
-                                    SizedBox(
-                                      width: 10,
-                                    ),
-                                    ElevatedButton(
-                                      child: Text("Save").tr(),
-                                      onPressed: () {
-                                        for (int i = 0;
-                                            i < selectedMealTimes.length;
-                                            i++) {
-                                          int correctIndex =
-                                              mulitSelectMealTimesFullList
-                                                  .indexOf(
-                                                      selectedMealTimes[i]);
-                                          mealsInCurrentDayList[correctIndex]
-                                              .saveMeal(
-                                                  txtControllersList[
-                                                          correctIndex]
-                                                      .text,
-                                                  weekMap.keys.elementAt(index),
-                                                  selectedMealTimes[i],
-                                                  mealsInCurrentDayList[
-                                                          correctIndex]
-                                                      .recipe);
-                                          editMealStringList[correctIndex] =
-                                              null;
-                                        }
-                                        Navigator.of(context).pop();
-                                        asyncMethod().then((value) {
-                                          setState(() {});
-                                        });
-                                        // editDay(breakfast, lunch, evening,
-                                        //     weekMap.keys.elementAt(index));
-                                      },
-                                      style: saveButtonStyle,
-                                    ),
-                                  ],
-                                ),
-                              );
-                            });
-                      },
-                      child: Card(
-                        color: Constants.thirdColor,
-                        elevation: 6,
-                        key: ValueKey(index),
-                        margin: EdgeInsets.all(5),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(16),
-                        ),
-                        child: allEntriesEmpty(currentMap)
-                            ? Column(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceEvenly,
-                                children: <Widget>[
-                                  Text(
-                                      '${formatter.format(weekMap.keys.elementAt(index))} ${weekMap.keys.elementAt(index).day.toString()}.${weekMap.keys.elementAt(index).month.toString()}.${weekMap.keys.elementAt(index).year.toString()}',
-                                      style: TextStyle(
-                                          fontSize: 15,
-                                          fontWeight: FontWeight.bold)),
-                                  Text(""),
-                                  Text("-"),
-                                  Text(""),
-                                ],
-                              )
-                            : Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: <Widget>[
-                                  Padding(
-                                    padding: const EdgeInsets.all(6.0),
-                                    child: Text(
-                                        '${formatter.format(weekMap.keys.elementAt(index))} ${weekMap.keys.elementAt(index).day.toString()}.${weekMap.keys.elementAt(index).month.toString()}.${weekMap.keys.elementAt(index).year.toString()}',
-                                        style: TextStyle(
-                                            fontSize: 15,
-                                            fontWeight: FontWeight.bold)),
-                                  ),
-                                  Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceEvenly,
-                                    children: [
-                                      for (int i = 0;
-                                          i < selectedMealTimes.length;
-                                          i++)
-                                        selectedMealTimes[i] == "Snack"
-                                            ? SizedBox()
-                                            : Expanded(
-                                                child: Padding(
-                                                  padding:
-                                                      const EdgeInsets.all(4.0),
-                                                  child: Row(
-                                                    mainAxisAlignment:
-                                                        MainAxisAlignment
-                                                            .spaceEvenly,
-                                                    children: [
-                                                      Expanded(
-                                                        child: Column(
-                                                          mainAxisAlignment:
-                                                              MainAxisAlignment
-                                                                  .center,
-                                                          children: [
-                                                            Text(
-                                                              selectedMealTimes[
-                                                                      i]
-                                                                  .tr(),
-                                                              textAlign:
-                                                                  TextAlign
-                                                                      .start,
-                                                              style: TextStyle(
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .bold,
-                                                                  fontSize: 14),
-                                                            ),
-                                                            Text(
-                                                              mealsInCurrentDayList[
-                                                                          mulitSelectMealTimesFullList
-                                                                              .indexOf(selectedMealTimes[i])]
-                                                                      .mealName ??
-                                                                  "-",
-                                                              textAlign:
-                                                                  TextAlign
-                                                                      .center,
-                                                            ),
-                                                          ],
-                                                        ),
-                                                      ),
-                                                      SizedBox(
-                                                        width: 8,
-                                                      ),
-                                                      Visibility(
-                                                        visible: selectedMealTimes
-                                                                .contains(
-                                                                    "Snack")
-                                                            ? i <
-                                                                selectedMealTimes
-                                                                        .length -
-                                                                    2
-                                                            : i <
-                                                                selectedMealTimes
-                                                                        .length -
-                                                                    1,
-                                                        child: Container(
-                                                          color: Constants
-                                                              .fourthColor,
-                                                          height: 30,
-                                                          width: 1,
-                                                          margin:
-                                                              EdgeInsets.all(4),
-                                                        ),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                ),
-                                              ),
-                                    ],
-                                  ),
-                                  selectedMealTimes.contains("Snack")
-                                      ? Padding(
-                                          padding:
-                                              const EdgeInsets.only(right: 15),
-                                          child: Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.center,
-                                            children: [
-                                              Text(
-                                                "Snack".tr(),
-                                                style: TextStyle(
-                                                    fontWeight: FontWeight.bold,
-                                                    fontSize: 14),
-                                              ),
-                                              Text(
-                                                mealsInCurrentDayList[
-                                                            mulitSelectMealTimesFullList
-                                                                .indexOf(
-                                                                    "Snack")]
-                                                        .mealName ??
-                                                    "-",
-                                                textAlign: TextAlign.center,
-                                              ),
-                                            ],
-                                          ),
-                                        )
-                                      : SizedBox(),
-                                ],
-                              ),
-                      ),
-                    );
-                  },
-                ),
+                child: myUser.isLoggedIn ? onlineWidget() : offlineList(),
               ),
               // FractionallySizedBox(
               //   widthFactor: 0.9,
@@ -824,6 +429,380 @@ class _MainScreenState extends State<MainScreen> {
           currentIndex: 2,
         ),
       ),
+    );
+  }
+
+  StreamBuilder<dynamic> onlineWidget() {
+    return StreamBuilder(
+        stream: dbRef.onValue,
+        builder: (BuildContext context, snapshot) {
+          if (snapshot.hasData) {
+            DataSnapshot dataValues = snapshot.data.snapshot;
+            Map<dynamic, dynamic> values = dataValues.value;
+            if (values != null) {
+              values.forEach((key, value) {
+                print(value.toString());
+                print(key.toString());
+              });
+              return Text("Data");
+            } else {
+              return Text("All Entries Empty");
+            }
+          } else {
+            return Text("No Data");
+          }
+        });
+  }
+
+  ListView offlineList() {
+    return ListView.builder(
+      scrollDirection: Axis.vertical,
+      itemCount: weekMap.length ?? 1,
+      itemBuilder: (context, int index) {
+        DateTime key = weekMap.keys.elementAt(index);
+        Map currentMap = weekMap[key];
+        Meal breakfast = currentMap["Breakfast"] ?? Meal();
+        Meal lunch = currentMap["Lunch"] ?? Meal();
+        Meal evening = currentMap["Dinner"] ?? Meal();
+        Meal snack = currentMap["Snack"] ?? Meal();
+        List<Meal> mealsInCurrentDayList = [breakfast, lunch, evening, snack];
+        return GestureDetector(
+          onTap: () {
+            editBreakfast = null;
+            editLunch = null;
+            editEvening = null;
+            editSnack = null;
+            List<String> editMealStringList = [
+              editBreakfast,
+              editLunch,
+              editEvening,
+              editSnack
+            ];
+            var breakfastCtrl = TextEditingController(text: breakfast.mealName);
+            var lunchCtrl = TextEditingController(text: lunch.mealName);
+            var dinnerCtrl = TextEditingController(text: evening.mealName);
+            var snackCtrl = TextEditingController(text: snack.mealName);
+
+            List<TextEditingController> txtControllersList = [
+              breakfastCtrl,
+              lunchCtrl,
+              dinnerCtrl,
+              snackCtrl
+            ];
+
+            breakfastLink = "";
+            lunchLink = "";
+            eveningLink = "";
+            snackLink = "";
+            List<String> mealLinks = [
+              breakfastLink,
+              lunchLink,
+              eveningLink,
+              snackLink
+            ];
+            print(evening.recipe);
+            showDialog(
+                context: context,
+                builder: (BuildContext context) {
+                  return Container(
+                    child: AlertDialog(
+                      shape: RoundedRectangleBorder(
+                          borderRadius:
+                              BorderRadius.all(Radius.circular(20.0))),
+                      backgroundColor: Constants.secondaryColor,
+                      scrollable: true,
+                      title: Text(
+                        '${formatter.format(weekMap.keys.elementAt(index))} ${weekMap.keys.elementAt(index).day.toString()}.${weekMap.keys.elementAt(index).month.toString()}.${weekMap.keys.elementAt(index).year.toString()}',
+                        textAlign: TextAlign.center,
+                      ),
+                      content: StatefulBuilder(builder:
+                          (BuildContext context, StateSetter setState) {
+                        return Container(
+                          height: 100 +
+                              (20 *
+                                  (countLinks(
+                                      breakfast, lunch, evening, snack))) +
+                              (50 * selectedMealTimes.length),
+                          child: Form(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: <Widget>[
+                                for (var mealTimes in selectedMealTimes)
+                                  Column(
+                                    children: [
+                                      TypeAheadField(
+                                        textFieldConfiguration:
+                                            TextFieldConfiguration(
+                                          maxLines: 4,
+                                          minLines: 1,
+                                          keyboardType: TextInputType.multiline,
+                                          textCapitalization:
+                                              TextCapitalization.sentences,
+                                          controller: txtControllersList[
+                                              mulitSelectMealTimesFullList
+                                                  .indexOf(mealTimes)],
+                                          decoration: InputDecoration(
+                                              labelText: mealTimes.tr(),
+                                              suffixIcon: IconButton(
+                                                onPressed: () {
+                                                  _showDeleteDialog(
+                                                      mealsInCurrentDayList[
+                                                          mulitSelectMealTimesFullList
+                                                              .indexOf(
+                                                                  mealTimes)],
+                                                      txtControllersList[
+                                                          mulitSelectMealTimesFullList
+                                                              .indexOf(
+                                                                  mealTimes)]);
+                                                },
+                                                icon: Icon(Icons.delete),
+                                              )),
+                                          textAlign: TextAlign.left,
+                                          onChanged: (value) {
+                                            editMealStringList[
+                                                    mulitSelectMealTimesFullList
+                                                        .indexOf(mealTimes)] =
+                                                value;
+                                          },
+                                        ),
+                                        suggestionsCallback: (pattern) {
+                                          return getIdeas(pattern);
+                                        },
+                                        itemBuilder: (context, idea) {
+                                          return ListTile(
+                                            title: Text(idea["mealName"]),
+                                          );
+                                        },
+                                        hideOnEmpty: true,
+                                        hideOnError: true,
+                                        debounceDuration:
+                                            Duration(milliseconds: 400),
+                                        onSuggestionSelected: (idea) {
+                                          editMealStringList[
+                                                  mulitSelectMealTimesFullList
+                                                      .indexOf(mealTimes)] =
+                                              idea["mealName"];
+                                          mealLinks[mulitSelectMealTimesFullList
+                                              .indexOf(mealTimes)] = "";
+                                          txtControllersList[
+                                                  mulitSelectMealTimesFullList
+                                                      .indexOf(mealTimes)]
+                                              .text = idea["mealName"];
+                                          if (idea["recipe"] != "" ||
+                                              idea["recipe"] != null) {
+                                            mealLinks[
+                                                    mulitSelectMealTimesFullList
+                                                        .indexOf(mealTimes)] =
+                                                idea["recipe"];
+                                          }
+                                        },
+                                      ),
+                                      Visibility(
+                                        visible: (mealsInCurrentDayList[
+                                                        mulitSelectMealTimesFullList
+                                                            .indexOf(mealTimes)]
+                                                    .recipe !=
+                                                "" &&
+                                            mealsInCurrentDayList[
+                                                        mulitSelectMealTimesFullList
+                                                            .indexOf(mealTimes)]
+                                                    .recipe !=
+                                                null),
+                                        child: ElevatedButton(
+                                          child: Text("Link to recipe").tr(),
+                                          onPressed: () {
+                                            String recipeLink =
+                                                mealsInCurrentDayList[
+                                                        mulitSelectMealTimesFullList
+                                                            .indexOf(mealTimes)]
+                                                    .recipe;
+                                            if (recipeLink
+                                                    .startsWith("https://") ||
+                                                recipeLink
+                                                    .startsWith("http://")) {
+                                              launch(recipeLink);
+                                            } else {
+                                              launch("https://" + recipeLink);
+                                            }
+                                          },
+                                          style: recipeButtonStyle,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                              ],
+                            ),
+                          ),
+                        );
+                      }),
+                      actions: <Widget>[
+                        ElevatedButton(
+                          child: Text(
+                            "Cancel",
+                            style: TextStyle(color: Colors.blue),
+                          ).tr(),
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                            asyncMethod().then((value) {
+                              setState(() {});
+                            });
+                          },
+                          style: cancelButtonStyle,
+                        ),
+                        SizedBox(
+                          width: 10,
+                        ),
+                        ElevatedButton(
+                          child: Text("Save").tr(),
+                          onPressed: () {
+                            for (int i = 0; i < selectedMealTimes.length; i++) {
+                              int correctIndex = mulitSelectMealTimesFullList
+                                  .indexOf(selectedMealTimes[i]);
+                              mealsInCurrentDayList[correctIndex].saveMeal(
+                                  txtControllersList[correctIndex].text,
+                                  weekMap.keys.elementAt(index),
+                                  selectedMealTimes[i],
+                                  mealsInCurrentDayList[correctIndex].recipe);
+                              editMealStringList[correctIndex] = null;
+                            }
+                            Navigator.of(context).pop();
+                            asyncMethod().then((value) {
+                              setState(() {});
+                            });
+                            // editDay(breakfast, lunch, evening,
+                            //     weekMap.keys.elementAt(index));
+                          },
+                          style: saveButtonStyle,
+                        ),
+                      ],
+                    ),
+                  );
+                });
+          },
+          child: Card(
+            color: Constants.thirdColor,
+            elevation: 6,
+            key: ValueKey(index),
+            margin: EdgeInsets.all(5),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: allEntriesEmpty(currentMap)
+                ? Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: <Widget>[
+                      Text(
+                          '${formatter.format(weekMap.keys.elementAt(index))} ${weekMap.keys.elementAt(index).day.toString()}.${weekMap.keys.elementAt(index).month.toString()}.${weekMap.keys.elementAt(index).year.toString()}',
+                          style: TextStyle(
+                              fontSize: 15, fontWeight: FontWeight.bold)),
+                      Text(""),
+                      Text("-"),
+                      Text(""),
+                    ],
+                  )
+                : Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      Padding(
+                        padding: const EdgeInsets.all(6.0),
+                        child: Text(
+                            '${formatter.format(weekMap.keys.elementAt(index))} ${weekMap.keys.elementAt(index).day.toString()}.${weekMap.keys.elementAt(index).month.toString()}.${weekMap.keys.elementAt(index).year.toString()}',
+                            style: TextStyle(
+                                fontSize: 15, fontWeight: FontWeight.bold)),
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          for (int i = 0; i < selectedMealTimes.length; i++)
+                            selectedMealTimes[i] == "Snack"
+                                ? SizedBox()
+                                : Expanded(
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(4.0),
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceEvenly,
+                                        children: [
+                                          Expanded(
+                                            child: Column(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.center,
+                                              children: [
+                                                Text(
+                                                  selectedMealTimes[i].tr(),
+                                                  textAlign: TextAlign.start,
+                                                  style: TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      fontSize: 14),
+                                                ),
+                                                Text(
+                                                  mealsInCurrentDayList[
+                                                              mulitSelectMealTimesFullList
+                                                                  .indexOf(
+                                                                      selectedMealTimes[
+                                                                          i])]
+                                                          .mealName ??
+                                                      "-",
+                                                  textAlign: TextAlign.center,
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                          SizedBox(
+                                            width: 8,
+                                          ),
+                                          Visibility(
+                                            visible: selectedMealTimes
+                                                    .contains("Snack")
+                                                ? i <
+                                                    selectedMealTimes.length - 2
+                                                : i <
+                                                    selectedMealTimes.length -
+                                                        1,
+                                            child: Container(
+                                              color: Constants.fourthColor,
+                                              height: 30,
+                                              width: 1,
+                                              margin: EdgeInsets.all(4),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                        ],
+                      ),
+                      selectedMealTimes.contains("Snack")
+                          ? Padding(
+                              padding: const EdgeInsets.only(right: 15),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Text(
+                                    "Snack".tr(),
+                                    style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 14),
+                                  ),
+                                  Text(
+                                    mealsInCurrentDayList[
+                                                mulitSelectMealTimesFullList
+                                                    .indexOf("Snack")]
+                                            .mealName ??
+                                        "-",
+                                    textAlign: TextAlign.center,
+                                  ),
+                                ],
+                              ),
+                            )
+                          : SizedBox(),
+                    ],
+                  ),
+          ),
+        );
+      },
     );
   }
 }

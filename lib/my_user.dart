@@ -2,6 +2,7 @@ class MyUser {
   String UID;
   bool hasPremium;
   bool isLoggedIn;
+  String selectedMealPlan;
   List<String> allowedDbs;
 
   MyUser(
@@ -27,5 +28,12 @@ class MyUser {
 
   setPremium() {
     this.hasPremium = true;
+  }
+
+  String getSelectedMealPlan() {
+    if (this.selectedMealPlan == null) {
+      this.selectedMealPlan = allowedDbs[0];
+    }
+    return this.selectedMealPlan;
   }
 }

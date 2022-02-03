@@ -11,6 +11,7 @@ import 'package:auth_buttons/auth_buttons.dart'
     show GoogleAuthButton, EmailAuthButton, AuthButtonType, AuthIconType;
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart' hide Trans;
+import 'package:mealpy/constants.dart' as Constants;
 
 class SettingsScreen extends StatefulWidget {
   SettingsScreen({Key key, this.analytics, this.observer, this.database})
@@ -149,6 +150,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
     }
   }
 
+  _changeScene(int index) {
+    Get.offAndToNamed(Constants.bottomNavigationRoutes[index]);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -210,60 +215,33 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   });
                 },
                 whenEmpty: "Chose meals to show".tr()),
-            Divider(
-              thickness: 4,
-            ),
-            Center(
-              child: Padding(
-                padding: const EdgeInsets.only(top: 24.0),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    Align(
-                      alignment: AlignmentDirectional.centerStart,
-                      child: Text(
-                        "Login for sync and share".tr(),
-                        style: TextStyle(
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.blueGrey),
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(top: 16.0, bottom: 34),
-                      child: GoogleAuthButton(
-                        onPressed: () {
-                          _addData();
-                        },
-                        darkMode: false, // if true second example
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(bottom: 16.0),
-                      child: EmailAuthButton(onPressed: () {
-                        _registerWithMail();
-                      }),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(bottom: 16.0),
-                      child: EmailAuthButton(
-                        onPressed: () {
-                          _loginWithMail();
-                        },
-                        text: "Erneuter Login",
-                      ),
-                    ),
-                    IconButton(
-                        onPressed: () {
-                          _signOut();
-                        },
-                        icon: Icon(Icons.logout)),
-                  ],
-                ),
-              ),
-            )
           ],
         ),
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        unselectedItemColor: Colors.red,
+        showUnselectedLabels: true,
+        selectedItemColor: Constants.fourthColor,
+        items: <BottomNavigationBarItem>[
+          BottomNavigationBarItem(
+            icon: Icon(Icons.settings),
+            label: 'Settings'.tr(),
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.person),
+            label: 'Profile'.tr(),
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.restaurant),
+            label: 'Meal Plan'.tr(),
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.menu_book),
+            label: 'Ideas'.tr(),
+          ),
+        ],
+        onTap: _changeScene,
+        currentIndex: 0,
       ),
     );
   }

@@ -207,108 +207,6 @@ class _MainScreenState extends State<MainScreen> {
     }
   }
 
-  //TODO: Speichern in der Klasse Meal handlen
-  //Snack ebenfalls speichern
-  // Future<void> editDay(
-  //     Meal breakfast, Meal lunch, Meal evening, DateTime date) async {
-  //   print(editBreakfast);
-  //   print(editEvening);
-  //   print(editLunch);
-  //   Batch batch = _databaseHelper.db.batch();
-  //   if (breakfast.id != null && editBreakfast != null) {
-  //     print("updated Breakfast");
-  //     batch.update(
-  //       "meals",
-  //       Meal(
-  //         id: breakfast.id,
-  //         mealName: editBreakfast,
-  //         date: breakfast.date,
-  //         dayTime: breakfast.dayTime,
-  //         recipe: breakfastLink,
-  //       ).toMap(),
-  //       where: "id = ?",
-  //       whereArgs: [breakfast.id],
-  //     );
-  //   } else {
-  //     if (editBreakfast != null) {
-  //       await _databaseHelper.db.insert(
-  //           "meals",
-  //           Meal(
-  //             mealName: editBreakfast,
-  //             date: date.millisecondsSinceEpoch,
-  //             dayTime: "Breakfast",
-  //             recipe: breakfastLink,
-  //           ).toMapWithoutId(),
-  //           conflictAlgorithm: ConflictAlgorithm.replace);
-  //       print("neu Breakfast");
-  //     }
-  //   }
-  //   if (lunch.id != null && editLunch != null) {
-  //     print("updated Lunch");
-  //     batch.update(
-  //         "meals",
-  //         Meal(
-  //           id: lunch.id,
-  //           mealName: editLunch,
-  //           date: lunch.date,
-  //           dayTime: lunch.dayTime,
-  //           recipe: lunchLink,
-  //         ).toMap(),
-  //         where: 'id = ?',
-  //         whereArgs: [lunch.id]);
-  //   } else {
-  //     if (editLunch != null) {
-  //       await _databaseHelper.db.insert(
-  //         "meals",
-  //         Meal(
-  //           mealName: editLunch,
-  //           date: date.millisecondsSinceEpoch,
-  //           dayTime: "Lunch",
-  //           recipe: lunchLink,
-  //         ).toMapWithoutId(),
-  //         conflictAlgorithm: ConflictAlgorithm.replace,
-  //       );
-  //       print("neu Lunch");
-  //     }
-  //   }
-  //   if (evening.id != null && editEvening != null) {
-  //     print("updated Dinner");
-  //     batch.update(
-  //         "meals",
-  //         Meal(
-  //           id: evening.id,
-  //           mealName: editEvening,
-  //           date: evening.date,
-  //           dayTime: evening.dayTime,
-  //           recipe: eveningLink,
-  //         ).toMap(),
-  //         where: "id = ?",
-  //         whereArgs: [evening.id]);
-  //   } else {
-  //     if (editEvening != null) {
-  //       await _databaseHelper.db.insert(
-  //           "meals",
-  //           Meal(
-  //             mealName: editEvening,
-  //             date: date.millisecondsSinceEpoch,
-  //             dayTime: "Dinner",
-  //             recipe: eveningLink,
-  //           ).toMapWithoutId(),
-  //           conflictAlgorithm: ConflictAlgorithm.replace);
-  //       print("neu Dinner");
-  //     }
-  //   }
-  //   await batch.commit(noResult: true, continueOnError: true);
-  //   editBreakfast = null;
-  //   editLunch = null;
-  //   editEvening = null;
-  //   editSnack = null;
-  //   Navigator.of(context).pop();
-  //   asyncMethod().then((value) {
-  //     setState(() {});
-  //   });
-  // }
-
   Future<void> _sendAnalyticsEvent(mealName) async {
     await widget.analytics.logEvent(
       name: 'created_Meal',
@@ -353,6 +251,10 @@ class _MainScreenState extends State<MainScreen> {
           editBreakfast = null;
           Get.back();
         });
+  }
+
+  _changeScene(int index) {
+    Get.offAndToNamed(Constants.bottomNavigationRoutes[index]);
   }
 
   @override
@@ -870,196 +772,57 @@ class _MainScreenState extends State<MainScreen> {
                   },
                 ),
               ),
-              FractionallySizedBox(
-                widthFactor: 0.9,
-                child: ElevatedButton(
-                    style:
-                        ElevatedButton.styleFrom(primary: Constants.mainColor),
-                    onPressed: () async {
-                      Navigator.of(context)
-                          .pushNamed(FoodList.id)
-                          .then((value) => setState(() {
-                                asyncMethod();
-                              }));
-                    },
-                    child: Padding(
-                      padding: const EdgeInsets.all(12.0),
-                      child: Text(
-                        "Idea List \uD83C\uDF7D️",
-                        style: TextStyle(fontSize: 18),
-                      ).tr(),
-                    )),
-              ),
-              SizedBox(
-                height: 10,
-              )
+              // FractionallySizedBox(
+              //   widthFactor: 0.9,
+              //   child: ElevatedButton(
+              //       style:
+              //           ElevatedButton.styleFrom(primary: Constants.mainColor),
+              //       onPressed: () async {
+              //         Navigator.of(context)
+              //             .pushNamed(FoodList.id)
+              //             .then((value) => setState(() {
+              //                   asyncMethod();
+              //                 }));
+              //       },
+              //       child: Padding(
+              //         padding: const EdgeInsets.all(12.0),
+              //         child: Text(
+              //           "Idea List \uD83C\uDF7D️",
+              //           style: TextStyle(fontSize: 18),
+              //         ).tr(),
+              //       )),
+              // ),
+              // SizedBox(
+              //   height: 10,
+              // )
             ],
           ),
         ),
-        // floatingActionButton: Padding(
-        //   padding: const EdgeInsets.only(bottom: 24.0),
-        //   child: FloatingActionButton(
-        //     onPressed: () {
-        //       DateTime date = DateTime.now();
-        //       selectedLocalMealTime = selectedMealTimes[0];
-        //       mealTime = "Breakfast";
-        //       mealDate = DateTime(date.year, date.month, date.day)
-        //           .millisecondsSinceEpoch;
-        //       showDialog(
-        //           context: context,
-        //           builder: (BuildContext context) {
-        //             var mealCtrl = TextEditingController();
-        //             var link = "";
-        //             return AlertDialog(
-        //               shape: RoundedRectangleBorder(
-        //                   borderRadius:
-        //                       BorderRadius.all(Radius.circular(20.0))),
-        //               backgroundColor: Constants.secondaryColor,
-        //               scrollable: true,
-        //               title: Text(
-        //                 'Mealplan',
-        //                 textAlign: TextAlign.center,
-        //               ),
-        //               content: StatefulBuilder(builder:
-        //                   (BuildContext context, StateSetter setState) {
-        //                 return Container(
-        //                   height: 300,
-        //                   child: Form(
-        //                     child: Column(
-        //                       mainAxisAlignment: MainAxisAlignment.start,
-        //                       crossAxisAlignment: CrossAxisAlignment.center,
-        //                       children: <Widget>[
-        //                         TypeAheadField(
-        //                           textFieldConfiguration:
-        //                               TextFieldConfiguration(
-        //                             controller: mealCtrl,
-        //                             textCapitalization:
-        //                                 TextCapitalization.sentences,
-        //                             decoration:
-        //                                 InputDecoration(labelText: 'Meal'.tr()),
-        //                             textAlign: TextAlign.left,
-        //                             autofocus: false,
-        //                           ),
-        //                           hideOnEmpty: true,
-        //                           hideOnError: true,
-        //                           debounceDuration: Duration(milliseconds: 400),
-        //                           suggestionsCallback: (pattern) {
-        //                             return getIdeas(pattern);
-        //                           },
-        //                           itemBuilder: (context, idea) {
-        //                             return ListTile(
-        //                               title: Text(idea["mealName"]),
-        //                             );
-        //                           },
-        //                           onSuggestionSelected: (idea) {
-        //                             link = "";
-        //                             mealCtrl.text = idea["mealName"];
-        //                             if (idea["recipe"] != "" ||
-        //                                 idea["recipe"] != null) {
-        //                               link = idea["recipe"];
-        //                             }
-        //                           },
-        //                         ),
-        //                         TextFormField(
-        //                           readOnly: true,
-        //                           decoration:
-        //                               InputDecoration(labelText: 'Date'.tr()),
-        //                           controller: dateCtl,
-        //                           onTap: () async {
-        //                             FocusScope.of(context)
-        //                                 .requestFocus(FocusNode());
-
-        //                             date = await showDatePicker(
-        //                                 context: context,
-        //                                 initialDate: DateTime.now(),
-        //                                 firstDate: DateTime(1900),
-        //                                 lastDate: DateTime(2100));
-
-        //                             dateCtl.text =
-        //                                 '${DateFormat('EE').format(date)} ${date.day.toString()}.${date.month.toString()}.${date.year.toString()}';
-        //                             mealDate = DateTime(
-        //                                     date.year, date.month, date.day)
-        //                                 .millisecondsSinceEpoch;
-        //                           },
-        //                         ),
-        //                         SizedBox(
-        //                           height: 10,
-        //                         ),
-        //                         Container(
-        //                           alignment: Alignment.centerLeft,
-        //                           child: DropdownButton(
-        //                             value: selectedLocalMealTime ??
-        //                                 selectedMealTimes[0].tr(),
-        //                             icon: Icon(Icons.local_dining),
-        //                             elevation: 16,
-        //                             onChanged: (String newValue) {
-        //                               setState(() {
-        //                                 selectedLocalMealTime = newValue;
-        //                               });
-        //                             },
-        //                             items: selectedMealTimes
-        //                                 .map<DropdownMenuItem<String>>(
-        //                               (String value) {
-        //                                 return DropdownMenuItem<String>(
-        //                                   value: value,
-        //                                   child: Text(value.tr()),
-        //                                 );
-        //                               },
-        //                             ).toList(),
-        //                           ),
-        //                         ),
-        //                       ],
-        //                     ),
-        //                   ),
-        //                 );
-        //               }),
-        //               actions: <Widget>[
-        //                 ElevatedButton(
-        //                   child: Text(
-        //                     "Cancel",
-        //                     style: TextStyle(color: Colors.blue),
-        //                   ).tr(),
-        //                   onPressed: () {
-        //                     Navigator.of(context).pop();
-        //                   },
-        //                   style: cancelButtonStyle,
-        //                 ),
-        //                 ElevatedButton(
-        //                   child: Text("Save").tr(),
-        //                   onPressed: () async {
-        //                     try {
-        //                       await _databaseHelper.db.insert(
-        //                         "meals",
-        //                         Meal(
-        //                           mealName: mealCtrl.text.toString(),
-        //                           date: mealDate,
-        //                           dayTime: mealTime,
-        //                           recipe: link,
-        //                         ).toMapWithoutId(),
-        //                       );
-        //                       _sendAnalyticsEvent(mealCtrl.text.toString());
-        //                       Navigator.of(context).pop();
-        //                       asyncMethod().then((value) {
-        //                         setState(() {});
-        //                       });
-        //                     } catch (e) {
-        //                       print("Duplikat");
-        //                       Navigator.of(context).pop();
-        //                       ScaffoldMessenger.of(context).showSnackBar(
-        //                           SnackBar(
-        //                               content:
-        //                                   Text("Duplicate Meal Message").tr()));
-        //                     }
-        //                   },
-        //                   style: saveButtonStyle,
-        //                 ),
-        //               ],
-        //             );
-        //           });
-        //     },
-        //     child: Icon(Icons.add),
-        //   ),
-        // This trailing comma makes auto-formatting nicer for build methods.
+        bottomNavigationBar: BottomNavigationBar(
+          unselectedItemColor: Colors.red,
+          showUnselectedLabels: true,
+          selectedItemColor: Constants.fourthColor,
+          items: <BottomNavigationBarItem>[
+            BottomNavigationBarItem(
+              icon: Icon(Icons.settings),
+              label: 'Settings'.tr(),
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.person),
+              label: 'Profile'.tr(),
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.restaurant),
+              label: 'Meal Plan'.tr(),
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.menu_book),
+              label: 'Ideas'.tr(),
+            ),
+          ],
+          onTap: _changeScene,
+          currentIndex: 2,
+        ),
       ),
     );
   }

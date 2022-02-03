@@ -11,3 +11,5 @@ Color primaryButtonColor = const Color(0xFFE57010);
 Color saveButtonColor = const Color(0xFF21AB6B);
 
 Color cancelButtonColor = Colors.white;
+
+List<String> bottomNavigationRoutes = ["/settings", "/profile", "/", "idea"];

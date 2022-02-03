@@ -330,22 +330,6 @@ class _MainScreenState extends State<MainScreen> {
                 ),
               ),
             ),
-            Padding(
-              padding: EdgeInsets.only(right: 10),
-              child: GestureDetector(
-                onTap: () async {
-                  Navigator.of(context)
-                      .pushNamed(SettingsScreen.id)
-                      .then((value) => setState(() {
-                            _handleFirstDayOfWeek();
-                          }));
-                },
-                child: Icon(
-                  Icons.settings,
-                  size: 32,
-                ),
-              ),
-            ),
           ],
         ),
         body: Center(

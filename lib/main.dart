@@ -126,23 +126,27 @@ class _MyAppState extends State<MyApp> {
       }),
       getPages: [
         GetPage(
-            transition: Transition.rightToLeft,
+            transition: Transition.noTransition,
             name: "/",
             page: () => MainScreen(
                 analytics: MyApp.analytics, observer: MyApp.observer)),
         GetPage(
+            transition: Transition.noTransition,
             name: "/idea",
             page: () =>
                 FoodList(analytics: MyApp.analytics, observer: MyApp.observer)),
         GetPage(
+            transition: Transition.noTransition,
             name: "/settings",
             page: () => SettingsScreen(
                 analytics: MyApp.analytics, observer: MyApp.observer)),
         GetPage(
+            transition: Transition.noTransition,
             name: "/category",
             page: () => CategoryScreen(
                 analytics: MyApp.analytics, observer: MyApp.observer)),
         GetPage(
+            transition: Transition.noTransition,
             name: "/profile",
             page: () => ProfileScreen(
                 analytics: MyApp.analytics, observer: MyApp.observer))

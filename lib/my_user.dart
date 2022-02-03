@@ -1,3 +1,5 @@
+import 'package:shared_preferences/shared_preferences.dart';
+
 class MyUser {
   String UID;
   bool hasPremium;
@@ -35,5 +37,11 @@ class MyUser {
       this.selectedMealPlan = allowedDbs[0];
     }
     return this.selectedMealPlan;
+  }
+
+  setSelectedMealPlan(String selectPlan)async {
+    this.selectedMealPlan = selectPlan;
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setString("selectedPlan", selectPlan);
   }
 }

@@ -106,6 +106,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       appBar: AppBar(
         centerTitle: true,
         title: Text("Settings".tr()),
+        backgroundColor: Constants.mainColor,
       ),
       body: Padding(
         padding: const EdgeInsets.all(32.0),

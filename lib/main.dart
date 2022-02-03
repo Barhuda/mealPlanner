@@ -104,7 +104,11 @@ class _MyAppState extends State<MyApp> {
     });
 
     await ref.root.child("mealDbs").update({
-      userUid: {"name": "TestMealDB", "weekdays": {}}
+      userUid: {
+        "name": "My Plan",
+        "weekdays": {},
+        "allowedUsers": {"${user.uid}": true}
+      }
     });
   }
 

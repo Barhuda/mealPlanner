@@ -69,11 +69,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
         children: [
           TextFormField(
             controller: mailText,
+            keyboardType: TextInputType.emailAddress,
             decoration: InputDecoration(
                 label: Text("Mail"), hintText: "Enter Mail".tr()),
           ),
           TextFormField(
             controller: passwordText,
+            obscureText: true,
+            keyboardType: TextInputType.visiblePassword,
             decoration: InputDecoration(
                 label: Text("Password"), hintText: "Enter Password".tr()),
           ),
@@ -110,14 +113,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
       hasError = true;
     }
     Navigator.of(context).pop();
+    setState(() {});
     print(hasError);
     if (hasError) {
       Get.snackbar(title, content, snackPosition: SnackPosition.TOP);
+    } else {
+      Get.snackbar("Success".tr(), "Account has been registred".tr(),
+          snackPosition: SnackPosition.TOP);
     }
   }
 
   _signOut() async {
     await FirebaseAuth.instance.signOut();
+    setState(() {});
   }
 
   _loginWithMail() {
@@ -137,11 +145,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
         children: [
           TextFormField(
             controller: mailText,
+            keyboardType: TextInputType.emailAddress,
             decoration: InputDecoration(
                 label: Text("Mail"), hintText: "Enter Mail".tr()),
           ),
           TextFormField(
             controller: passwordText,
+            obscureText: true,
+            keyboardType: TextInputType.visiblePassword,
             decoration: InputDecoration(
                 label: Text("Password"), hintText: "Enter Password".tr()),
           ),
@@ -180,6 +191,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     if (hasError) {
       Get.snackbar(title, content, snackPosition: SnackPosition.TOP);
     }
+    setState(() {});
   }
 
   _changeScene(int index) {
@@ -190,6 +202,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: Constants.mainColor,
         centerTitle: true,
         title: Text("Profile".tr()),
         actions: [
@@ -209,7 +222,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
       ),
       body: Padding(
         padding: const EdgeInsets.all(32.0),
-        child: myUser.hasPremium ? SignInWidgets() : getPremium(),
+        child: myUser.hasPremium
+            ? myUser.isLoggedIn
+                ? Text("Ich bin eingeloggt")
+                : SignInWidgets()
+            : getPremium(),
       ),
       bottomNavigationBar: BottomNavigationBar(
         unselectedItemColor: Colors.red,

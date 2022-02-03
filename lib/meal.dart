@@ -1,7 +1,10 @@
+import 'package:intl/intl.dart';
 import 'package:sqflite/sqflite.dart';
 
 import 'database_helper.dart';
 import 'injection.dart';
+import 'package:firebase_database/firebase_database.dart';
+import 'package:flutter/material.dart';
 
 class Meal {
   DatabaseHelper _databaseHelper = Injection.injector.get();
@@ -13,6 +16,8 @@ class Meal {
   String dayTime;
 
   Meal({this.id, this.mealName, this.date, this.dayTime, this.recipe});
+
+  final DateFormat dateFormatter = DateFormat('yyyy-MM-dd');
 
   Map<String, dynamic> toMapWithoutId() {
     final map = new Map<String, dynamic>();
@@ -108,6 +113,20 @@ class Meal {
       }
     }
     return resultMap;
+  }
+
+  deleteMealFromFirebase(String userDb) {
+    print("User DB: $userDb");
+    String dateFormatted =
+        dateFormatter.format(DateTime.fromMillisecondsSinceEpoch(this.date));
+    FirebaseDatabase.instance
+        .ref("mealDbs")
+        .child(userDb)
+        .child("weekdays")
+        .child(dateFormatted)
+        .child(this.dayTime.toLowerCase())
+        .remove();
+    print("deleted at: " + dateFormatted);
   }
 }
 

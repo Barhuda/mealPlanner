@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:flutter/cupertino.dart';
@@ -64,6 +65,7 @@ class _MainScreenState extends State<MainScreen> {
   ScreenshotController screenshotController = ScreenshotController();
   MyUser myUser = Get.find();
   Stream<DatabaseEvent> dbStream;
+  final DateFormat dateFormatter = DateFormat('yyyy-MM-dd');
 
   List<String> selectedMealTimes = [];
 
@@ -270,9 +272,9 @@ class _MainScreenState extends State<MainScreen> {
 
   _getDbRef() {
     final DateTime now = currentDate;
-    final DateFormat formatter = DateFormat('yyyy-MM-dd');
-    final String formatted = formatter.format(now);
-    final String endDate = formatter.format(now.add(Duration(days: 6)));
+
+    final String formatted = dateFormatter.format(now);
+    final String endDate = dateFormatter.format(now.add(Duration(days: 6)));
     print("Enddatum" + endDate);
     print("Formatiert" + formatted);
     if (myUser.UID != null) {
@@ -432,15 +434,192 @@ class _MainScreenState extends State<MainScreen> {
           if (snapshot.hasData) {
             DataSnapshot dataValues = snapshot.data.snapshot;
             Map<dynamic, dynamic> values = dataValues.value;
+            Map<dynamic, dynamic> parsed = {};
+            print(parsed);
             if (values != null) {
               values.forEach((key, value) {
                 print(value.toString());
                 print(key.toString());
+                parsed[key] = value;
               });
-              return Text("Data");
+              return ListView.builder(
+                  itemCount: 7,
+                  itemBuilder: (BuildContext context, int index) {
+                    String cardDate = dateFormatter
+                        .format(currentDate.add(Duration(days: index)));
+                    Map<dynamic, dynamic> mealsInDay = parsed[cardDate];
+                    return Card(
+                      color: Constants.thirdColor,
+                      elevation: 6,
+                      key: ValueKey(index),
+                      margin: EdgeInsets.all(5),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      child: parsed[cardDate] == null
+                          ? Column(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: <Widget>[
+                                Text(
+                                    '${formatter.format(weekMap.keys.elementAt(index))} ${weekMap.keys.elementAt(index).day.toString()}.${weekMap.keys.elementAt(index).month.toString()}.${weekMap.keys.elementAt(index).year.toString()}',
+                                    style: TextStyle(
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.bold)),
+                                Text(""),
+                                Text("-"),
+                                Text(""),
+                              ],
+                            )
+                          : Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: <Widget>[
+                                Padding(
+                                  padding: const EdgeInsets.all(6.0),
+                                  child: Text(
+                                      '${formatter.format(weekMap.keys.elementAt(index))} ${weekMap.keys.elementAt(index).day.toString()}.${weekMap.keys.elementAt(index).month.toString()}.${weekMap.keys.elementAt(index).year.toString()}',
+                                      style: TextStyle(
+                                          fontSize: 15,
+                                          fontWeight: FontWeight.bold)),
+                                ),
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceEvenly,
+                                  children: [
+                                    for (int i = 0;
+                                        i < selectedMealTimes.length;
+                                        i++)
+                                      selectedMealTimes[i] == "Snack"
+                                          ? SizedBox()
+                                          : Expanded(
+                                              child: Padding(
+                                                padding:
+                                                    const EdgeInsets.all(4.0),
+                                                child: Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment
+                                                          .spaceEvenly,
+                                                  children: [
+                                                    Expanded(
+                                                      child: Column(
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .center,
+                                                        children: [
+                                                          Text(
+                                                            selectedMealTimes[i]
+                                                                .tr(),
+                                                            textAlign:
+                                                                TextAlign.start,
+                                                            style: TextStyle(
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold,
+                                                                fontSize: 14),
+                                                          ),
+                                                          Text(
+                                                            mealsInDay != null
+                                                                ? mealsInDay[selectedMealTimes[i]
+                                                                            .toLowerCase()] !=
+                                                                        null
+                                                                    ? mealsInDay[
+                                                                            selectedMealTimes[i].toLowerCase()]
+                                                                        ["name"]
+                                                                    : "-"
+                                                                : "-",
+                                                            textAlign: TextAlign
+                                                                .center,
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                    SizedBox(
+                                                      width: 8,
+                                                    ),
+                                                    Visibility(
+                                                      visible: selectedMealTimes
+                                                              .contains("Snack")
+                                                          ? i <
+                                                              selectedMealTimes
+                                                                      .length -
+                                                                  2
+                                                          : i <
+                                                              selectedMealTimes
+                                                                      .length -
+                                                                  1,
+                                                      child: Container(
+                                                        color: Constants
+                                                            .fourthColor,
+                                                        height: 30,
+                                                        width: 1,
+                                                        margin:
+                                                            EdgeInsets.all(4),
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                            ),
+                                  ],
+                                ),
+                                selectedMealTimes.contains("Snack")
+                                    ? Padding(
+                                        padding:
+                                            const EdgeInsets.only(right: 15),
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.center,
+                                          children: [
+                                            Text(
+                                              "Snack".tr(),
+                                              style: TextStyle(
+                                                  fontWeight: FontWeight.bold,
+                                                  fontSize: 14),
+                                            ),
+                                            Text(
+                                              mealsInDay != null
+                                                  ? mealsInDay["Snack"] != null
+                                                      ? mealsInDay["Snack"]
+                                                          ["name"]
+                                                      : "-"
+                                                  : "-",
+                                              textAlign: TextAlign.center,
+                                            ),
+                                          ],
+                                        ),
+                                      )
+                                    : SizedBox(),
+                              ],
+                            ),
+                    );
+                  });
             } else {
               print("Alles leer");
-              return Text("All Entries Empty");
+              return ListView.builder(
+                  itemCount: 7,
+                  itemBuilder: (BuildContext context, int index) {
+                    String cardDate = dateFormatter
+                        .format(currentDate.add(Duration(days: index)));
+                    Map<dynamic, dynamic> mealsInDay = parsed[cardDate];
+                    return Card(
+                        color: Constants.thirdColor,
+                        elevation: 6,
+                        margin: EdgeInsets.all(5),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: <Widget>[
+                            Text(
+                                '${formatter.format(weekMap.keys.elementAt(index))} ${weekMap.keys.elementAt(index).day.toString()}.${weekMap.keys.elementAt(index).month.toString()}.${weekMap.keys.elementAt(index).year.toString()}',
+                                style: TextStyle(
+                                    fontSize: 15, fontWeight: FontWeight.bold)),
+                            Text(""),
+                            Text("-"),
+                            Text(""),
+                          ],
+                        ));
+                  });
             }
           } else {
             return Text("No Data");

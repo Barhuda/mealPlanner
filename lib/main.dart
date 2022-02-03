@@ -48,7 +48,12 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     _getFireBaseStream();
+    _setPremium();
     super.initState();
+  }
+
+  _setPremium() {
+    myUser.setPremium();
   }
 
   _getFireBaseStream() {
@@ -71,16 +76,22 @@ class _MyAppState extends State<MyApp> {
 
     if (event.snapshot.value == null) {
       _createNewUserInDB(user, ref);
+      _getAvailableDbs(user, ref);
     } else {
       _getAvailableDbs(user, ref);
     }
   }
 
   _getAvailableDbs(User user, DatabaseReference ref) async {
+    List<String> allowedDbs = [];
     DatabaseEvent event = await ref.child("allowedDbs").once();
-    Map decoded = jsonDecode(event.snapshot.value);
-    myUser.setAllowedDbs(event.snapshot.value);
-    print(event.snapshot.value);
+    Map<dynamic, dynamic> decoded = event.snapshot.value;
+    decoded.forEach((key, value) {
+      allowedDbs.add(key);
+    });
+    myUser.setAllowedDbs(allowedDbs);
+
+    // myUser.setAllowedDbs(event.snapshot.value);
   }
 
   _createNewUserInDB(User user, DatabaseReference ref) async {
@@ -91,6 +102,7 @@ class _MyAppState extends State<MyApp> {
         "allowedDbs": {userUid: true}
       }
     });
+
     await ref.root.child("mealDbs").update({
       userUid: {"name": "TestMealDB", "weekdays": {}}
     });
@@ -114,6 +126,7 @@ class _MyAppState extends State<MyApp> {
       }),
       getPages: [
         GetPage(
+            transition: Transition.rightToLeft,
             name: "/",
             page: () => MainScreen(
                 analytics: MyApp.analytics, observer: MyApp.observer)),

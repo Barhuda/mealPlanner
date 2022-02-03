@@ -39,16 +39,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   void initState() {
     super.initState();
-    if (myUser.isLoggedIn) {
-      _getUserInfo();
-    }
-  }
-
-  _getUserInfo() async {
-    DatabaseReference ref =
-        FirebaseDatabase.instance.ref("Users/${myUser.UID}");
-    DatabaseEvent event = await ref.once();
-    print(event.snapshot.value);
+    print("User has Premium? " + myUser.hasPremium.toString());
   }
 
   final DateFormat formatter = DateFormat("EEEE");
@@ -192,7 +183,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   _changeScene(int index) {
-    Get.toNamed(Constants.bottomNavigationRoutes[index]);
+    Get.offAllNamed(Constants.bottomNavigationRoutes[index]);
   }
 
   @override
@@ -218,61 +209,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       ),
       body: Padding(
         padding: const EdgeInsets.all(32.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Align(
-              alignment: AlignmentDirectional.topStart,
-              child: Text(
-                "Login for sync and share".tr(),
-                style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.blueGrey),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(top: 80.0),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.only(top: 16.0, bottom: 34),
-                    child: GoogleAuthButton(
-                      onPressed: () {
-                        _addData();
-                      },
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 16.0),
-                    child: EmailAuthButton(
-                      onPressed: () {
-                        _registerWithMail();
-                      },
-                      text: "Register with Email".tr(),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            SizedBox(
-              height: 150,
-            ),
-            Align(
-              alignment: AlignmentDirectional.bottomCenter,
-              child: TextButton(
-                onPressed: () {
-                  _loginWithMail();
-                },
-                child: Text(
-                  "Erneuter Login",
-                  style: TextStyle(color: Colors.blue),
-                ),
-              ),
-            ),
-          ],
-        ),
+        child: myUser.hasPremium ? SignInWidgets() : getPremium(),
       ),
       bottomNavigationBar: BottomNavigationBar(
         unselectedItemColor: Colors.red,
@@ -299,6 +236,95 @@ class _ProfileScreenState extends State<ProfileScreen> {
         onTap: _changeScene,
         currentIndex: 1,
       ),
+    );
+  }
+
+  Column SignInWidgets() {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Align(
+          alignment: AlignmentDirectional.topStart,
+          child: Text(
+            "Login for sync and share".tr(),
+            style: TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+                color: Colors.blueGrey),
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.only(top: 80.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(top: 16.0, bottom: 34),
+                child: GoogleAuthButton(
+                  onPressed: () {
+                    _addData();
+                  },
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(bottom: 16.0),
+                child: EmailAuthButton(
+                  onPressed: () {
+                    _registerWithMail();
+                  },
+                  text: "Register with Email".tr(),
+                ),
+              ),
+            ],
+          ),
+        ),
+        SizedBox(
+          height: 150,
+        ),
+        Align(
+          alignment: AlignmentDirectional.bottomCenter,
+          child: TextButton(
+            onPressed: () {
+              _loginWithMail();
+            },
+            child: Text(
+              "Erneuter Login",
+              style: TextStyle(color: Colors.blue),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class getPremium extends StatefulWidget {
+  const getPremium({
+    Key key,
+  }) : super(key: key);
+
+  @override
+  State<getPremium> createState() => _getPremiumState();
+}
+
+class _getPremiumState extends State<getPremium> {
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Text(
+          "Get Premium",
+          style: TextStyle(
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+              color: Colors.blueGrey),
+        ),
+        IconButton(
+            onPressed: () {
+              print("Premium Handler");
+            },
+            icon: Icon(Icons.grade))
+      ],
     );
   }
 }

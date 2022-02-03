@@ -254,7 +254,7 @@ class _MainScreenState extends State<MainScreen> {
   }
 
   _changeScene(int index) {
-    Get.offAndToNamed(Constants.bottomNavigationRoutes[index]);
+    Get.offAllNamed(Constants.bottomNavigationRoutes[index]);
   }
 
   @override

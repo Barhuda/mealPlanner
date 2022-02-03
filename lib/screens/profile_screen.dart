@@ -12,6 +12,7 @@ import 'package:auth_buttons/auth_buttons.dart'
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart' hide Trans;
 import 'package:mealpy/constants.dart' as Constants;
+import 'package:google_sign_in/google_sign_in.dart';
 
 class ProfileScreen extends StatefulWidget {
   ProfileScreen({Key key, this.analytics, this.observer, this.database})
@@ -28,6 +29,11 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
+  GoogleSignIn _googleSignIn = GoogleSignIn(
+    scopes: <String>[
+      'email',
+    ],
+  );
   SharedPreferences prefs;
 
   bool _isLoading = true;
@@ -50,6 +56,24 @@ class _ProfileScreenState extends State<ProfileScreen> {
     } else {
       print("UID Leer");
     }
+  }
+
+  _signInWithGoogle() async {
+    // Trigger the authentication flow
+    final GoogleSignInAccount googleUser = await GoogleSignIn().signIn();
+
+    // Obtain the auth details from the request
+    final GoogleSignInAuthentication googleAuth =
+        await googleUser?.authentication;
+
+    // Create a new credential
+    final credential = GoogleAuthProvider.credential(
+      accessToken: googleAuth?.accessToken,
+      idToken: googleAuth?.idToken,
+    );
+
+    // Once signed in, return the UserCredential
+    return await FirebaseAuth.instance.signInWithCredential(credential);
   }
 
   _registerWithMail() async {
@@ -279,7 +303,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 padding: const EdgeInsets.only(top: 16.0, bottom: 34),
                 child: GoogleAuthButton(
                   onPressed: () {
-                    _addData();
+                    _signInWithGoogle();
                   },
                 ),
               ),

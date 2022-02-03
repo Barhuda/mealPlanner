@@ -48,6 +48,7 @@ dependencies:
   firebase_database: ^9.0.6
   firebase_auth: ^3.3.6
   auth_buttons: ^2.0.4
+  google_sign_in: ^5.2.3
   multiselect: 
     git: https://github.com/Barhuda/multiselect
 

@@ -13,6 +13,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart' hide Trans;
 import 'package:mealpy/constants.dart' as Constants;
 
+
 class SettingsScreen extends StatefulWidget {
   SettingsScreen({Key key, this.analytics, this.observer, this.database})
       : super(key: key);

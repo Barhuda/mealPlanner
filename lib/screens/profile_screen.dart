@@ -46,6 +46,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   void initState() {
     super.initState();
     print("User has Premium? " + myUser.hasPremium.toString());
+    
   }
 
   final DateFormat formatter = DateFormat("EEEE");
@@ -222,6 +223,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
     Get.offAllNamed(Constants.bottomNavigationRoutes[index]);
   }
 
+  selectMealPlan(String mealPlan) {
+    myUser.setSelectedMealPlan(mealPlan);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -248,7 +253,58 @@ class _ProfileScreenState extends State<ProfileScreen> {
         padding: const EdgeInsets.all(32.0),
         child: myUser.hasPremium
             ? myUser.isLoggedIn
-                ? Text("Ich bin eingeloggt")
+                ? Column(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Align(
+                          alignment: AlignmentDirectional.centerStart,
+                          child: Text(
+                            "Mealpan".tr(),
+                            textAlign: TextAlign.left,
+                            style: TextStyle(
+                                fontSize: 18, fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                      ),
+                      Expanded(
+                        child: ListView.builder(
+                          itemCount: myUser.allowedDbs.length,
+                          itemBuilder: (BuildContext context, int index) {
+                            return GestureDetector(
+                              onTap: () {
+                                selectMealPlan(myUser.allowedDbs[index]);
+                              },
+                              child: Card(
+                                color: Colors.teal,
+                                elevation: 6,
+                                key: ValueKey(index),
+                                margin: EdgeInsets.all(5),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(16),
+                                ),
+                                child: Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Column(
+                                    children: [
+                                      Text(
+                                        myUser.allowedDbs[index],
+                                        style: TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.bold),
+                                        textAlign: TextAlign.center,
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                    ],
+                  )
                 : SignInWidgets()
             : getPremium(),
       ),

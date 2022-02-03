@@ -56,7 +56,7 @@ class _MyAppState extends State<MyApp> {
     myUser.setPremium();
   }
 
-  _getFireBaseStream() {
+  Future<void> _getFireBaseStream() async {
     final FirebaseAuth _auth = FirebaseAuth.instance;
     _auth.authStateChanges().listen((User user) {
       if (user == null) {
@@ -69,7 +69,7 @@ class _MyAppState extends State<MyApp> {
     });
   }
 
-  _getUsersDB(User user) async {
+  Future<void> _getUsersDB(User user) async {
     DatabaseReference ref = FirebaseDatabase.instance.ref("Users/${user.uid}");
 
     DatabaseEvent event = await ref.once();
@@ -78,7 +78,7 @@ class _MyAppState extends State<MyApp> {
       _createNewUserInDB(user, ref);
       _getAvailableDbs(user, ref);
     } else {
-      _getAvailableDbs(user, ref);
+      await _getAvailableDbs(user, ref);
     }
   }
 

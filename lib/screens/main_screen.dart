@@ -28,6 +28,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:get/get.dart' hide Trans;
 import 'package:mealpy/my_user.dart';
 import 'package:firebase_database/firebase_database.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class MainScreen extends StatefulWidget {
   MainScreen({Key key, this.analytics, this.observer}) : super(key: key);
@@ -132,7 +133,6 @@ class _MainScreenState extends State<MainScreen> {
   @override
   void initState() {
     super.initState();
-
     initializeFlutterFire();
     currentDate = DateTime.now();
     _handleFirstDayOfWeek();
@@ -270,23 +270,27 @@ class _MainScreenState extends State<MainScreen> {
     Get.offAllNamed(Constants.bottomNavigationRoutes[index]);
   }
 
-  _getDbRef() {
+  _getDbRef() async {
     final DateTime now = currentDate;
-
+    String selectedMealplan = await myUser.getSelectedMealPlan();
     final String formatted = dateFormatter.format(now);
     final String endDate = dateFormatter.format(now.add(Duration(days: 6)));
     print("Enddatum" + endDate);
     print("Formatiert" + formatted);
     if (myUser.UID != null) {
-      dbStream = FirebaseDatabase.instance
-          .ref()
-          .child("mealDbs")
-          .child("123")
-          .child("weekdays")
-          .orderByKey()
-          .startAt(formatted)
-          .endAt(endDate)
-          .onValue;
+      try {
+        dbStream = FirebaseDatabase.instance
+            .ref()
+            .child("mealDbs")
+            .child(selectedMealplan)
+            .child("weekdays")
+            .orderByKey()
+            .startAt(formatted)
+            .endAt(endDate)
+            .onValue;
+      } catch (e) {
+        print(e);
+      }
     }
   }
 

@@ -5,7 +5,7 @@ class MyUser {
   bool hasPremium;
   bool isLoggedIn;
   String selectedMealPlan;
-  List<String> allowedDbs;
+  List<String> allowedDbs = [];
 
   MyUser(
       {this.isLoggedIn = false,
@@ -24,7 +24,7 @@ class MyUser {
   }
 
   setAllowedDbs(List allowedDbscoming) {
-    allowedDbs = allowedDbscoming;
+    this.allowedDbs = allowedDbscoming;
     print(this.allowedDbs);
   }
 
@@ -32,16 +32,23 @@ class MyUser {
     this.hasPremium = true;
   }
 
-  String getSelectedMealPlan() {
+  Future<String> getSelectedMealPlan() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
     if (this.selectedMealPlan == null) {
-      this.selectedMealPlan = allowedDbs[0];
+      String mealPlanFromPrefs = prefs.getString("selectedPlan");
+      if (mealPlanFromPrefs != null) {
+        this.selectedMealPlan = mealPlanFromPrefs;
+      } else {
+        this.selectedMealPlan = this.UID;
+      }
     }
     return this.selectedMealPlan;
   }
 
-  setSelectedMealPlan(String selectPlan)async {
+  setSelectedMealPlan(String selectPlan) async {
     this.selectedMealPlan = selectPlan;
     SharedPreferences prefs = await SharedPreferences.getInstance();
     prefs.setString("selectedPlan", selectPlan);
+    print(selectPlan);
   }
 }

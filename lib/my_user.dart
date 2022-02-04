@@ -51,4 +51,6 @@ class MyUser {
     prefs.setString("selectedPlan", selectPlan);
     print(selectPlan);
   }
+
+
 }

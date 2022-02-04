@@ -41,12 +41,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
   MyUser myUser = Get.find();
 
   int selectedValue = 0;
+  Map<String, dynamic> mealDbsNames = {};
+  Map<String, dynamic> mealDbsUsers = {};
 
   @override
   void initState() {
     super.initState();
     print("User has Premium? " + myUser.hasPremium.toString());
-    
+    _getMealPlanNamesAndUsers();
   }
 
   final DateFormat formatter = DateFormat("EEEE");
@@ -227,6 +229,22 @@ class _ProfileScreenState extends State<ProfileScreen> {
     myUser.setSelectedMealPlan(mealPlan);
   }
 
+  _getMealPlanNamesAndUsers() async {
+    for (var dbs in myUser.allowedDbs) {
+      DatabaseEvent event =
+          await FirebaseDatabase.instance.ref("mealDbs/$dbs").once();
+      Map<dynamic, dynamic> results = event.snapshot.value;
+      if (results != null) {
+        results.forEach((key, value) {
+          mealDbsNames[dbs] = results["name"] ?? "";
+          mealDbsUsers[dbs] = results["allowedUsers"] ?? "";
+        });
+      }
+      print(mealDbsNames);
+      print(mealDbsUsers);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -271,6 +289,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         child: ListView.builder(
                           itemCount: myUser.allowedDbs.length,
                           itemBuilder: (BuildContext context, int index) {
+                            String currentDbInIndex = myUser.allowedDbs[index];
                             return GestureDetector(
                               onTap: () {
                                 selectMealPlan(myUser.allowedDbs[index]);
@@ -288,13 +307,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   child: Column(
                                     children: [
                                       Text(
-                                        myUser.allowedDbs[index],
+                                        mealDbsNames[currentDbInIndex],
                                         style: TextStyle(
                                             color: Colors.white,
                                             fontSize: 18,
                                             fontWeight: FontWeight.bold),
                                         textAlign: TextAlign.center,
                                       ),
+                                      Text(mealDbsUsers[currentDbInIndex]
+                                          .toString())
                                     ],
                                   ),
                                 ),

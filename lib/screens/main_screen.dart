@@ -139,6 +139,10 @@ class _MainScreenState extends State<MainScreen> {
     DatabaseHelper _databaseHelper = Injection.injector.get();
   }
 
+  _startup() async {
+    await _getDbRef();
+  }
+
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
@@ -157,6 +161,7 @@ class _MainScreenState extends State<MainScreen> {
     }
     asyncMethod().then((value) {
       setState(() {
+        _getDbRef();
         print('fired');
       });
     });
@@ -275,8 +280,7 @@ class _MainScreenState extends State<MainScreen> {
     String selectedMealplan = await myUser.getSelectedMealPlan();
     final String formatted = dateFormatter.format(now);
     final String endDate = dateFormatter.format(now.add(Duration(days: 6)));
-    print("Enddatum" + endDate);
-    print("Formatiert" + formatted);
+    print("PLAN: " + selectedMealplan);
     if (myUser.UID != null) {
       try {
         dbStream = FirebaseDatabase.instance
@@ -288,6 +292,8 @@ class _MainScreenState extends State<MainScreen> {
             .startAt(formatted)
             .endAt(endDate)
             .onValue;
+        print("DAten: " + selectedMealplan + "  " + "$formatted ; $endDate");
+        setState(() {});
       } catch (e) {
         print(e);
       }
@@ -435,11 +441,12 @@ class _MainScreenState extends State<MainScreen> {
     return StreamBuilder(
         stream: dbStream,
         builder: (BuildContext context, snapshot) {
+          print(snapshot.connectionState);
           if (snapshot.hasData) {
             DataSnapshot dataValues = snapshot.data.snapshot;
             Map<dynamic, dynamic> values = dataValues.value;
             Map<dynamic, dynamic> parsed = {};
-            print(parsed);
+            print("Data:" + values.toString());
             if (values != null) {
               values.forEach((key, value) {
                 print(value.toString());

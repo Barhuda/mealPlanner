@@ -237,12 +237,31 @@ class _ProfileScreenState extends State<ProfileScreen> {
       if (results != null) {
         results.forEach((key, value) {
           mealDbsNames[dbs] = results["name"] ?? "";
-          mealDbsUsers[dbs] = results["allowedUsers"] ?? "";
+          Map<dynamic, dynamic> throwAway = {};
+          throwAway[dbs] = results["allowedUsers"] ?? "";
+          throwAway.forEach((key, value) {
+            List<String> dbsList = [];
+            Map<dynamic, dynamic> newMap = value;
+            newMap.forEach((key, value) {
+              dbsList.add(key);
+            });
+            mealDbsUsers[dbs] = dbsList
+                .toString()
+                .replaceAll("[", "")
+                .replaceAll("]", "")
+                .replaceAll(",", " /");
+          });
         });
       }
       print(mealDbsNames);
       print(mealDbsUsers);
     }
+    setState(() {});
+  }
+
+  _selectMealPlan(String selectPlan) {
+    myUser.setSelectedMealPlan(selectPlan);
+    setState(() {});
   }
 
   @override
@@ -294,29 +313,61 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               onTap: () {
                                 selectMealPlan(myUser.allowedDbs[index]);
                               },
-                              child: Card(
-                                color: Colors.teal,
-                                elevation: 6,
-                                key: ValueKey(index),
-                                margin: EdgeInsets.all(5),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(16),
-                                ),
-                                child: Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: Column(
-                                    children: [
-                                      Text(
-                                        mealDbsNames[currentDbInIndex],
-                                        style: TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 18,
-                                            fontWeight: FontWeight.bold),
-                                        textAlign: TextAlign.center,
-                                      ),
-                                      Text(mealDbsUsers[currentDbInIndex]
-                                          .toString())
-                                    ],
+                              child: GestureDetector(
+                                onTap: () {
+                                  _selectMealPlan(currentDbInIndex);
+                                },
+                                child: Card(
+                                  color: myUser.selectedMealPlan ==
+                                          currentDbInIndex
+                                      ? Colors.teal
+                                      : Colors.blueGrey,
+                                  elevation: 6,
+                                  key: ValueKey(index),
+                                  margin: EdgeInsets.all(5),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(16),
+                                  ),
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceEvenly,
+                                      children: [
+                                        Text(
+                                          mealDbsNames[currentDbInIndex] ?? "",
+                                          style: TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 18,
+                                              fontWeight: FontWeight.bold),
+                                          textAlign: TextAlign.center,
+                                        ),
+                                        Row(
+                                          children: [
+                                            Text("User: ".tr(),
+                                                style: TextStyle(
+                                                    color:
+                                                        Constants.thirdColor)),
+                                            Expanded(
+                                              child: Center(
+                                                child: Text(
+                                                    mealDbsUsers[
+                                                                currentDbInIndex]
+                                                            .toString() ??
+                                                        "",
+                                                    textAlign: TextAlign.center,
+                                                    style: TextStyle(
+                                                        color: Constants
+                                                            .secondaryColor)),
+                                              ),
+                                            ),
+                                            SizedBox(
+                                              width: 32,
+                                            )
+                                          ],
+                                        )
+                                      ],
+                                    ),
                                   ),
                                 ),
                               ),

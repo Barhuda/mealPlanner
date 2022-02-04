@@ -67,6 +67,7 @@ class _MainScreenState extends State<MainScreen> {
   MyUser myUser = Get.find();
   Stream<DatabaseEvent> dbStream;
   final DateFormat dateFormatter = DateFormat('yyyy-MM-dd');
+  String dbName;
 
   List<String> selectedMealTimes = [];
 
@@ -137,10 +138,6 @@ class _MainScreenState extends State<MainScreen> {
     currentDate = DateTime.now();
     _handleFirstDayOfWeek();
     DatabaseHelper _databaseHelper = Injection.injector.get();
-  }
-
-  _startup() async {
-    await _getDbRef();
   }
 
   @override
@@ -293,6 +290,13 @@ class _MainScreenState extends State<MainScreen> {
             .endAt(endDate)
             .onValue;
         print("DAten: " + selectedMealplan + "  " + "$formatted ; $endDate");
+        DatabaseEvent nameEvent = await FirebaseDatabase.instance
+            .ref()
+            .child("mealDbs")
+            .child(selectedMealplan)
+            .child("name")
+            .once();
+        dbName = nameEvent.snapshot.value.toString();
         setState(() {});
       } catch (e) {
         print(e);
@@ -310,9 +314,11 @@ class _MainScreenState extends State<MainScreen> {
         appBar: AppBar(
           backgroundColor: Constants.mainColor,
           actionsIconTheme: IconThemeData(size: 40),
-          title: Text(
-            'Meal planner'.tr(),
-          ),
+          title: myUser.isLoggedIn
+              ? Text(dbName ?? "Meal planner")
+              : Text(
+                  'Meal planner'.tr(),
+                ),
           centerTitle: true,
           leading: Padding(
             padding: EdgeInsets.only(left: 10),

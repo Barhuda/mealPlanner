@@ -18,6 +18,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'my_user.dart';
+import 'firebasertdb.dart';
 
 MyUser myUser = MyUser();
 void main() async {
@@ -58,13 +59,15 @@ class _MyAppState extends State<MyApp> {
 
   Future<void> _getFireBaseStream() async {
     final FirebaseAuth _auth = FirebaseAuth.instance;
-    _auth.authStateChanges().listen((User user) {
+    _auth.authStateChanges().listen((User user) async {
       if (user == null) {
         myUser.userLoggedOut();
         print('User is currently signed out!');
       } else {
         myUser.userLoggedIn(user.uid);
         _getUsersDB(user);
+        String hisName = await FirebaseRTDB.getUserName(user.uid);
+        myUser.setUsername(hisName);
       }
     });
   }
@@ -98,7 +101,7 @@ class _MyAppState extends State<MyApp> {
     String userUid = user.uid;
     await ref.parent.update({
       userUid: {
-        "name": user.email,
+        "name": user.email ?? "User",
         "allowedDbs": {userUid: true}
       }
     });

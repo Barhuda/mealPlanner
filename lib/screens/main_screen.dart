@@ -277,7 +277,6 @@ class _MainScreenState extends State<MainScreen> {
     String selectedMealplan = await myUser.getSelectedMealPlan();
     final String formatted = dateFormatter.format(now);
     final String endDate = dateFormatter.format(now.add(Duration(days: 6)));
-    print("PLAN: " + selectedMealplan);
     if (myUser.UID != null) {
       try {
         dbStream = FirebaseDatabase.instance

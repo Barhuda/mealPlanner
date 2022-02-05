@@ -2,6 +2,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class MyUser {
   String UID;
+  String username;
   bool hasPremium;
   bool isLoggedIn;
   String selectedMealPlan;
@@ -16,6 +17,10 @@ class MyUser {
   userLoggedIn(String UID) {
     this.isLoggedIn = true;
     this.UID = UID;
+  }
+
+  setUsername(String receivedName) {
+    this.username = receivedName;
   }
 
   userLoggedOut() {
@@ -51,6 +56,4 @@ class MyUser {
     prefs.setString("selectedPlan", selectPlan);
     print(selectPlan);
   }
-
-
 }

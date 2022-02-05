@@ -13,6 +13,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart' hide Trans;
 import 'package:mealpy/constants.dart' as Constants;
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:mealpy/firebasertdb.dart';
 
 class ProfileScreen extends StatefulWidget {
   ProfileScreen({Key key, this.analytics, this.observer, this.database})
@@ -30,8 +31,9 @@ class ProfileScreen extends StatefulWidget {
 
 class _ProfileScreenState extends State<ProfileScreen> {
   GoogleSignIn _googleSignIn = GoogleSignIn(
-    scopes: <String>[
+    scopes: [
       'email',
+      'https://www.googleapis.com/auth/contacts.readonly',
     ],
   );
   SharedPreferences prefs;
@@ -43,12 +45,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
   int selectedValue = 0;
   Map<String, dynamic> mealDbsNames = {};
   Map<String, dynamic> mealDbsUsers = {};
+  TextEditingController newNameCtr = TextEditingController();
 
   @override
   void initState() {
     super.initState();
     print("User has Premium? " + myUser.hasPremium.toString());
-    _getMealPlanNamesAndUsers();
+    if (myUser.isLoggedIn) {
+      _getMealPlanNamesAndUsers();
+    }
   }
 
   final DateFormat formatter = DateFormat("EEEE");
@@ -234,25 +239,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
       DatabaseEvent event =
           await FirebaseDatabase.instance.ref("mealDbs/$dbs").once();
       Map<dynamic, dynamic> results = event.snapshot.value;
+
       if (results != null) {
-        results.forEach((key, value) {
+        results.forEach((key, value) async {
           mealDbsNames[dbs] = results["name"] ?? "";
-          Map<dynamic, dynamic> throwAway = {};
-          throwAway[dbs] = results["allowedUsers"] ?? "";
-          throwAway.forEach((key, value) {
-            List<String> dbsList = [];
-            Map<dynamic, dynamic> newMap = value;
-            newMap.forEach((key, value) {
-              dbsList.add(key);
-            });
-            mealDbsUsers[dbs] = dbsList
-                .toString()
-                .replaceAll("[", "")
-                .replaceAll("]", "")
-                .replaceAll(",", " /");
-          });
         });
       }
+      List<String> myList = await FirebaseRTDB.getAllowedUsersNames(dbs);
+      mealDbsUsers[dbs] = myList;
       print(mealDbsNames);
       print(mealDbsUsers);
     }
@@ -261,6 +255,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   _selectMealPlan(String selectPlan) {
     myUser.setSelectedMealPlan(selectPlan);
+    setState(() {});
+  }
+
+  _saveName(String newName) async {
+    await FirebaseRTDB.changeUserName(myUser.UID, newName);
+    myUser.setUsername(newName);
+    newNameCtr.clear();
     setState(() {});
   }
 
@@ -292,6 +293,23 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ? myUser.isLoggedIn
                 ? Column(
                     children: [
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Align(
+                          alignment: AlignmentDirectional.centerStart,
+                          child: TextField(
+                            controller: newNameCtr,
+                            decoration: InputDecoration(
+                                label: Text("Change your Username".tr()),
+                                hintText: myUser.username ?? "User"),
+                          ),
+                        ),
+                      ),
+                      ElevatedButton(
+                          onPressed: () {
+                            _saveName(newNameCtr.text);
+                          },
+                          child: Text("Save".tr())),
                       Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: Align(
@@ -353,7 +371,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                                 child: Text(
                                                     mealDbsUsers[
                                                                 currentDbInIndex]
-                                                            .toString() ??
+                                                            .toString()
+                                                            .replaceAll("[", "")
+                                                            .replaceAll("]", "")
+                                                            .replaceAll(
+                                                                ",", " ") ??
                                                         "",
                                                     textAlign: TextAlign.center,
                                                     style: TextStyle(

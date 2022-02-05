@@ -263,7 +263,39 @@ class _ProfileScreenState extends State<ProfileScreen> {
     await FirebaseRTDB.changeUserName(myUser.UID, newName);
     myUser.setUsername(newName);
     newNameCtr.clear();
-    setState(() {});
+  }
+
+  _setNewMealplanName(String dbUID, String newName) {
+    if (newName != "") {
+      FirebaseRTDB.changeMealPlanName(dbUID, newName);
+    }
+  }
+
+  _setNewMealplanNameDialog(String dbUID, String initialName) {
+    TextEditingController mealPlanName =
+        TextEditingController(text: initialName);
+
+    Get.defaultDialog(
+      title: "Set new meal plan name".tr(),
+      onConfirm: () {
+        _setNewMealplanName(dbUID, mealPlanName.text);
+        Get.offAllNamed("/profile");
+      },
+      confirmTextColor: Colors.white,
+      textConfirm: "Save".tr(),
+      onCancel: () {
+        Navigator.of(context).pop();
+      },
+      content: Column(
+        children: [
+          TextFormField(
+            controller: mealPlanName,
+            decoration: InputDecoration(
+                label: Text("Plan".tr()), hintText: "Enter Mail".tr()),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
@@ -370,19 +402,26 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                                 )),
                                             Expanded(
                                               child: Center(
-                                                child: Text(
-                                                    mealDbsUsers[
-                                                                currentDbInIndex]
-                                                            .toString()
-                                                            .replaceAll("[", "")
-                                                            .replaceAll("]", "")
-                                                            .replaceAll(
-                                                                ",", " ") ??
-                                                        "",
-                                                    textAlign: TextAlign.center,
-                                                    style: TextStyle(
-                                                        color: Constants
-                                                            .secondaryColor)),
+                                                child: mealDbsUsers[
+                                                            currentDbInIndex] ==
+                                                        []
+                                                    ? SizedBox
+                                                    : Text(
+                                                        mealDbsUsers[
+                                                                    currentDbInIndex]
+                                                                .toString()
+                                                                .replaceAll(
+                                                                    "[", "")
+                                                                .replaceAll(
+                                                                    "]", "")
+                                                                .replaceAll(
+                                                                    ",", " ") ??
+                                                            "",
+                                                        textAlign:
+                                                            TextAlign.center,
+                                                        style: TextStyle(
+                                                            color: Constants
+                                                                .secondaryColor)),
                                               ),
                                             ),
                                             SizedBox(
@@ -401,7 +440,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                                   MyButton.addFriendButtonStyle,
                                             ),
                                             ElevatedButton(
-                                                onPressed: () {},
+                                                onPressed: () {
+                                                  _setNewMealplanNameDialog(
+                                                      currentDbInIndex,
+                                                      mealDbsNames[
+                                                          currentDbInIndex]);
+                                                },
                                                 child: Text("Rename plan".tr()),
                                                 style: MyButton
                                                     .addFriendButtonStyle)

@@ -37,4 +37,10 @@ class FirebaseRTDB {
     Map<dynamic, dynamic> results = event.snapshot.value;
     return results["name"];
   }
+
+  static Future<void> changeMealPlanName(String dbID, String newName) async {
+      Map<String, dynamic> newMap = {};
+      newMap["name"] = newName;
+        await FirebaseDatabase.instance.ref("mealDbs/$dbID").update(newMap);
+  }
 }

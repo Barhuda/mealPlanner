@@ -10,7 +10,7 @@ class FirebaseRTDB {
   }
 
   static Future<List<String>> getAllowedUsersNames(String UserUID) async {
-    List<String> allowedUsers = [];
+    List<String> allowedUsers = [""];
     DatabaseEvent event = await FirebaseDatabase.instance
         .ref("mealDbs/$UserUID/allowedUsers")
         .once();

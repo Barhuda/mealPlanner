@@ -14,6 +14,7 @@ import 'package:get/get.dart' hide Trans;
 import 'package:mealpy/constants.dart' as Constants;
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:mealpy/firebasertdb.dart';
+import 'package:mealpy/buttons/buttonStyles.dart' as MyButton;
 
 class ProfileScreen extends StatefulWidget {
   ProfileScreen({Key key, this.analytics, this.observer, this.database})
@@ -309,7 +310,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           onPressed: () {
                             _saveName(newNameCtr.text);
                           },
-                          child: Text("Save".tr())),
+                          child: Text("Save".tr()),
+                          style: MyButton.saveButtonStyle),
                       Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: Align(
@@ -364,8 +366,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                           children: [
                                             Text("User: ".tr(),
                                                 style: TextStyle(
-                                                    color:
-                                                        Constants.thirdColor)),
+                                                  color: Constants.thirdColor,
+                                                )),
                                             Expanded(
                                               child: Center(
                                                 child: Text(
@@ -387,7 +389,24 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                               width: 32,
                                             )
                                           ],
-                                        )
+                                        ),
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceAround,
+                                          children: [
+                                            ElevatedButton(
+                                              onPressed: () {},
+                                              child: Text("+ Add Friend".tr()),
+                                              style:
+                                                  MyButton.addFriendButtonStyle,
+                                            ),
+                                            ElevatedButton(
+                                                onPressed: () {},
+                                                child: Text("Rename plan".tr()),
+                                                style: MyButton
+                                                    .addFriendButtonStyle)
+                                          ],
+                                        ),
                                       ],
                                     ),
                                   ),

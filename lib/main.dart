@@ -50,11 +50,22 @@ class _MyAppState extends State<MyApp> {
   void initState() {
     _getFireBaseStream();
     _setPremium();
+    _getSharedPrefs();
     super.initState();
   }
 
   _setPremium() {
     myUser.setPremium();
+  }
+
+  _getSharedPrefs() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    List<String> selectedMultiselectMealTimes =
+        prefs.getStringList('mealTimes');
+    if (selectedMultiselectMealTimes == null) {
+      prefs.setStringList(
+          "mealTimes", ["Breakfast", "Lunch", "Dinner", "Snack"]);
+    }
   }
 
   Future<void> _getFireBaseStream() async {

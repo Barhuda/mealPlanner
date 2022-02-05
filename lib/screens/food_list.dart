@@ -86,6 +86,7 @@ class _FoodListState extends State<FoodList> {
     prefs = await SharedPreferences.getInstance();
     sortAlphabetical = prefs.getBool('sort') ?? false;
     selectedMealTimes = prefs.getStringList('mealTimes');
+    print("SelectedMealTimes =" + selectedMealTimes.toString());
     if (sortAlphabetical) {
       meallist.sort((a, b) =>
           a.mealName.toLowerCase().compareTo(b.mealName.toLowerCase()));

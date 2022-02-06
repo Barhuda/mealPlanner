@@ -128,6 +128,18 @@ class Meal {
         .remove();
     print("deleted at: " + dateFormatted);
   }
+
+  saveMealToFirebase(String dbUID) {
+    String dateFormatted =
+        dateFormatter.format(DateTime.fromMillisecondsSinceEpoch(this.date));
+    FirebaseDatabase.instance
+        .ref("mealDbs")
+        .child(dbUID)
+        .child("weekdays")
+        .child(dateFormatted)
+        .child(this.dayTime.toLowerCase())
+        .update({"link": this.recipe, "name": this.mealName});
+  }
 }
 
 // 17.02.2021 - Lunch - Spaghetti

@@ -272,6 +272,117 @@ class _MainScreenState extends State<MainScreen> {
     Get.offAllNamed(Constants.bottomNavigationRoutes[index]);
   }
 
+  _addMealDialog(String cardDate, {Map<dynamic, dynamic> parsedMeals}) {
+    TextEditingController breakfstCtrl = TextEditingController();
+
+    TextEditingController lunchCtrl = TextEditingController();
+
+    TextEditingController dinnerCtrl = TextEditingController();
+
+    TextEditingController snackCtrl = TextEditingController();
+
+    if (parsedMeals != null) {
+      if (parsedMeals["breakfast"] != null) {
+        breakfstCtrl.text = parsedMeals["breakfast"]["name"] ?? "";
+      }
+      if (parsedMeals["lunch"] != null) {
+        lunchCtrl.text = parsedMeals["lunch"]["name"] ?? "";
+      }
+      if (parsedMeals["dinner"] != null) {
+        dinnerCtrl.text = parsedMeals["dinner"]["name"] ?? "";
+      }
+      if (parsedMeals["snack"] != null) {
+        snackCtrl.text = parsedMeals["snack"]["name"] ?? "";
+      }
+    }
+    List<TextEditingController> editCtrls = [
+      breakfstCtrl,
+      lunchCtrl,
+      dinnerCtrl,
+      snackCtrl
+    ];
+
+    Get.defaultDialog(
+      title: cardDate,
+      onConfirm: () {
+        print("do Save");
+        _saveMealToFirebase(cardDate, editCtrls);
+        Navigator.of(context).pop();
+      },
+      confirmTextColor: Colors.white,
+      textConfirm: "Save".tr(),
+      onCancel: () {
+        Navigator.of(context).pop();
+      },
+      content: Column(
+        children: [
+          for (String meal in selectedMealTimes)
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: TypeAheadField(
+                suggestionsCallback: (pattern) {
+                  return getIdeas(pattern);
+                },
+                itemBuilder: (context, idea) {
+                  return ListTile(
+                    title: Text(idea["mealName"]),
+                  );
+                },
+                debounceDuration: Duration(milliseconds: 400),
+                onSuggestionSelected: (idea) {
+                  editCtrls[mulitSelectMealTimesFullList.indexOf(meal)].text =
+                      idea["mealName"];
+                  if (idea["recipe"] != "" || idea["recipe"] != null) {
+                    print("Save Meal with idea and Recipe");
+                  }
+                },
+                hideOnEmpty: true,
+                hideOnError: true,
+                textFieldConfiguration: TextFieldConfiguration(
+                  maxLines: 4,
+                  minLines: 1,
+                  keyboardType: TextInputType.multiline,
+                  textCapitalization: TextCapitalization.sentences,
+                  controller:
+                      editCtrls[mulitSelectMealTimesFullList.indexOf(meal)],
+                  decoration: InputDecoration(
+                      labelText: meal.tr(),
+                      suffixIcon: IconButton(
+                        onPressed: () {
+                          Meal(
+                                  date: DateTime.parse(cardDate)
+                                      .millisecondsSinceEpoch,
+                                  dayTime: meal)
+                              .deleteMealFromFirebase(myUser.selectedMealPlan);
+                          Navigator.of(context).pop();
+                        },
+                        icon: Icon(Icons.delete),
+                      )),
+                ),
+              ),
+            )
+          // TextFormField(
+          //   controller: mealPlanName,
+          //   decoration: InputDecoration(
+          //       label: Text("Plan".tr()), hintText: "Enter Mail".tr()),
+          // ),
+        ],
+      ),
+    );
+  }
+
+  _saveMealToFirebase(String cardDate, List<TextEditingController> editctrls) {
+    for (var ctrls in editctrls) {
+      if (ctrls.text != "") {
+        Meal(
+                date: DateTime.parse(cardDate).millisecondsSinceEpoch,
+                mealName: ctrls.text,
+                dayTime: mulitSelectMealTimesFullList[editctrls.indexOf(ctrls)])
+            .saveMealToFirebase(myUser.selectedMealPlan);
+      }
+    }
+  }
+
   _getDbRef() async {
     final DateTime now = currentDate;
     String selectedMealplan = await myUser.getSelectedMealPlan();
@@ -464,148 +575,160 @@ class _MainScreenState extends State<MainScreen> {
                     String cardDate = dateFormatter
                         .format(currentDate.add(Duration(days: index)));
                     Map<dynamic, dynamic> mealsInDay = parsed[cardDate];
-                    return Card(
-                      color: Constants.thirdColor,
-                      elevation: 6,
-                      key: ValueKey(index),
-                      margin: EdgeInsets.all(5),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                      child: parsed[cardDate] == null
-                          ? Column(
-                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                              children: <Widget>[
-                                Text(
-                                    '${formatter.format(weekMap.keys.elementAt(index))} ${weekMap.keys.elementAt(index).day.toString()}.${weekMap.keys.elementAt(index).month.toString()}.${weekMap.keys.elementAt(index).year.toString()}',
-                                    style: TextStyle(
-                                        fontSize: 15,
-                                        fontWeight: FontWeight.bold)),
-                                Text(""),
-                                Text("-"),
-                                Text(""),
-                              ],
-                            )
-                          : Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: <Widget>[
-                                Padding(
-                                  padding: const EdgeInsets.all(6.0),
-                                  child: Text(
+                    return GestureDetector(
+                      onTap: () {
+                        _addMealDialog(cardDate, parsedMeals: mealsInDay);
+                      },
+                      child: Card(
+                        color: Constants.thirdColor,
+                        elevation: 6,
+                        key: ValueKey(index),
+                        margin: EdgeInsets.all(5),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        child: parsed[cardDate] == null
+                            ? Column(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceEvenly,
+                                children: <Widget>[
+                                  Text(
                                       '${formatter.format(weekMap.keys.elementAt(index))} ${weekMap.keys.elementAt(index).day.toString()}.${weekMap.keys.elementAt(index).month.toString()}.${weekMap.keys.elementAt(index).year.toString()}',
                                       style: TextStyle(
                                           fontSize: 15,
                                           fontWeight: FontWeight.bold)),
-                                ),
-                                Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceEvenly,
-                                  children: [
-                                    for (int i = 0;
-                                        i < selectedMealTimes.length;
-                                        i++)
-                                      selectedMealTimes[i] == "Snack"
-                                          ? SizedBox()
-                                          : Expanded(
-                                              child: Padding(
-                                                padding:
-                                                    const EdgeInsets.all(4.0),
-                                                child: Row(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment
-                                                          .spaceEvenly,
-                                                  children: [
-                                                    Expanded(
-                                                      child: Column(
-                                                        mainAxisAlignment:
-                                                            MainAxisAlignment
-                                                                .center,
-                                                        children: [
-                                                          Text(
-                                                            selectedMealTimes[i]
-                                                                .tr(),
-                                                            textAlign:
-                                                                TextAlign.start,
-                                                            style: TextStyle(
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .bold,
-                                                                fontSize: 14),
-                                                          ),
-                                                          Text(
-                                                            mealsInDay != null
-                                                                ? mealsInDay[selectedMealTimes[i]
-                                                                            .toLowerCase()] !=
-                                                                        null
-                                                                    ? mealsInDay[
-                                                                            selectedMealTimes[i].toLowerCase()]
-                                                                        ["name"]
-                                                                    : "-"
-                                                                : "-",
-                                                            textAlign: TextAlign
-                                                                .center,
-                                                          ),
-                                                        ],
+                                  Text(""),
+                                  Text("-"),
+                                  Text(""),
+                                ],
+                              )
+                            : Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: <Widget>[
+                                  Padding(
+                                    padding: const EdgeInsets.all(6.0),
+                                    child: Text(
+                                        '${formatter.format(weekMap.keys.elementAt(index))} ${weekMap.keys.elementAt(index).day.toString()}.${weekMap.keys.elementAt(index).month.toString()}.${weekMap.keys.elementAt(index).year.toString()}',
+                                        style: TextStyle(
+                                            fontSize: 15,
+                                            fontWeight: FontWeight.bold)),
+                                  ),
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceEvenly,
+                                    children: [
+                                      for (int i = 0;
+                                          i < selectedMealTimes.length;
+                                          i++)
+                                        selectedMealTimes[i] == "Snack"
+                                            ? SizedBox()
+                                            : Expanded(
+                                                child: Padding(
+                                                  padding:
+                                                      const EdgeInsets.all(4.0),
+                                                  child: Row(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .spaceEvenly,
+                                                    children: [
+                                                      Expanded(
+                                                        child: Column(
+                                                          mainAxisAlignment:
+                                                              MainAxisAlignment
+                                                                  .center,
+                                                          children: [
+                                                            Text(
+                                                              selectedMealTimes[
+                                                                      i]
+                                                                  .tr(),
+                                                              textAlign:
+                                                                  TextAlign
+                                                                      .start,
+                                                              style: TextStyle(
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .bold,
+                                                                  fontSize: 14),
+                                                            ),
+                                                            Text(
+                                                              mealsInDay != null
+                                                                  ? mealsInDay[selectedMealTimes[i]
+                                                                              .toLowerCase()] !=
+                                                                          null
+                                                                      ? mealsInDay[
+                                                                              selectedMealTimes[i].toLowerCase()]
+                                                                          [
+                                                                          "name"]
+                                                                      : "-"
+                                                                  : "-",
+                                                              textAlign:
+                                                                  TextAlign
+                                                                      .center,
+                                                            ),
+                                                          ],
+                                                        ),
                                                       ),
-                                                    ),
-                                                    SizedBox(
-                                                      width: 8,
-                                                    ),
-                                                    Visibility(
-                                                      visible: selectedMealTimes
-                                                              .contains("Snack")
-                                                          ? i <
-                                                              selectedMealTimes
-                                                                      .length -
-                                                                  2
-                                                          : i <
-                                                              selectedMealTimes
-                                                                      .length -
-                                                                  1,
-                                                      child: Container(
-                                                        color: Constants
-                                                            .fourthColor,
-                                                        height: 30,
-                                                        width: 1,
-                                                        margin:
-                                                            EdgeInsets.all(4),
+                                                      SizedBox(
+                                                        width: 8,
                                                       ),
-                                                    ),
-                                                  ],
+                                                      Visibility(
+                                                        visible: selectedMealTimes
+                                                                .contains(
+                                                                    "Snack")
+                                                            ? i <
+                                                                selectedMealTimes
+                                                                        .length -
+                                                                    2
+                                                            : i <
+                                                                selectedMealTimes
+                                                                        .length -
+                                                                    1,
+                                                        child: Container(
+                                                          color: Constants
+                                                              .fourthColor,
+                                                          height: 30,
+                                                          width: 1,
+                                                          margin:
+                                                              EdgeInsets.all(4),
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
                                                 ),
                                               ),
-                                            ),
-                                  ],
-                                ),
-                                selectedMealTimes.contains("Snack")
-                                    ? Padding(
-                                        padding:
-                                            const EdgeInsets.only(right: 15),
-                                        child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.center,
-                                          children: [
-                                            Text(
-                                              "Snack".tr(),
-                                              style: TextStyle(
-                                                  fontWeight: FontWeight.bold,
-                                                  fontSize: 14),
-                                            ),
-                                            Text(
-                                              mealsInDay != null
-                                                  ? mealsInDay["Snack"] != null
-                                                      ? mealsInDay["Snack"]
-                                                          ["name"]
-                                                      : "-"
-                                                  : "-",
-                                              textAlign: TextAlign.center,
-                                            ),
-                                          ],
-                                        ),
-                                      )
-                                    : SizedBox(),
-                              ],
-                            ),
+                                    ],
+                                  ),
+                                  selectedMealTimes.contains("Snack")
+                                      ? Padding(
+                                          padding:
+                                              const EdgeInsets.only(right: 15),
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.center,
+                                            children: [
+                                              Text(
+                                                "Snack".tr(),
+                                                style: TextStyle(
+                                                    fontWeight: FontWeight.bold,
+                                                    fontSize: 14),
+                                              ),
+                                              Text(
+                                                mealsInDay != null
+                                                    ? mealsInDay["Snack"] !=
+                                                            null
+                                                        ? mealsInDay["Snack"]
+                                                            ["name"]
+                                                        : "-"
+                                                    : "-",
+                                                textAlign: TextAlign.center,
+                                              ),
+                                            ],
+                                          ),
+                                        )
+                                      : SizedBox(),
+                                ],
+                              ),
+                      ),
                     );
                   });
             } else {
@@ -616,25 +739,31 @@ class _MainScreenState extends State<MainScreen> {
                     String cardDate = dateFormatter
                         .format(currentDate.add(Duration(days: index)));
                     Map<dynamic, dynamic> mealsInDay = parsed[cardDate];
-                    return Card(
-                        color: Constants.thirdColor,
-                        elevation: 6,
-                        margin: EdgeInsets.all(5),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(16),
-                        ),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: <Widget>[
-                            Text(
-                                '${formatter.format(weekMap.keys.elementAt(index))} ${weekMap.keys.elementAt(index).day.toString()}.${weekMap.keys.elementAt(index).month.toString()}.${weekMap.keys.elementAt(index).year.toString()}',
-                                style: TextStyle(
-                                    fontSize: 15, fontWeight: FontWeight.bold)),
-                            Text(""),
-                            Text("-"),
-                            Text(""),
-                          ],
-                        ));
+                    return GestureDetector(
+                      onTap: () {
+                        _addMealDialog(cardDate);
+                      },
+                      child: Card(
+                          color: Constants.thirdColor,
+                          elevation: 6,
+                          margin: EdgeInsets.all(5),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: <Widget>[
+                              Text(
+                                  '${formatter.format(weekMap.keys.elementAt(index))} ${weekMap.keys.elementAt(index).day.toString()}.${weekMap.keys.elementAt(index).month.toString()}.${weekMap.keys.elementAt(index).year.toString()}',
+                                  style: TextStyle(
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.bold)),
+                              Text(""),
+                              Text("-"),
+                              Text(""),
+                            ],
+                          )),
+                    );
                   });
             }
           } else {

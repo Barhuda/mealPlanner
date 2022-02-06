@@ -39,8 +39,10 @@ class FirebaseRTDB {
   }
 
   static Future<void> changeMealPlanName(String dbID, String newName) async {
-      Map<String, dynamic> newMap = {};
-      newMap["name"] = newName;
-        await FirebaseDatabase.instance.ref("mealDbs/$dbID").update(newMap);
+    Map<String, dynamic> newMap = {};
+    newMap["name"] = newName;
+    await FirebaseDatabase.instance.ref("mealDbs/$dbID").update(newMap);
   }
+
+ 
 }

@@ -429,27 +429,33 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                             )
                                           ],
                                         ),
-                                        Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceAround,
-                                          children: [
-                                            ElevatedButton(
-                                              onPressed: () {},
-                                              child: Text("+ Add Friend".tr()),
-                                              style:
-                                                  MyButton.addFriendButtonStyle,
-                                            ),
-                                            ElevatedButton(
-                                                onPressed: () {
-                                                  _setNewMealplanNameDialog(
-                                                      currentDbInIndex,
-                                                      mealDbsNames[
-                                                          currentDbInIndex]);
-                                                },
-                                                child: Text("Rename plan".tr()),
+                                        Padding(
+                                          padding: const EdgeInsets.only(
+                                              top: 24.0, bottom: 12),
+                                          child: Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceAround,
+                                            children: [
+                                              ElevatedButton(
+                                                onPressed: () {},
+                                                child:
+                                                    Text("+ Add Friend".tr()),
                                                 style: MyButton
-                                                    .addFriendButtonStyle)
-                                          ],
+                                                    .addFriendButtonStyle,
+                                              ),
+                                              ElevatedButton(
+                                                  onPressed: () {
+                                                    _setNewMealplanNameDialog(
+                                                        currentDbInIndex,
+                                                        mealDbsNames[
+                                                            currentDbInIndex]);
+                                                  },
+                                                  child:
+                                                      Text("Rename plan".tr()),
+                                                  style: MyButton
+                                                      .addFriendButtonStyle)
+                                            ],
+                                          ),
                                         ),
                                       ],
                                     ),

@@ -498,29 +498,6 @@ class _MainScreenState extends State<MainScreen> {
               Expanded(
                 child: myUser.isLoggedIn ? onlineWidget() : offlineList(),
               ),
-              // FractionallySizedBox(
-              //   widthFactor: 0.9,
-              //   child: ElevatedButton(
-              //       style:
-              //           ElevatedButton.styleFrom(primary: Constants.mainColor),
-              //       onPressed: () async {
-              //         Navigator.of(context)
-              //             .pushNamed(FoodList.id)
-              //             .then((value) => setState(() {
-              //                   asyncMethod();
-              //                 }));
-              //       },
-              //       child: Padding(
-              //         padding: const EdgeInsets.all(12.0),
-              //         child: Text(
-              //           "Idea List \uD83C\uDF7D️",
-              //           style: TextStyle(fontSize: 18),
-              //         ).tr(),
-              //       )),
-              // ),
-              // SizedBox(
-              //   height: 10,
-              // )
             ],
           ),
         ),
@@ -565,9 +542,11 @@ class _MainScreenState extends State<MainScreen> {
             print("Data:" + values.toString());
             if (values != null) {
               values.forEach((key, value) {
-                print(value.toString());
-                print(key.toString());
                 parsed[key] = value;
+              });
+              print(parsed);
+              parsed.forEach((key, value) {
+                
               });
               return ListView.builder(
                   itemCount: 7,

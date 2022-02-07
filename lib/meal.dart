@@ -44,6 +44,12 @@ class Meal {
       date: data['date'],
       dayTime: data['daytime'],
       recipe: data['recipe']);
+  
+  factory Meal.fromFirebaseMap(Map<dynamic, dynamic> data, String dayTime) => new Meal(
+      mealName: data['name'],
+      date: data['date'],
+      dayTime: data['daytime'],
+      recipe: data['recipe']);
 
   Future<List<Meal>> getWeekList(DateTime firstWeekDay) async {
     List<Map> dbResult = await _databaseHelper.db.rawQuery(

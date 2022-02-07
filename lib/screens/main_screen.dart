@@ -544,16 +544,22 @@ class _MainScreenState extends State<MainScreen> {
               values.forEach((key, value) {
                 parsed[key] = value;
               });
-              print(parsed);
-              parsed.forEach((key, value) {
-                
-              });
+
               return ListView.builder(
                   itemCount: 7,
                   itemBuilder: (BuildContext context, int index) {
                     String cardDate = dateFormatter
                         .format(currentDate.add(Duration(days: index)));
                     Map<dynamic, dynamic> mealsInDay = parsed[cardDate];
+                    Map<String, Map<String, Meal>> mealMapPerDate = {};
+                    if (mealsInDay != null) {
+                      mealsInDay.forEach((key, value) {
+                        Meal newMeal = Meal.fromFirebaseMap(
+                            mealsInDay, key.toString().toLowerCase(), cardDate);
+                        print("Meal name ${newMeal.mealName}");
+                      });
+                    }
+
                     return GestureDetector(
                       onTap: () {
                         _addMealDialog(cardDate, parsedMeals: mealsInDay);

@@ -81,7 +81,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       idToken: googleAuth?.idToken,
     );
 
-    // Once signed in, return the UserCredential
+    Get.offAllNamed("/profile"); // Once signed in, return the UserCredential
     return await FirebaseAuth.instance.signInWithCredential(credential);
   }
 
@@ -90,8 +90,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
     TextEditingController passwordText = TextEditingController();
     Get.defaultDialog(
       title: "Register with Mail".tr(),
-      onConfirm: () {
-        _doFirebaseMailRegistration(mailText.text, passwordText.text);
+      onConfirm: () async {
+        await _doFirebaseMailRegistration(mailText.text, passwordText.text);
+        Get.offAllNamed("/profile");
       },
       confirmTextColor: Colors.white,
       textConfirm: "Register".tr(),
@@ -166,8 +167,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
     TextEditingController passwordText = TextEditingController();
     Get.defaultDialog(
       title: "Login with Mail".tr(),
-      onConfirm: () {
-        _doFireBaseLoginWithMail(mailText.text, passwordText.text);
+      onConfirm: () async {
+        await _doFireBaseLoginWithMail(mailText.text, passwordText.text);
+        Get.offAllNamed("/profile");
       },
       confirmTextColor: Colors.white,
       textConfirm: "Login".tr(),

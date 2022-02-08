@@ -894,10 +894,10 @@ class _MainScreenState extends State<MainScreen> {
                                               .text = idea["mealName"];
                                           if (idea["recipe"] != "" ||
                                               idea["recipe"] != null) {
-                                            mealLinks[
+                                            mealsInCurrentDayList[
                                                     mulitSelectMealTimesFullList
-                                                        .indexOf(mealTimes)] =
-                                                idea["recipe"];
+                                                        .indexOf(mealTimes)]
+                                                .recipe = idea["recipe"];
                                           }
                                         },
                                       ),

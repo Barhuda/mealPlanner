@@ -19,6 +19,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'my_user.dart';
 import 'firebasertdb.dart';
+import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 
 MyUser myUser = MyUser();
 void main() async {
@@ -26,6 +27,7 @@ void main() async {
   await Injection.initInjection();
   await EasyLocalization.ensureInitialized();
   await Firebase.initializeApp();
+
   runApp(EasyLocalization(
     useOnlyLangCode: true,
     supportedLocales: [Locale('en'), Locale('de')],
@@ -51,6 +53,8 @@ class _MyAppState extends State<MyApp> {
     _getFireBaseStream();
     _setPremium();
     _getSharedPrefs();
+    _handleDeepLink();
+    _handleDeepLinkStream();
     super.initState();
   }
 
@@ -80,6 +84,28 @@ class _MyAppState extends State<MyApp> {
         String hisName = await FirebaseRTDB.getUserName(user.uid);
         myUser.setUsername(hisName);
       }
+    });
+  }
+
+  _handleDeepLink() async {
+    final PendingDynamicLinkData initialLink =
+        await FirebaseDynamicLinks.instance.getInitialLink();
+    if (initialLink != null) {
+      final Uri deepLink = initialLink.link;
+
+      print("test Deep Link");
+      // Example of using the dynamic link to push the user to a different screen
+      Get.offAndToNamed("/profile");
+    }
+  }
+
+  _handleDeepLinkStream() {
+    FirebaseDynamicLinks.instance.onLink.listen((dynamicLinkData) async {
+      await Future.delayed(Duration(seconds: 1));
+      Get.offAllNamed("/profile");
+      print(dynamicLinkData.link.queryParameters['data']);
+    }).onError((error) {
+      print(error);
     });
   }
 

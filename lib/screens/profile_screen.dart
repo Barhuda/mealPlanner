@@ -57,11 +57,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
     print("User has Premium? " + myUser.hasPremium.toString());
     if (myUser.isLoggedIn) {
       _getMealPlanNamesAndUsers();
-    }
-    if (Get.arguments != null) {
-      arguments = Get.arguments;
-      dbUIDtoAddFromFriend = arguments[0];
-      print("UID from Friend is::::: $dbUIDtoAddFromFriend");
+      if (Get.arguments != null) {
+        arguments = Get.arguments;
+        dbUIDtoAddFromFriend = arguments[0];
+        print("UID from Friend is::::: $dbUIDtoAddFromFriend");
+        _handleAddingNewMealplanThroughLink(dbUIDtoAddFromFriend);
+      }
     }
   }
 
@@ -329,6 +330,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
     final Uri uri = shortenedLink.shortUrl;
     return "$uri";
+  }
+
+  _handleAddingNewMealplanThroughLink(String newDBUID) async{
+    if (myUser.allowedDbs.contains(newDBUID)) {
+      return;
+    } else {
+      await FirebaseRTDB.addDBtoAllowedDbs(myUser.UID, newDBUID);
+      List allowedDbs = myUser.allowedDbs;
+      allowedDbs.add(newDBUID);
+      myUser.setAllowedDbs(allowedDbs);
+    }
   }
 
   @override

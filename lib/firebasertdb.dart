@@ -44,5 +44,18 @@ class FirebaseRTDB {
     await FirebaseDatabase.instance.ref("mealDbs/$dbID").update(newMap);
   }
 
- 
+  static Future<void> addDBtoAllowedDbs(
+      String userUID, String newDBToAdd) async {
+    Map<String, dynamic> newMap = {};
+    newMap[newDBToAdd] = true;
+    await FirebaseDatabase.instance
+        .ref("Users/$userUID/allowedDbs")
+        .update(newMap);
+    Map<String, dynamic> userMap = {};
+    userMap[userUID] = true;
+    await FirebaseDatabase.instance
+        .ref("mealDbs/$newDBToAdd/allowedUsers")
+        .update(userMap);
+    return;
+  }
 }

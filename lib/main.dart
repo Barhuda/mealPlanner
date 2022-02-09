@@ -92,11 +92,10 @@ class _MyAppState extends State<MyApp> {
         await FirebaseDynamicLinks.instance.getInitialLink();
     if (initialLink != null) {
       final Uri deepLink = initialLink.link;
-
-      print("test Deep Link");
-      print(deepLink.queryParameters['data']);
-      // Example of using the dynamic link to push the user to a different screen
-      Get.offAndToNamed("/profile");
+      await Future.delayed(Duration(seconds: 1));
+      String dbUID = deepLink.queryParameters['uid'];
+      print(dbUID);
+      Get.offAllNamed("/profile", arguments: [dbUID]);
     }
   }
 

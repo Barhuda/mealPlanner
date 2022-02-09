@@ -94,6 +94,7 @@ class _MyAppState extends State<MyApp> {
       final Uri deepLink = initialLink.link;
 
       print("test Deep Link");
+      print(deepLink.queryParameters['data']);
       // Example of using the dynamic link to push the user to a different screen
       Get.offAndToNamed("/profile");
     }
@@ -102,8 +103,9 @@ class _MyAppState extends State<MyApp> {
   _handleDeepLinkStream() {
     FirebaseDynamicLinks.instance.onLink.listen((dynamicLinkData) async {
       await Future.delayed(Duration(seconds: 1));
-      Get.offAllNamed("/profile");
-      print(dynamicLinkData.link.queryParameters['data']);
+      String dbUID = dynamicLinkData.link.queryParameters['uid'];
+      print(dbUID);
+      Get.offAllNamed("/profile", arguments: [dbUID]);
     }).onError((error) {
       print(error);
     });

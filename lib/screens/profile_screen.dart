@@ -15,6 +15,7 @@ import 'package:mealpy/constants.dart' as Constants;
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:mealpy/firebasertdb.dart';
 import 'package:mealpy/buttons/buttonStyles.dart' as MyButton;
+import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 
 class ProfileScreen extends StatefulWidget {
   ProfileScreen({Key key, this.analytics, this.observer, this.database})
@@ -47,6 +48,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Map<String, dynamic> mealDbsNames = {};
   Map<String, dynamic> mealDbsUsers = {};
   TextEditingController newNameCtr = TextEditingController();
+  var arguments;
+  String dbUIDtoAddFromFriend;
 
   @override
   void initState() {
@@ -54,6 +57,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
     print("User has Premium? " + myUser.hasPremium.toString());
     if (myUser.isLoggedIn) {
       _getMealPlanNamesAndUsers();
+    }
+    if (Get.arguments != null) {
+      arguments = Get.arguments;
+      dbUIDtoAddFromFriend = arguments[0];
+      print("UID from Friend is::::: $dbUIDtoAddFromFriend");
     }
   }
 
@@ -300,6 +308,29 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
+  Future<String> _addFriend(String dbUID) async {
+    FirebaseDynamicLinks dynamicLinks = FirebaseDynamicLinks.instance;
+
+    final DynamicLinkParameters parameters = DynamicLinkParameters(
+      uriPrefix: 'https://mealpy.page.link',
+      link: Uri.parse(
+          'https://mealpy.page.link/sharemeals?uid=$dbUID'), // <- your paramaters
+
+      androidParameters: AndroidParameters(
+        packageName: 'com.mk.mealpy',
+        minimumVersion: 9,
+      ),
+      socialMetaTagParameters: SocialMetaTagParameters(
+        title: "Add Mealplan",
+      ),
+    );
+    final ShortDynamicLink shortenedLink =
+        await dynamicLinks.buildShortLink(parameters);
+
+    final Uri uri = shortenedLink.shortUrl;
+    return "$uri";
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -439,7 +470,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                                 MainAxisAlignment.spaceAround,
                                             children: [
                                               ElevatedButton(
-                                                onPressed: () {},
+                                                onPressed: () async {
+                                                  String url = await _addFriend(
+                                                      myUser.allowedDbs[index]);
+                                                  print(url);
+                                                },
                                                 child:
                                                     Text("+ Add Friend".tr()),
                                                 style: MyButton

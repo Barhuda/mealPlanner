@@ -26,12 +26,13 @@ import 'package:in_app_purchase/in_app_purchase.dart';
 import 'package:in_app_purchase_android/in_app_purchase_android.dart';
 
 MyUser myUser = MyUser();
+SharedPreferences prefs;
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Injection.initInjection();
   await EasyLocalization.ensureInitialized();
   await Firebase.initializeApp();
-
+  prefs = await SharedPreferences.getInstance();
   runApp(EasyLocalization(
     useOnlyLangCode: true,
     supportedLocales: [Locale('en'), Locale('de')],
@@ -87,6 +88,8 @@ class _MyAppState extends State<MyApp> {
         } else if (purchaseDetails.status == PurchaseStatus.purchased ||
             purchaseDetails.status == PurchaseStatus.restored) {
           print("Gekauft!");
+          myUser.setPremium();
+          prefs.setBool("premium", true);
         }
         if (purchaseDetails.pendingCompletePurchase) {
           await InAppPurchase.instance.completePurchase(purchaseDetails);
@@ -95,14 +98,21 @@ class _MyAppState extends State<MyApp> {
     });
   }
 
-  _getPastPurchases() async{
-    if(defaultTargetPlatform == TargetPlatform.android){
-   InAppPurchaseAndroidPlatformAddition androidAddition = 
-      InAppPurchase.instance.getPlatformAddition<InAppPurchaseAndroidPlatformAddition>();
+  _getPastPurchases() async {
+    if (defaultTargetPlatform == TargetPlatform.android) {
+      InAppPurchaseAndroidPlatformAddition androidAddition = InAppPurchase
+          .instance
+          .getPlatformAddition<InAppPurchaseAndroidPlatformAddition>();
 
-  QueryPurchaseDetailsResponse response = await androidAddition.queryPastPurchases();
+      QueryPurchaseDetailsResponse response =
+          await androidAddition.queryPastPurchases();
+      if (response.pastPurchases.isNotEmpty) {
+        if (response.pastPurchases[0].productID == "premium") {
+          myUser.hasPremium = true;
+          prefs.setBool("premium", true);
+        }
+      }
     }
-
   }
 
   _setPremium() {
@@ -110,12 +120,15 @@ class _MyAppState extends State<MyApp> {
   }
 
   _getSharedPrefs() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
     List<String> selectedMultiselectMealTimes =
         prefs.getStringList('mealTimes');
     if (selectedMultiselectMealTimes == null) {
       prefs.setStringList(
           "mealTimes", ["Breakfast", "Lunch", "Dinner", "Snack"]);
+    }
+    bool userPremium = prefs.getBool("premium") ?? false;
+    if (userPremium) {
+      myUser.setPremium();
     }
   }
 

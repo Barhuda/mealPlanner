@@ -351,24 +351,25 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Constants.mainColor,
-        centerTitle: true,
-        title: Text("Profile".tr()),
-        actions: [
-          Padding(
-            padding: const EdgeInsets.only(right: 12.0),
-            child: GestureDetector(
-              onTap: () {
-                _signOut();
-              },
-              child: Icon(
-                Icons.logout,
-                size: 25,
-              ),
-            ),
-          ),
-        ],
-      ),
+          backgroundColor: Constants.mainColor,
+          centerTitle: true,
+          title: Text("Profile".tr()),
+          actions: myUser.isLoggedIn
+              ? [
+                  Padding(
+                    padding: const EdgeInsets.only(right: 12.0),
+                    child: GestureDetector(
+                      onTap: () {
+                        _signOut();
+                      },
+                      child: Icon(
+                        Icons.logout,
+                        size: 25,
+                      ),
+                    ),
+                  ),
+                ]
+              : null),
       body: Padding(
         padding: const EdgeInsets.all(32.0),
         child: myUser.hasPremium
@@ -631,6 +632,8 @@ class _getPremiumState extends State<getPremium> {
     InAppPurchase.instance.buyNonConsumable(purchaseParam: purchaseParam);
   }
 
+  String productPrice;
+
   @override
   void initState() {
     _getProductDetails();
@@ -643,6 +646,7 @@ class _getPremiumState extends State<getPremium> {
         await InAppPurchase.instance.queryProductDetails(_kIds);
     print(response.productDetails);
     products = response.productDetails;
+    productPrice = products[0].price;
     setState(() {});
   }
 
@@ -654,9 +658,12 @@ class _getPremiumState extends State<getPremium> {
 
       QueryPurchaseDetailsResponse response =
           await androidAddition.queryPastPurchases();
-      print(response.pastPurchases[0].productID);
-      print("Hat gekauft: " + response.pastPurchases[0].productID);
-
+      if (response.pastPurchases.isNotEmpty) {
+        print("Hat gekauft: " + response.pastPurchases[0].productID);
+        print(response.pastPurchases[0].status);
+      } else {
+        print("leer");
+      }
     }
   }
 
@@ -679,18 +686,12 @@ class _getPremiumState extends State<getPremium> {
             },
             child: Padding(
               padding: const EdgeInsets.all(8.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  Icon(Icons.grade),
-                  Padding(
-                    padding: const EdgeInsets.only(left: 32.0),
-                    child: Text(
-                      "Buy Premium",
-                      style: TextStyle(fontSize: 18),
-                    ),
-                  ),
-                ],
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Text(
+                  "Buy Premium (${productPrice})",
+                  style: TextStyle(fontSize: 18),
+                ),
               ),
             )),
         ElevatedButton(

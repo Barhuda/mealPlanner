@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:mealpy/screens/category_screen.dart';
 import 'package:mealpy/screens/food_list.dart';
@@ -22,6 +23,7 @@ import 'my_user.dart';
 import 'firebasertdb.dart';
 import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
+import 'package:in_app_purchase_android/in_app_purchase_android.dart';
 
 MyUser myUser = MyUser();
 void main() async {
@@ -73,7 +75,6 @@ class _MyAppState extends State<MyApp> {
     }, onError: (error) {
       print(error);
     });
-
   }
 
   void _listenToPurchaseUpdated(List<PurchaseDetails> purchaseDetailsList) {
@@ -85,13 +86,23 @@ class _MyAppState extends State<MyApp> {
           print(purchaseDetails.error);
         } else if (purchaseDetails.status == PurchaseStatus.purchased ||
             purchaseDetails.status == PurchaseStatus.restored) {
-          print(purchaseDetails);
+          print("Gekauft!");
         }
         if (purchaseDetails.pendingCompletePurchase) {
           await InAppPurchase.instance.completePurchase(purchaseDetails);
         }
       }
     });
+  }
+
+  _getPastPurchases() async{
+    if(defaultTargetPlatform == TargetPlatform.android){
+   InAppPurchaseAndroidPlatformAddition androidAddition = 
+      InAppPurchase.instance.getPlatformAddition<InAppPurchaseAndroidPlatformAddition>();
+
+  QueryPurchaseDetailsResponse response = await androidAddition.queryPastPurchases();
+    }
+
   }
 
   _setPremium() {

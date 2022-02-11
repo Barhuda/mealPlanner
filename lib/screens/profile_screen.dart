@@ -1,4 +1,5 @@
 import 'package:firebase_database/firebase_database.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_analytics/observer.dart';
@@ -17,6 +18,7 @@ import 'package:mealpy/firebasertdb.dart';
 import 'package:mealpy/buttons/buttonStyles.dart' as MyButton;
 import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
+import 'package:in_app_purchase_android/in_app_purchase_android.dart';
 
 class ProfileScreen extends StatefulWidget {
   ProfileScreen({Key key, this.analytics, this.observer, this.database})
@@ -644,6 +646,20 @@ class _getPremiumState extends State<getPremium> {
     setState(() {});
   }
 
+  _getPastPurchases() async {
+    if (defaultTargetPlatform == TargetPlatform.android) {
+      InAppPurchaseAndroidPlatformAddition androidAddition = InAppPurchase
+          .instance
+          .getPlatformAddition<InAppPurchaseAndroidPlatformAddition>();
+
+      QueryPurchaseDetailsResponse response =
+          await androidAddition.queryPastPurchases();
+      print(response.pastPurchases[0].productID);
+      print("Hat gekauft: " + response.pastPurchases[0].productID);
+
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -671,6 +687,28 @@ class _getPremiumState extends State<getPremium> {
                     padding: const EdgeInsets.only(left: 32.0),
                     child: Text(
                       "Buy Premium",
+                      style: TextStyle(fontSize: 18),
+                    ),
+                  ),
+                ],
+              ),
+            )),
+        ElevatedButton(
+            style: MyButton.buyPremiumButton,
+            onPressed: () {
+              print("Premium Handler");
+              _getPastPurchases();
+            },
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  Icon(Icons.grade),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 32.0),
+                    child: Text(
+                      "Test History",
                       style: TextStyle(fontSize: 18),
                     ),
                   ),

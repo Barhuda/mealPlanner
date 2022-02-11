@@ -148,6 +148,20 @@ class Meal {
         .child(this.dayTime.toLowerCase())
         .update({"link": this.recipe, "name": this.mealName});
   }
+
+  saveIdeaMealToFirebase(String dbUID) {
+    String dateFormatted =
+        dateFormatter.format(DateTime.fromMillisecondsSinceEpoch(this.date));
+    FirebaseDatabase.instance
+        .ref("mealDbs")
+        .child(dbUID)
+        .child("weekdays")
+        .update({
+      dateFormatted: {
+        this.dayTime.toLowerCase(): {"link": this.recipe, "name": this.mealName}
+      }
+    });
+  }
 }
 
 // 17.02.2021 - Lunch - Spaghetti

@@ -251,22 +251,24 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   _getMealPlanNamesAndUsers() async {
-    for (var dbs in myUser.allowedDbs) {
-      DatabaseEvent event =
-          await FirebaseDatabase.instance.ref("mealDbs/$dbs").once();
-      Map<dynamic, dynamic> results = event.snapshot.value;
+    if (myUser.allowedDbs.isNotEmpty) {
+      for (var dbs in myUser.allowedDbs) {
+        DatabaseEvent event =
+            await FirebaseDatabase.instance.ref("mealDbs/$dbs").once();
+        Map<dynamic, dynamic> results = event.snapshot.value;
 
-      if (results != null) {
-        results.forEach((key, value) async {
-          mealDbsNames[dbs] = results["name"] ?? "";
-        });
+        if (results != null) {
+          results.forEach((key, value) async {
+            mealDbsNames[dbs] = results["name"] ?? "";
+          });
+        }
+        List<String> myList = await FirebaseRTDB.getAllowedUsersNames(dbs);
+        mealDbsUsers[dbs] = myList;
+        print(mealDbsNames);
+        print(mealDbsUsers);
       }
-      List<String> myList = await FirebaseRTDB.getAllowedUsersNames(dbs);
-      mealDbsUsers[dbs] = myList;
-      print(mealDbsNames);
-      print(mealDbsUsers);
+      setState(() {});
     }
-    setState(() {});
   }
 
   _selectMealPlan(String selectPlan) {

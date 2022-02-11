@@ -2,6 +2,7 @@ import 'package:category_picker/category_picker_item.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:mealpy/category.dart';
+import 'package:mealpy/main.dart';
 import 'package:mealpy/meallist.dart';
 import 'package:mealpy/constants.dart' as Constants;
 import 'package:mealpy/database_helper.dart';
@@ -519,6 +520,7 @@ class _FoodListState extends State<FoodList> {
                                             mealNote,
                                             textEditingController.text,
                                             saveCategoryId());
+
                                         Navigator.of(context).pop();
                                         asyncMethod(selectedCategoryFilterID)
                                             .then((value) {
@@ -702,17 +704,35 @@ class _FoodListState extends State<FoodList> {
                                                       ).tr(),
                                                       onPressed: () async {
                                                         try {
-                                                          Meal().saveMeal(
-                                                              mealName ??
-                                                                  currentMeal
-                                                                      .mealName,
-                                                              DateTime(
-                                                                  date.year,
-                                                                  date.month,
-                                                                  date.day),
-                                                              mealTime,
-                                                              currentMeal
-                                                                  .recipe);
+                                                          if (myUser
+                                                              .isLoggedIn) {
+                                                            Meal(
+                                                                    mealName: mealName ??
+                                                                        currentMeal
+                                                                            .mealName,
+                                                                    dayTime:
+                                                                        mealTime,
+                                                                    date: date
+                                                                        .millisecondsSinceEpoch,
+                                                                    recipe: currentMeal
+                                                                        .recipe)
+                                                                .saveMealToFirebase(
+                                                                    myUser.UID);
+                                                            print(
+                                                                "save to Firebase");
+                                                          } else {
+                                                            Meal().saveMeal(
+                                                                mealName ??
+                                                                    currentMeal
+                                                                        .mealName,
+                                                                DateTime(
+                                                                    date.year,
+                                                                    date.month,
+                                                                    date.day),
+                                                                mealTime,
+                                                                currentMeal
+                                                                    .recipe);
+                                                          }
 
                                                           Navigator.of(context)
                                                               .pop();

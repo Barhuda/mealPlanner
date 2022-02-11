@@ -129,6 +129,8 @@ class _MyAppState extends State<MyApp> {
     bool userPremium = prefs.getBool("premium") ?? false;
     if (userPremium) {
       myUser.setPremium();
+    } else {
+      _getPastPurchases();
     }
   }
 

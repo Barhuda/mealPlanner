@@ -49,6 +49,7 @@ class _MainScreenState extends State<MainScreen> {
   DateTime datePeriod = DateTime.now().add(Duration(days: 6));
   int mealDate = DateTime.now().millisecondsSinceEpoch;
   final DateFormat formatter = DateFormat("EEEE");
+  final DateFormat formatWithWeekday = DateFormat("yMMMEd");
   String mealTime = 'Breakfast';
   DateTime selectedDate;
   String mealName = '';
@@ -253,7 +254,7 @@ class _MainScreenState extends State<MainScreen> {
 
   _showDeleteDialog(Meal mealToDelete, TextEditingController textCtrl) {
     Get.defaultDialog(
-        title: "Delete Meal",
+        title: "Delete Meal".tr(),
         middleText: "Do you really want to delete this meal?".tr(),
         textCancel: "Cancel".tr(),
         textConfirm: "Delete".tr(),
@@ -261,9 +262,15 @@ class _MainScreenState extends State<MainScreen> {
         cancelTextColor: Colors.black,
         buttonColor: Colors.white,
         onConfirm: () {
-          mealToDelete.deleteMeal();
-          textCtrl.clear();
-          editBreakfast = null;
+          if (myUser.isLoggedIn) {
+            mealToDelete.deleteMealFromFirebase(myUser.selectedMealPlan);
+          } else {
+            mealToDelete.deleteMeal();
+            textCtrl.clear();
+            editBreakfast = null;
+          }
+
+          Get.back();
           Get.back();
         });
   }
@@ -324,7 +331,7 @@ class _MainScreenState extends State<MainScreen> {
     }
 
     Get.defaultDialog(
-      title: cardDate,
+      title: formatWithWeekday.format(DateTime.parse(cardDate)),
       onConfirm: () {
         print("do Save");
         _saveMealToFirebase(cardDate, editCtrls);
@@ -372,13 +379,13 @@ class _MainScreenState extends State<MainScreen> {
                           labelText: meal.tr(),
                           suffixIcon: IconButton(
                             onPressed: () {
-                              Meal(
+                              _showDeleteDialog(
+                                  Meal(
                                       date: DateTime.parse(cardDate)
                                           .millisecondsSinceEpoch,
-                                      dayTime: meal)
-                                  .deleteMealFromFirebase(
-                                      myUser.selectedMealPlan);
-                              Navigator.of(context).pop();
+                                      dayTime: meal),
+                                  editCtrls[mulitSelectMealTimesFullList
+                                      .indexOf(meal)]);
                             },
                             icon: Icon(Icons.delete),
                           )),
@@ -741,9 +748,9 @@ class _MainScreenState extends State<MainScreen> {
                                               ),
                                               Text(
                                                 mealsInDay != null
-                                                    ? mealsInDay["Snack"] !=
+                                                    ? mealsInDay["snack"] !=
                                                             null
-                                                        ? mealsInDay["Snack"]
+                                                        ? mealsInDay["snack"]
                                                             ["name"]
                                                         : "-"
                                                     : "-",

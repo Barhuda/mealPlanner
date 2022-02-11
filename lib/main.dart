@@ -3,7 +3,6 @@ import 'dart:convert';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_inapp_purchase/flutter_inapp_purchase.dart';
 import 'package:mealpy/screens/category_screen.dart';
 import 'package:mealpy/screens/food_list.dart';
 import 'package:mealpy/screens/main_screen.dart';
@@ -22,6 +21,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'my_user.dart';
 import 'firebasertdb.dart';
 import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
+import 'package:in_app_purchase/in_app_purchase.dart';
 
 MyUser myUser = MyUser();
 void main() async {
@@ -50,10 +50,13 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
+  /// The In App Purchase plugin
+  StreamSubscription<List<PurchaseDetails>> _subscription;
+
   @override
   void initState() {
     _getFireBaseStream();
-
+    _getPurchaseStream();
     // _setPremium();
     _getSharedPrefs();
     _handleDeepLink();
@@ -61,7 +64,35 @@ class _MyAppState extends State<MyApp> {
     super.initState();
   }
 
+  _getPurchaseStream() async {
+    final Stream purchaseUpdated = InAppPurchase.instance.purchaseStream;
+    _subscription = purchaseUpdated.listen((purchaseDetailsList) {
+      _listenToPurchaseUpdated(purchaseDetailsList);
+    }, onDone: () {
+      _subscription.cancel();
+    }, onError: (error) {
+      print(error);
+    });
 
+  }
+
+  void _listenToPurchaseUpdated(List<PurchaseDetails> purchaseDetailsList) {
+    purchaseDetailsList.forEach((PurchaseDetails purchaseDetails) async {
+      if (purchaseDetails.status == PurchaseStatus.pending) {
+        print("Purchase Loading");
+      } else {
+        if (purchaseDetails.status == PurchaseStatus.error) {
+          print(purchaseDetails.error);
+        } else if (purchaseDetails.status == PurchaseStatus.purchased ||
+            purchaseDetails.status == PurchaseStatus.restored) {
+          print(purchaseDetails);
+        }
+        if (purchaseDetails.pendingCompletePurchase) {
+          await InAppPurchase.instance.completePurchase(purchaseDetails);
+        }
+      }
+    });
+  }
 
   _setPremium() {
     myUser.setPremium();
@@ -162,7 +193,6 @@ class _MyAppState extends State<MyApp> {
   void dispose() async {
     // TODO: implement dispose
     super.dispose();
-
   }
 
   @override

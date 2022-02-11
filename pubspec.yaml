@@ -50,6 +50,7 @@ dependencies:
   firebase_dynamic_links: ^4.0.5
   auth_buttons: ^2.0.4
   google_sign_in: ^5.2.3
+  in_app_purchase: ^2.0.1
   multiselect: 
     git: https://github.com/Barhuda/multiselect
 

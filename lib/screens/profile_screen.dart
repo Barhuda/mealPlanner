@@ -16,7 +16,7 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:mealpy/firebasertdb.dart';
 import 'package:mealpy/buttons/buttonStyles.dart' as MyButton;
 import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
-
+import 'package:in_app_purchase/in_app_purchase.dart';
 
 class ProfileScreen extends StatefulWidget {
   ProfileScreen({Key key, this.analytics, this.observer, this.database})
@@ -345,8 +345,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }
   }
 
-
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -621,12 +619,30 @@ class getPremium extends StatefulWidget {
 }
 
 class _getPremiumState extends State<getPremium> {
+  List<ProductDetails> products = [];
 
   _purchasePremium() {
+    final ProductDetails productDetails = products[0];
+    final PurchaseParam purchaseParam =
+        PurchaseParam(productDetails: productDetails);
 
-
+    InAppPurchase.instance.buyNonConsumable(purchaseParam: purchaseParam);
   }
 
+  @override
+  void initState() {
+    _getProductDetails();
+    super.initState();
+  }
+
+  _getProductDetails() async {
+    const Set<String> _kIds = <String>{'premium'};
+    final ProductDetailsResponse response =
+        await InAppPurchase.instance.queryProductDetails(_kIds);
+    print(response.productDetails);
+    products = response.productDetails;
+    setState(() {});
+  }
 
   @override
   Widget build(BuildContext context) {

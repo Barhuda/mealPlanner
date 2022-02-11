@@ -1,7 +1,9 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_inapp_purchase/flutter_inapp_purchase.dart';
 import 'package:mealpy/screens/category_screen.dart';
 import 'package:mealpy/screens/food_list.dart';
 import 'package:mealpy/screens/main_screen.dart';
@@ -51,12 +53,15 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     _getFireBaseStream();
-    _setPremium();
+
+    // _setPremium();
     _getSharedPrefs();
     _handleDeepLink();
     _handleDeepLinkStream();
     super.initState();
   }
+
+
 
   _setPremium() {
     myUser.setPremium();
@@ -151,6 +156,13 @@ class _MyAppState extends State<MyApp> {
         "allowedUsers": {"${user.uid}": true}
       }
     });
+  }
+
+  @override
+  void dispose() async {
+    // TODO: implement dispose
+    super.dispose();
+
   }
 
   @override

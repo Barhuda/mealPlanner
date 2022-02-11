@@ -17,6 +17,7 @@ import 'package:mealpy/firebasertdb.dart';
 import 'package:mealpy/buttons/buttonStyles.dart' as MyButton;
 import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 
+
 class ProfileScreen extends StatefulWidget {
   ProfileScreen({Key key, this.analytics, this.observer, this.database})
       : super(key: key);
@@ -57,6 +58,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     print("User has Premium? " + myUser.hasPremium.toString());
     if (myUser.isLoggedIn) {
       _getMealPlanNamesAndUsers();
+      newNameCtr.text = myUser.username ?? "User";
       if (Get.arguments != null) {
         arguments = Get.arguments;
         dbUIDtoAddFromFriend = arguments[0];
@@ -273,7 +275,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   _saveName(String newName) async {
     await FirebaseRTDB.changeUserName(myUser.UID, newName);
     myUser.setUsername(newName);
-    newNameCtr.clear();
+    setState(() {});
   }
 
   _setNewMealplanName(String dbUID, String newName) {
@@ -332,7 +334,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     return "$uri";
   }
 
-  _handleAddingNewMealplanThroughLink(String newDBUID) async{
+  _handleAddingNewMealplanThroughLink(String newDBUID) async {
     if (myUser.allowedDbs.contains(newDBUID)) {
       return;
     } else {
@@ -342,6 +344,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
       myUser.setAllowedDbs(allowedDbs);
     }
   }
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -378,8 +382,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           child: TextField(
                             controller: newNameCtr,
                             decoration: InputDecoration(
-                                label: Text("Change your Username".tr()),
-                                hintText: myUser.username ?? "User"),
+                              label: Text("Change your Username".tr()),
+                            ),
                           ),
                         ),
                       ),
@@ -449,8 +453,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                               child: Center(
                                                 child: mealDbsUsers[
                                                             currentDbInIndex] ==
-                                                        []
-                                                    ? SizedBox
+                                                        null
+                                                    ? Text("")
                                                     : Text(
                                                         mealDbsUsers[
                                                                     currentDbInIndex]
@@ -617,6 +621,13 @@ class getPremium extends StatefulWidget {
 }
 
 class _getPremiumState extends State<getPremium> {
+
+  _purchasePremium() {
+
+
+  }
+
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -628,11 +639,28 @@ class _getPremiumState extends State<getPremium> {
               fontWeight: FontWeight.bold,
               color: Colors.blueGrey),
         ),
-        IconButton(
+        ElevatedButton(
+            style: MyButton.buyPremiumButton,
             onPressed: () {
               print("Premium Handler");
+              _purchasePremium();
             },
-            icon: Icon(Icons.grade))
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  Icon(Icons.grade),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 32.0),
+                    child: Text(
+                      "Buy Premium",
+                      style: TextStyle(fontSize: 18),
+                    ),
+                  ),
+                ],
+              ),
+            ))
       ],
     );
   }

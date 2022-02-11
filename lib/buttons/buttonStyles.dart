@@ -34,3 +34,8 @@ final ButtonStyle categorieButton = ElevatedButton.styleFrom(
   shape: RoundedRectangleBorder(
       borderRadius: BorderRadius.all(Radius.circular(12))),
 );
+
+final ButtonStyle buyPremiumButton = ElevatedButton.styleFrom(
+    primary: Color.fromARGB(255, 238, 12, 12),
+    shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.all(Radius.circular(12))));

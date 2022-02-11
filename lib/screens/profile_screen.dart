@@ -19,6 +19,7 @@ import 'package:mealpy/buttons/buttonStyles.dart' as MyButton;
 import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
 import 'package:in_app_purchase_android/in_app_purchase_android.dart';
+import 'package:share/share.dart';
 
 class ProfileScreen extends StatefulWidget {
   ProfileScreen({Key key, this.analytics, this.observer, this.database})
@@ -314,7 +315,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  Future<String> _addFriend(String dbUID) async {
+  Future<void> _addFriend(String dbUID) async {
     FirebaseDynamicLinks dynamicLinks = FirebaseDynamicLinks.instance;
 
     final DynamicLinkParameters parameters = DynamicLinkParameters(
@@ -334,7 +335,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         await dynamicLinks.buildShortLink(parameters);
 
     final Uri uri = shortenedLink.shortUrl;
-    return "$uri";
+    Share.share("I want to add you to my meal plan: $uri");
   }
 
   _handleAddingNewMealplanThroughLink(String newDBUID) async {
@@ -489,9 +490,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                             children: [
                                               ElevatedButton(
                                                 onPressed: () async {
-                                                  String url = await _addFriend(
+                                                  await _addFriend(
                                                       myUser.allowedDbs[index]);
-                                                  print(url);
                                                 },
                                                 child:
                                                     Text("+ Add Friend".tr()),

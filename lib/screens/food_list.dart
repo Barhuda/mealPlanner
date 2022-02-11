@@ -717,7 +717,8 @@ class _FoodListState extends State<FoodList> {
                                                                     recipe: currentMeal
                                                                         .recipe)
                                                                 .saveMealToFirebase(
-                                                                    myUser.UID);
+                                                                    myUser
+                                                                        .selectedMealPlan);
                                                             print(
                                                                 "save to Firebase");
                                                           } else {

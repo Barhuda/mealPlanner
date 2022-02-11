@@ -280,27 +280,48 @@ class _MainScreenState extends State<MainScreen> {
     TextEditingController dinnerCtrl = TextEditingController();
 
     TextEditingController snackCtrl = TextEditingController();
-
-    if (parsedMeals != null) {
-      if (parsedMeals["breakfast"] != null) {
-        breakfstCtrl.text = parsedMeals["breakfast"]["name"] ?? "";
-      }
-      if (parsedMeals["lunch"] != null) {
-        lunchCtrl.text = parsedMeals["lunch"]["name"] ?? "";
-      }
-      if (parsedMeals["dinner"] != null) {
-        dinnerCtrl.text = parsedMeals["dinner"]["name"] ?? "";
-      }
-      if (parsedMeals["snack"] != null) {
-        snackCtrl.text = parsedMeals["snack"]["name"] ?? "";
-      }
-    }
     List<TextEditingController> editCtrls = [
       breakfstCtrl,
       lunchCtrl,
       dinnerCtrl,
       snackCtrl
     ];
+
+    Map<String, String> linkMap = {
+      "breakfast": "",
+      "lunch": "",
+      "dinner": "",
+      "snack": ""
+    };
+
+    print(parsedMeals);
+
+    if (parsedMeals != null) {
+      if (parsedMeals["breakfast"] != null) {
+        breakfstCtrl.text = parsedMeals["breakfast"]["name"] ?? "";
+        if (parsedMeals["breakfast"]["link"] != null) {
+          linkMap["breakfast"] = parsedMeals["breakfast"]["link"];
+        }
+      }
+      if (parsedMeals["lunch"] != null) {
+        lunchCtrl.text = parsedMeals["lunch"]["name"] ?? "";
+        if (parsedMeals["lunch"]["link"] != null) {
+          linkMap["lunch"] = parsedMeals["lunch"]["link"];
+        }
+      }
+      if (parsedMeals["dinner"] != null) {
+        dinnerCtrl.text = parsedMeals["dinner"]["name"] ?? "";
+        if (parsedMeals["dinner"]["link"] != null) {
+          linkMap["dinner"] = parsedMeals["dinner"]["link"];
+        }
+      }
+      if (parsedMeals["snack"] != null) {
+        snackCtrl.text = parsedMeals["snack"]["name"] ?? "";
+        if (parsedMeals["snack"]["link"] != null) {
+          linkMap["snack"] = parsedMeals["snack"]["link"];
+        }
+      }
+    }
 
     Get.defaultDialog(
       title: cardDate,
@@ -317,49 +338,70 @@ class _MainScreenState extends State<MainScreen> {
       content: Column(
         children: [
           for (String meal in selectedMealTimes)
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: TypeAheadField(
-                suggestionsCallback: (pattern) {
-                  return getIdeas(pattern);
-                },
-                itemBuilder: (context, idea) {
-                  return ListTile(
-                    title: Text(idea["mealName"]),
-                  );
-                },
-                debounceDuration: Duration(milliseconds: 400),
-                onSuggestionSelected: (idea) {
-                  editCtrls[mulitSelectMealTimesFullList.indexOf(meal)].text =
-                      idea["mealName"];
-                  if (idea["recipe"] != "" || idea["recipe"] != null) {
-                    print("Save Meal with idea and Recipe");
-                  }
-                },
-                hideOnEmpty: true,
-                hideOnError: true,
-                textFieldConfiguration: TextFieldConfiguration(
-                  maxLines: 4,
-                  minLines: 1,
-                  keyboardType: TextInputType.multiline,
-                  textCapitalization: TextCapitalization.sentences,
-                  controller:
-                      editCtrls[mulitSelectMealTimesFullList.indexOf(meal)],
-                  decoration: InputDecoration(
-                      labelText: meal.tr(),
-                      suffixIcon: IconButton(
-                        onPressed: () {
-                          Meal(
-                                  date: DateTime.parse(cardDate)
-                                      .millisecondsSinceEpoch,
-                                  dayTime: meal)
-                              .deleteMealFromFirebase(myUser.selectedMealPlan);
-                          Navigator.of(context).pop();
-                        },
-                        icon: Icon(Icons.delete),
-                      )),
+            Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: TypeAheadField(
+                    suggestionsCallback: (pattern) {
+                      return getIdeas(pattern);
+                    },
+                    itemBuilder: (context, idea) {
+                      return ListTile(
+                        title: Text(idea["mealName"]),
+                      );
+                    },
+                    debounceDuration: Duration(milliseconds: 400),
+                    onSuggestionSelected: (idea) {
+                      editCtrls[mulitSelectMealTimesFullList.indexOf(meal)]
+                          .text = idea["mealName"];
+                      if (idea["recipe"] != "" || idea["recipe"] != null) {
+                        print("Save Meal with idea and Recipe");
+                      }
+                    },
+                    hideOnEmpty: true,
+                    hideOnError: true,
+                    textFieldConfiguration: TextFieldConfiguration(
+                      maxLines: 4,
+                      minLines: 1,
+                      keyboardType: TextInputType.multiline,
+                      textCapitalization: TextCapitalization.sentences,
+                      controller:
+                          editCtrls[mulitSelectMealTimesFullList.indexOf(meal)],
+                      decoration: InputDecoration(
+                          labelText: meal.tr(),
+                          suffixIcon: IconButton(
+                            onPressed: () {
+                              Meal(
+                                      date: DateTime.parse(cardDate)
+                                          .millisecondsSinceEpoch,
+                                      dayTime: meal)
+                                  .deleteMealFromFirebase(
+                                      myUser.selectedMealPlan);
+                              Navigator.of(context).pop();
+                            },
+                            icon: Icon(Icons.delete),
+                          )),
+                    ),
+                  ),
                 ),
-              ),
+                Visibility(
+                  visible: linkMap[meal.toLowerCase()] != "",
+                  child: ElevatedButton(
+                    child: Text("Link to recipe").tr(),
+                    onPressed: () {
+                      String recipeLink = linkMap[meal.toLowerCase()];
+                      if (recipeLink.startsWith("https://") ||
+                          recipeLink.startsWith("http://")) {
+                        launch(recipeLink);
+                      } else {
+                        launch("https://" + recipeLink);
+                      }
+                    },
+                    style: recipeButtonStyle,
+                  ),
+                ),
+              ],
             )
           // TextFormField(
           //   controller: mealPlanName,

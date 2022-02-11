@@ -108,7 +108,8 @@ class _MyAppState extends State<MyApp> {
           await androidAddition.queryPastPurchases();
       if (response.pastPurchases.isNotEmpty) {
         if (response.pastPurchases[0].productID == "premium") {
-          myUser.hasPremium = true;
+          print("Der hat das schon gekauft");
+          myUser.setPremium();
           prefs.setBool("premium", true);
         }
       }
@@ -126,7 +127,7 @@ class _MyAppState extends State<MyApp> {
       prefs.setStringList(
           "mealTimes", ["Breakfast", "Lunch", "Dinner", "Snack"]);
     }
-    bool userPremium = prefs.getBool("premium") ?? false;
+    bool userPremium = await prefs.getBool("premium") ?? false;
     if (userPremium) {
       myUser.setPremium();
     } else {

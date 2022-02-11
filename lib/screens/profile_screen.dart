@@ -93,9 +93,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
       accessToken: googleAuth?.accessToken,
       idToken: googleAuth?.idToken,
     );
-
+    await FirebaseAuth.instance.signInWithCredential(credential);
     Get.offAllNamed("/profile"); // Once signed in, return the UserCredential
-    return await FirebaseAuth.instance.signInWithCredential(credential);
   }
 
   _registerWithMail() async {

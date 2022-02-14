@@ -698,13 +698,13 @@ class _getPremiumState extends State<getPremium> {
         ),
         Image.asset("assets/graphics/premium.png"),
         Text(
-          "• Share your meal plan with family and friends \n• Edit the same meal plan together (every member needs premium) \n• Online sync \n• One time cost, no subscription \n• You keep your meal ideas seperate",
+          "buy-premium-text".tr(),
           textAlign: TextAlign.left,
           style:
-              TextStyle(fontSize: 16, fontWeight: FontWeight.bold, height: 1.5),
+              TextStyle(fontSize: 16, fontWeight: FontWeight.bold, height: 1.8),
         ),
         Padding(
-          padding: const EdgeInsets.only(top: 70.0),
+          padding: const EdgeInsets.only(top: 50.0),
           child: ElevatedButton(
               style: MyButton.buyPremiumButton,
               onPressed: () {
@@ -716,7 +716,7 @@ class _getPremiumState extends State<getPremium> {
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: Text(
-                    "Buy Premium (${productPrice})",
+                    "Buy Premium ({})".tr(args: [productPrice.toString()]),
                     style: TextStyle(fontSize: 18),
                   ),
                 ),

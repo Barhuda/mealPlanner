@@ -251,7 +251,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   _getMealPlanNamesAndUsers() async {
-    if (myUser.allowedDbs.isNotEmpty) {
+    if (myUser.allowedDbs != null) {
       for (var dbs in myUser.allowedDbs) {
         DatabaseEvent event =
             await FirebaseDatabase.instance.ref("mealDbs/$dbs").once();
@@ -408,119 +408,132 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           ),
                         ),
                       ),
-                      Expanded(
-                        child: ListView.builder(
-                          itemCount: myUser.allowedDbs.length,
-                          itemBuilder: (BuildContext context, int index) {
-                            String currentDbInIndex = myUser.allowedDbs[index];
-                            return GestureDetector(
-                              onTap: () {
-                                selectMealPlan(myUser.allowedDbs[index]);
-                              },
-                              child: GestureDetector(
-                                onTap: () {
-                                  _selectMealPlan(currentDbInIndex);
-                                },
-                                child: Card(
-                                  color: myUser.selectedMealPlan ==
-                                          currentDbInIndex
-                                      ? Colors.teal
-                                      : Colors.blueGrey,
-                                  elevation: 6,
-                                  key: ValueKey(index),
-                                  margin: EdgeInsets.all(5),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(16),
-                                  ),
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceEvenly,
-                                      children: [
-                                        Text(
-                                          mealDbsNames[currentDbInIndex] ?? "",
-                                          style: TextStyle(
-                                              color: Colors.white,
-                                              fontSize: 18,
-                                              fontWeight: FontWeight.bold),
-                                          textAlign: TextAlign.center,
+                      myUser.allowedDbs != null
+                          ? Expanded(
+                              child: ListView.builder(
+                                itemCount: myUser.allowedDbs.length,
+                                itemBuilder: (BuildContext context, int index) {
+                                  String currentDbInIndex =
+                                      myUser.allowedDbs[index];
+                                  return GestureDetector(
+                                    onTap: () {
+                                      selectMealPlan(myUser.allowedDbs[index]);
+                                    },
+                                    child: GestureDetector(
+                                      onTap: () {
+                                        _selectMealPlan(currentDbInIndex);
+                                      },
+                                      child: Card(
+                                        color: myUser.selectedMealPlan ==
+                                                currentDbInIndex
+                                            ? Colors.teal
+                                            : Colors.blueGrey,
+                                        elevation: 6,
+                                        key: ValueKey(index),
+                                        margin: EdgeInsets.all(5),
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(16),
                                         ),
-                                        Row(
-                                          children: [
-                                            Text("User: ".tr(),
-                                                style: TextStyle(
-                                                  color: Constants.thirdColor,
-                                                )),
-                                            Expanded(
-                                              child: Center(
-                                                child: mealDbsUsers[
-                                                            currentDbInIndex] ==
-                                                        null
-                                                    ? Text("")
-                                                    : Text(
-                                                        mealDbsUsers[
-                                                                    currentDbInIndex]
-                                                                .toString()
-                                                                .replaceAll(
-                                                                    "[", "")
-                                                                .replaceAll(
-                                                                    "]", "")
-                                                                .replaceAll(
-                                                                    ",", " ") ??
-                                                            "",
-                                                        textAlign:
-                                                            TextAlign.center,
-                                                        style: TextStyle(
-                                                            color: Constants
-                                                                .secondaryColor)),
-                                              ),
-                                            ),
-                                            SizedBox(
-                                              width: 32,
-                                            )
-                                          ],
-                                        ),
-                                        Padding(
-                                          padding: const EdgeInsets.only(
-                                              top: 24.0, bottom: 12),
-                                          child: Row(
+                                        child: Padding(
+                                          padding: const EdgeInsets.all(8.0),
+                                          child: Column(
                                             mainAxisAlignment:
-                                                MainAxisAlignment.spaceAround,
+                                                MainAxisAlignment.spaceEvenly,
                                             children: [
-                                              ElevatedButton(
-                                                onPressed: () async {
-                                                  await _addFriend(
-                                                      myUser.allowedDbs[index]);
-                                                },
-                                                child:
-                                                    Text("+ Add Friend".tr()),
-                                                style: MyButton
-                                                    .addFriendButtonStyle,
+                                              Text(
+                                                mealDbsNames[
+                                                        currentDbInIndex] ??
+                                                    "",
+                                                style: TextStyle(
+                                                    color: Colors.white,
+                                                    fontSize: 18,
+                                                    fontWeight:
+                                                        FontWeight.bold),
+                                                textAlign: TextAlign.center,
                                               ),
-                                              ElevatedButton(
-                                                  onPressed: () {
-                                                    _setNewMealplanNameDialog(
-                                                        currentDbInIndex,
-                                                        mealDbsNames[
-                                                            currentDbInIndex]);
-                                                  },
-                                                  child:
-                                                      Text("Rename plan".tr()),
-                                                  style: MyButton
-                                                      .addFriendButtonStyle)
+                                              Row(
+                                                children: [
+                                                  Text("User: ".tr(),
+                                                      style: TextStyle(
+                                                        color: Constants
+                                                            .thirdColor,
+                                                      )),
+                                                  Expanded(
+                                                    child: Center(
+                                                      child: mealDbsUsers[
+                                                                  currentDbInIndex] ==
+                                                              null
+                                                          ? Text("")
+                                                          : Text(
+                                                              mealDbsUsers[
+                                                                          currentDbInIndex]
+                                                                      .toString()
+                                                                      .replaceAll(
+                                                                          "[",
+                                                                          "")
+                                                                      .replaceAll(
+                                                                          "]",
+                                                                          "")
+                                                                      .replaceAll(
+                                                                          ",",
+                                                                          " ") ??
+                                                                  "",
+                                                              textAlign:
+                                                                  TextAlign
+                                                                      .center,
+                                                              style: TextStyle(
+                                                                  color: Constants
+                                                                      .secondaryColor)),
+                                                    ),
+                                                  ),
+                                                  SizedBox(
+                                                    width: 32,
+                                                  )
+                                                ],
+                                              ),
+                                              Padding(
+                                                padding: const EdgeInsets.only(
+                                                    top: 24.0, bottom: 12),
+                                                child: Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment
+                                                          .spaceAround,
+                                                  children: [
+                                                    ElevatedButton(
+                                                      onPressed: () async {
+                                                        await _addFriend(myUser
+                                                            .allowedDbs[index]);
+                                                      },
+                                                      child: Text(
+                                                          "+ Add Friend".tr()),
+                                                      style: MyButton
+                                                          .addFriendButtonStyle,
+                                                    ),
+                                                    ElevatedButton(
+                                                        onPressed: () {
+                                                          _setNewMealplanNameDialog(
+                                                              currentDbInIndex,
+                                                              mealDbsNames[
+                                                                  currentDbInIndex]);
+                                                        },
+                                                        child: Text(
+                                                            "Rename plan".tr()),
+                                                        style: MyButton
+                                                            .addFriendButtonStyle)
+                                                  ],
+                                                ),
+                                              ),
                                             ],
                                           ),
                                         ),
-                                      ],
+                                      ),
                                     ),
-                                  ),
-                                ),
+                                  );
+                                },
                               ),
-                            );
-                          },
-                        ),
-                      ),
+                            )
+                          : SizedBox()
                     ],
                   )
                 : SignInWidgets()

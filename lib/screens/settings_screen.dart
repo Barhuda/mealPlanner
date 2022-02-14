@@ -15,12 +15,12 @@ import 'package:mealpy/constants.dart' as Constants;
 
 
 class SettingsScreen extends StatefulWidget {
-  SettingsScreen({Key key, this.analytics, this.observer, this.database})
+  SettingsScreen({Key? key, this.analytics, this.observer, this.database})
       : super(key: key);
 
-  final FirebaseDatabase database;
-  final FirebaseAnalytics analytics;
-  final FirebaseAnalyticsObserver observer;
+  final FirebaseDatabase? database;
+  final FirebaseAnalytics? analytics;
+  final FirebaseAnalyticsObserver? observer;
 
   static const String id = 'settings_screen';
 
@@ -29,16 +29,16 @@ class SettingsScreen extends StatefulWidget {
 }
 
 class _SettingsScreenState extends State<SettingsScreen> {
-  SharedPreferences prefs;
-  bool firstDayIsCurrentDay;
-  int selectedWeekDayAsFirstDay;
+  late SharedPreferences prefs;
+  bool? firstDayIsCurrentDay;
+  int? selectedWeekDayAsFirstDay;
   var days;
   bool _isLoading = true;
   bool sortAlphabetical = false;
   List<DropdownMenuItem<int>> dropDownList = [];
   MyUser myUser = Get.find();
 
-  int selectedValue = 0;
+  int? selectedValue = 0;
 
   List<String> mulitSelectMealTimesFullList = [
     "Breakfast",
@@ -123,7 +123,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       items: dropDownList,
                       value: selectedValue,
                       onChanged: (value) {
-                        prefs.setInt('selectedWeekDay', value);
+                        prefs.setInt('selectedWeekDay', value!);
                         setState(() {
                           selectedValue = value;
                         });

@@ -9,11 +9,11 @@ import 'package:flutter/material.dart';
 class Meal {
   DatabaseHelper _databaseHelper = Injection.injector.get();
 
-  int id;
-  String mealName;
-  int date;
-  String recipe;
-  String dayTime;
+  int? id;
+  String? mealName;
+  int? date;
+  String? recipe;
+  String? dayTime;
 
   Meal({this.id, this.mealName, this.date, this.dayTime, this.recipe});
 
@@ -54,7 +54,7 @@ class Meal {
           recipe: data[dayTime.toLowerCase()]["link"] ?? null);
 
   Future<List<Meal>> getWeekList(DateTime firstWeekDay) async {
-    List<Map> dbResult = await _databaseHelper.db.rawQuery(
+    List<Map> dbResult = await _databaseHelper.db!.rawQuery(
         'SELECT * FROM meals WHERE date >= "${firstWeekDay.subtract(Duration(days: 1)).millisecondsSinceEpoch}" AND date <= "${(firstWeekDay.add(new Duration(days: 6))).millisecondsSinceEpoch}"');
     return List.generate(
         dbResult.length,
@@ -66,8 +66,8 @@ class Meal {
             recipe: dbResult[index]['recipe']));
   }
 
-  Map<DateTime, Meal> generateMealMap(DateTime startDate) {
-    Map<DateTime, Meal> mealMap = {};
+  Map<DateTime, Meal?> generateMealMap(DateTime startDate) {
+    Map<DateTime, Meal?> mealMap = {};
     for (int i = 0; i < 7; i++) {
       mealMap[startDate.add(Duration(days: i))] = null;
     }
@@ -75,7 +75,7 @@ class Meal {
   }
 
   Future<void> deleteMeal() async {
-    await _databaseHelper.db.delete(
+    await _databaseHelper.db!.delete(
       "meals",
       where: "id = ?",
       whereArgs: [this.id],
@@ -83,8 +83,8 @@ class Meal {
   }
 
   Future<void> saveMeal(
-      String mealName, DateTime date, String dayTime, String link) async {
-    await _databaseHelper.db.insert(
+      String? mealName, DateTime date, String? dayTime, String? link) async {
+    await _databaseHelper.db!.insert(
         "meals",
         Meal(
           mealName: mealName,
@@ -95,27 +95,27 @@ class Meal {
         conflictAlgorithm: ConflictAlgorithm.replace);
   }
 
-  Future<Map<DateTime, Map<String, Meal>>> generateWeekList(
+  Future<Map<DateTime, Map<String?, Meal>>> generateWeekList(
       DateTime firstWeekDay) async {
     List<Meal> weekList = [];
-    Map<DateTime, Map<String, Meal>> resultMap = {};
+    Map<DateTime, Map<String?, Meal>> resultMap = {};
     for (int i = 0; i < 7; i++) {
       DateTime defaultDate = firstWeekDay.add(Duration(days: i));
       DateTime formattedDefaultDate =
           new DateTime(defaultDate.year, defaultDate.month, defaultDate.day);
-      resultMap[formattedDefaultDate] = <String, Meal>{};
+      resultMap[formattedDefaultDate] = <String?, Meal>{};
     }
     await getWeekList(firstWeekDay).then(
-        (value) => Future.forEach(value, (element) => weekList.add(element)));
+        (value) => Future.forEach(value, (dynamic element) => weekList.add(element)));
     for (int i = 0; i < weekList.length; i++) {
       Meal meal = weekList[i];
-      DateTime inputDate = DateTime.fromMillisecondsSinceEpoch(meal.date);
+      DateTime inputDate = DateTime.fromMillisecondsSinceEpoch(meal.date!);
       DateTime formattedDate =
           new DateTime(inputDate.year, inputDate.month, inputDate.day);
-      Map<String, Meal> mapToAdd = {};
+      Map<String?, Meal> mapToAdd = {};
       mapToAdd[meal.dayTime] = meal;
       if (resultMap.containsKey(formattedDate)) {
-        resultMap[formattedDate][meal.dayTime] = meal;
+        resultMap[formattedDate]![meal.dayTime] = meal;
       } else {
         resultMap[formattedDate] = mapToAdd;
       }
@@ -126,39 +126,39 @@ class Meal {
   deleteMealFromFirebase(String userDb) {
     print("User DB: $userDb");
     String dateFormatted =
-        dateFormatter.format(DateTime.fromMillisecondsSinceEpoch(this.date));
+        dateFormatter.format(DateTime.fromMillisecondsSinceEpoch(this.date!));
     FirebaseDatabase.instance
         .ref("mealDbs")
         .child(userDb)
         .child("weekdays")
         .child(dateFormatted)
-        .child(this.dayTime.toLowerCase())
+        .child(this.dayTime!.toLowerCase())
         .remove();
     print("deleted at: " + dateFormatted);
   }
 
   saveMealToFirebase(String dbUID) {
     String dateFormatted =
-        dateFormatter.format(DateTime.fromMillisecondsSinceEpoch(this.date));
+        dateFormatter.format(DateTime.fromMillisecondsSinceEpoch(this.date!));
     FirebaseDatabase.instance
         .ref("mealDbs")
         .child(dbUID)
         .child("weekdays")
         .child(dateFormatted)
-        .child(this.dayTime.toLowerCase())
+        .child(this.dayTime!.toLowerCase())
         .update({"link": this.recipe, "name": this.mealName});
   }
 
   saveIdeaMealToFirebase(String dbUID) {
     String dateFormatted =
-        dateFormatter.format(DateTime.fromMillisecondsSinceEpoch(this.date));
+        dateFormatter.format(DateTime.fromMillisecondsSinceEpoch(this.date!));
     FirebaseDatabase.instance
         .ref("mealDbs")
         .child(dbUID)
         .child("weekdays")
         .update({
       dateFormatted: {
-        this.dayTime.toLowerCase(): {"link": this.recipe, "name": this.mealName}
+        this.dayTime!.toLowerCase(): {"link": this.recipe, "name": this.mealName}
       }
     });
   }

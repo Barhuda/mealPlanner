@@ -1,10 +1,10 @@
 class DayMeal {
-  int id;
-  int date;
-  String mealMorning;
-  String mealLunch;
-  String mealEvening;
-  String snack;
+  int? id;
+  int? date;
+  String? mealMorning;
+  String? mealLunch;
+  String? mealEvening;
+  String? snack;
 
   DayMeal(
       {this.id,

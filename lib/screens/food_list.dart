@@ -1,4 +1,5 @@
-import 'package:category_picker/category_picker_item.dart';
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:mealpy/category.dart';
@@ -19,15 +20,15 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:mealpy/buttons/buttonStyles.dart';
 import 'package:clipboard/clipboard.dart';
 import 'package:mealpy/category.dart';
-import 'package:category_picker/category_picker.dart';
+import 'package:group_button/group_button.dart';
 import 'package:get/get.dart' hide Trans;
 
 class FoodList extends StatefulWidget {
-  FoodList({Key key, this.analytics, this.observer}) : super(key: key);
+  FoodList({Key? key, this.analytics, this.observer}) : super(key: key);
   static const String id = 'food_list';
 
-  final FirebaseAnalytics analytics;
-  final FirebaseAnalyticsObserver observer;
+  final FirebaseAnalytics? analytics;
+  final FirebaseAnalyticsObserver? observer;
 
   @override
   _FoodListState createState() => _FoodListState();
@@ -37,14 +38,14 @@ class _FoodListState extends State<FoodList> {
   DatabaseHelper _databaseHelper = Injection.injector.get();
   List<Meallist> meallist = [];
   List<Category> categoryList = [];
-  List<CategoryPickerItem> categoryPickerItems = [];
-  String mealName;
-  String mealNote;
-  String mealTime = 'Breakfast';
-  String selectedLocalMealTime;
-  int mealDate;
+  // List<CategoryPickerItem> categoryPickerItems = [];
+  String? mealName;
+  String? mealNote;
+  String? mealTime = 'Breakfast';
+  String? selectedLocalMealTime;
+  int? mealDate;
 
-  List<String> selectedMealTimes = [];
+  List<String>? selectedMealTimes = [];
 
   //TODO: ADD Snack to Dropdown
   var mealTimeListDropdown = <String>[
@@ -53,14 +54,14 @@ class _FoodListState extends State<FoodList> {
     'Dinner'.tr(),
     'Snack'.tr()
   ];
-  SharedPreferences prefs;
+  late SharedPreferences prefs;
   bool sortAlphabetical = false;
 
-  int selectedCategoryFilterID;
+  int? selectedCategoryFilterID;
 
   var categoryDropDownItems = <DropdownMenuItem>[];
 
-  int selectedCategoryID;
+  int? selectedCategoryID;
 
   TextEditingController categoryCtrl = TextEditingController();
   TextEditingController categoryDropdownCtrl = TextEditingController();
@@ -73,7 +74,7 @@ class _FoodListState extends State<FoodList> {
   @override
   void initState() {
     super.initState();
-    categoryPickerItems = Category().catPickerItems();
+    // categoryPickerItems = Category().catPickerItems();
     categoryDropDownItems = Category().createDropdownMenuItems();
     selectedCategoryID = -1;
     selectedCategoryFilterID = 0;
@@ -90,24 +91,24 @@ class _FoodListState extends State<FoodList> {
     print("SelectedMealTimes =" + selectedMealTimes.toString());
     if (sortAlphabetical) {
       meallist.sort((a, b) =>
-          a.mealName.toLowerCase().compareTo(b.mealName.toLowerCase()));
+          a.mealName!.toLowerCase().compareTo(b.mealName!.toLowerCase()));
     }
     categoryList = await Category().generateCategoryList();
   }
 
-  Future asyncMethod(int categoryID) async {
-    categoryPickerItems = Category().catPickerItems();
+  Future asyncMethod(int? categoryID) async {
+    // categoryPickerItems = Category().catPickerItems();
     categoryDropDownItems = Category().createDropdownMenuItems();
     meallist = await Meallist().generateMealList(selectedCategoryFilterID);
     if (sortAlphabetical) {
       meallist.sort((a, b) =>
-          a.mealName.toLowerCase().compareTo(b.mealName.toLowerCase()));
+          a.mealName!.toLowerCase().compareTo(b.mealName!.toLowerCase()));
     }
     categoryList = await Category().generateCategoryList();
   }
 
   Future<void> _sendAnalyticsEvent(ideaName) async {
-    await widget.analytics.logEvent(
+    await widget.analytics!.logEvent(
       name: 'created_Idea',
       parameters: <String, dynamic>{
         'Idea': ideaName,
@@ -116,7 +117,7 @@ class _FoodListState extends State<FoodList> {
     print('logEvent succeeded');
   }
 
-  int saveCategoryId() {
+  int? saveCategoryId() {
     if (selectedCategoryID == -1 || selectedCategoryID == null) {
       return null;
     } else {
@@ -223,7 +224,7 @@ class _FoodListState extends State<FoodList> {
                               Container(
                                 child: DropdownButton(
                                   items: categoryDropDownItems,
-                                  onChanged: (newVal) => setState(
+                                  onChanged: (dynamic newVal) => setState(
                                       () => selectedCategoryID = newVal),
                                   value: selectedCategoryID,
                                   isExpanded: true,
@@ -311,8 +312,7 @@ class _FoodListState extends State<FoodList> {
                             Meallist mealToSave = Meallist(
                                 mealName: mealName,
                                 note: mealNote ?? "",
-                                recipe:
-                                    textEditingController.text.toString() ?? "",
+                                recipe: textEditingController.text.toString(),
                                 categoryId: saveCategoryId());
                             _sendAnalyticsEvent(mealName);
 
@@ -336,16 +336,21 @@ class _FoodListState extends State<FoodList> {
         body: Center(
           child: Column(
             children: [
-              CategoryPicker(
-                items: categoryPickerItems,
-                defaultSelected: 0,
-                selectedItemColor: Constants.fourthColor,
-                onValueChanged: (value) {
-                  selectedCategoryFilterID = value.value;
+              GroupButton(
+                isRadio: true,
+                mainGroupAlignment: MainGroupAlignment.start,
+                selectedButton: 1,
+                direction: Axis.horizontal,
+                spacing: 10,
+                onSelected: (index, isSelected) {
+                  selectedCategoryFilterID = index;
                   asyncMethod(selectedCategoryFilterID).then((value) {
                     setState(() {});
                   });
                 },
+                buttons: categoryList.cast(),
+                borderRadius: BorderRadius.all(Radius.circular(48)),
+                selectedColor: Colors.blue,
               ),
               Expanded(
                 child: ListView.builder(
@@ -416,7 +421,7 @@ class _FoodListState extends State<FoodList> {
                                               Container(
                                                 child: DropdownButton(
                                                   items: categoryDropDownItems,
-                                                  onChanged: (newVal) =>
+                                                  onChanged: (dynamic newVal) =>
                                                       setState(() =>
                                                           selectedCategoryID =
                                                               newVal),
@@ -606,13 +611,14 @@ class _FoodListState extends State<FoodList> {
                                                                 child:
                                                                     DropdownButton(
                                                                   value: selectedLocalMealTime ??
-                                                                      selectedMealTimes[
+                                                                      selectedMealTimes![
                                                                           0],
                                                                   icon: Icon(Icons
                                                                       .local_dining),
                                                                   elevation: 16,
-                                                                  onChanged: (String
-                                                                      newValue) {
+                                                                  onChanged:
+                                                                      (String?
+                                                                          newValue) {
                                                                     setState(
                                                                         () {
                                                                       mealTime =
@@ -621,7 +627,7 @@ class _FoodListState extends State<FoodList> {
                                                                           mealTime;
                                                                     });
                                                                   },
-                                                                  items: selectedMealTimes.map<
+                                                                  items: selectedMealTimes!.map<
                                                                       DropdownMenuItem<
                                                                           String>>(
                                                                     (String
@@ -652,7 +658,7 @@ class _FoodListState extends State<FoodList> {
                                                                       .requestFocus(
                                                                           FocusNode());
 
-                                                                  date = await showDatePicker(
+                                                                  date = await (showDatePicker(
                                                                       context:
                                                                           context,
                                                                       initialDate:
@@ -663,7 +669,8 @@ class _FoodListState extends State<FoodList> {
                                                                               1900),
                                                                       lastDate:
                                                                           DateTime(
-                                                                              2100));
+                                                                              2100)) as FutureOr<
+                                                                      DateTime>);
 
                                                                   dateCtl.text =
                                                                       '${DateFormat('EE').format(date)} ${date.day.toString()}.${date.month.toString()}.${date.year.toString()}';
@@ -718,7 +725,7 @@ class _FoodListState extends State<FoodList> {
                                                                         .recipe)
                                                                 .saveMealToFirebase(
                                                                     myUser
-                                                                        .selectedMealPlan);
+                                                                        .selectedMealPlan!);
                                                             print(
                                                                 "save to Firebase");
                                                           } else {

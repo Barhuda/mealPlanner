@@ -26,7 +26,7 @@ import 'package:in_app_purchase/in_app_purchase.dart';
 import 'package:in_app_purchase_android/in_app_purchase_android.dart';
 
 MyUser myUser = MyUser();
-SharedPreferences prefs;
+late SharedPreferences prefs;
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Injection.initInjection();
@@ -54,7 +54,7 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   /// The In App Purchase plugin
-  StreamSubscription<List<PurchaseDetails>> _subscription;
+  late StreamSubscription<List<PurchaseDetails>> _subscription;
 
   @override
   void initState() {
@@ -75,7 +75,7 @@ class _MyAppState extends State<MyApp> {
       _subscription.cancel();
     }, onError: (error) {
       print(error);
-    });
+    }) as StreamSubscription<List<PurchaseDetails>>;
   }
 
   void _listenToPurchaseUpdated(List<PurchaseDetails> purchaseDetailsList) {
@@ -121,7 +121,7 @@ class _MyAppState extends State<MyApp> {
   }
 
   _getSharedPrefs() async {
-    List<String> selectedMultiselectMealTimes =
+    List<String>? selectedMultiselectMealTimes =
         prefs.getStringList('mealTimes');
     if (selectedMultiselectMealTimes == null) {
       prefs.setStringList(
@@ -137,26 +137,26 @@ class _MyAppState extends State<MyApp> {
 
   Future<void> _getFireBaseStream() async {
     final FirebaseAuth _auth = FirebaseAuth.instance;
-    _auth.authStateChanges().listen((User user) async {
+    _auth.authStateChanges().listen((User? user) async {
       if (user == null) {
         myUser.userLoggedOut();
         print('User is currently signed out!');
       } else {
         myUser.userLoggedIn(user.uid);
         _getUsersDB(user);
-        String hisName = await FirebaseRTDB.getUserName(user.uid);
+        String? hisName = await FirebaseRTDB.getUserName(user.uid);
         myUser.setUsername(hisName);
       }
     });
   }
 
   _handleDeepLink() async {
-    final PendingDynamicLinkData initialLink =
+    final PendingDynamicLinkData? initialLink =
         await FirebaseDynamicLinks.instance.getInitialLink();
     if (initialLink != null) {
       final Uri deepLink = initialLink.link;
       await Future.delayed(Duration(seconds: 1));
-      String dbUID = deepLink.queryParameters['uid'];
+      String? dbUID = deepLink.queryParameters['uid'];
       print(dbUID);
       Get.offAllNamed("/profile", arguments: [dbUID]);
     }
@@ -165,7 +165,7 @@ class _MyAppState extends State<MyApp> {
   _handleDeepLinkStream() {
     FirebaseDynamicLinks.instance.onLink.listen((dynamicLinkData) async {
       await Future.delayed(Duration(seconds: 1));
-      String dbUID = dynamicLinkData.link.queryParameters['uid'];
+      String? dbUID = dynamicLinkData.link.queryParameters['uid'];
       print(dbUID);
       Get.offAllNamed("/profile", arguments: [dbUID]);
     }).onError((error) {
@@ -189,7 +189,8 @@ class _MyAppState extends State<MyApp> {
   _getAvailableDbs(User user, DatabaseReference ref) async {
     List<String> allowedDbs = [];
     DatabaseEvent event = await ref.child("allowedDbs").once();
-    Map<dynamic, dynamic> decoded = event.snapshot.value;
+    Map<dynamic, dynamic> decoded =
+        event.snapshot.value as Map<dynamic, dynamic>;
     decoded.forEach((key, value) {
       allowedDbs.add(key);
     });
@@ -200,7 +201,7 @@ class _MyAppState extends State<MyApp> {
 
   _createNewUserInDB(User user, DatabaseReference ref) async {
     String userUid = user.uid;
-    await ref.parent.update({
+    await ref.parent!.update({
       userUid: {
         "name": user.email ?? "User",
         "allowedDbs": {userUid: true}

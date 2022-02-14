@@ -1,7 +1,7 @@
 import 'package:firebase_database/firebase_database.dart';
 
 class FirebaseRTDB {
-  static changeUserName(String userUID, String newName) async {
+  static changeUserName(String? userUID, String newName) async {
     if (newName != "") {
       Map<String, dynamic> newMap = {};
       newMap["name"] = newName;
@@ -9,12 +9,12 @@ class FirebaseRTDB {
     }
   }
 
-  static Future<List<String>> getAllowedUsersNames(String UserUID) async {
+  static Future<List<String>> getAllowedUsersNames(String? UserUID) async {
     List<String> allowedUsers = [""];
     DatabaseEvent event = await FirebaseDatabase.instance
         .ref("mealDbs/$UserUID/allowedUsers")
         .once();
-    Map<dynamic, dynamic> results = event.snapshot.value;
+    Map<dynamic, dynamic>? results = event.snapshot.value as Map<dynamic, dynamic>?;
     print("Erster Event: $results");
     if (results != null) {
       results.forEach((key, value) async {
@@ -22,7 +22,7 @@ class FirebaseRTDB {
         DatabaseEvent secondEvent =
             await FirebaseDatabase.instance.ref("Users/$key/name").once();
         if (secondEvent != null) {
-          String newResults = secondEvent.snapshot.value;
+          String? newResults = secondEvent.snapshot.value as String?;
           print("Zweiter Event: $newResults");
           allowedUsers.add(newResults ?? "");
         }
@@ -31,14 +31,14 @@ class FirebaseRTDB {
     return allowedUsers;
   }
 
-  static Future<String> getUserName(String userUID) async {
+  static Future<String?> getUserName(String userUID) async {
     DatabaseEvent event =
         await FirebaseDatabase.instance.ref("Users/$userUID").once();
-    Map<dynamic, dynamic> results = event.snapshot.value;
+    Map<dynamic, dynamic> results = event.snapshot.value as Map<dynamic, dynamic>;
     return results["name"];
   }
 
-  static Future<void> changeMealPlanName(String dbID, String newName) async {
+  static Future<void> changeMealPlanName(String? dbID, String newName) async {
     Map<String, dynamic> newMap = {};
     newMap["name"] = newName;
     await FirebaseDatabase.instance.ref("mealDbs/$dbID").update(newMap);

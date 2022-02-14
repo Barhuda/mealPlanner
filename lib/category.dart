@@ -3,16 +3,15 @@ import 'package:sqflite/sqflite.dart';
 
 import 'database_helper.dart';
 import 'injection.dart';
-import 'package:category_picker/category_picker_item.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class Category {
   DatabaseHelper _databaseHelper = Injection.injector.get();
 
-  int id;
-  String categoryName;
-  String colorValue;
+  int? id;
+  String? categoryName;
+  String? colorValue;
 
   Category({this.id, this.categoryName, this.colorValue});
 
@@ -32,46 +31,48 @@ class Category {
   }
 
   void saveToDB() async {
-    await _databaseHelper.db.insert(
+    await _databaseHelper.db!.insert(
       "category",
       this.toMapWithoutId(),
     );
   }
 
   Future<void> deleteFromDB() async {
-    await _databaseHelper.db.delete(
+    await _databaseHelper.db!.delete(
       "category",
       where: "id = ?",
       whereArgs: [this.id],
     );
   }
 
-  Future<void> updateInDB(String newName, String newColor) async {
-    await _databaseHelper.db.update(
-        "category", Category(id: this.id, categoryName: newName ?? this.categoryName, colorValue: newColor ?? this.colorValue).toMap(),
-        where: "id = ?", whereArgs: [this.id], conflictAlgorithm: ConflictAlgorithm.replace);
+  Future<void> updateInDB(String? newName, String? newColor) async {
+    await _databaseHelper.db!.update(
+        "category",
+        Category(
+                id: this.id,
+                categoryName: newName ?? this.categoryName,
+                colorValue: newColor ?? this.colorValue)
+            .toMap(),
+        where: "id = ?",
+        whereArgs: [this.id],
+        conflictAlgorithm: ConflictAlgorithm.replace);
   }
 
   Future<List<Category>> generateCategoryList() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     bool sortAlphabetical = prefs.getBool('sort') ?? false;
-    final List<Map<String, dynamic>> maps = await _databaseHelper.db.query("category", orderBy: sortAlphabetical ? "category_name ASC" : null);
+    final List<Map<String, dynamic>> maps = await _databaseHelper.db!.query(
+        "category",
+        orderBy: sortAlphabetical ? "category_name ASC" : null);
     return List.generate(maps.length, (i) {
-      return Category(id: maps[i]['id'], categoryName: maps[i]['category_name'], colorValue: maps[i]['color']);
+      return Category(
+          id: maps[i]['id'],
+          categoryName: maps[i]['category_name'],
+          colorValue: maps[i]['color']);
     });
   }
 
-  List<CategoryPickerItem> catPickerItems() {
-    List<CategoryPickerItem> resultWidgets = [];
-    resultWidgets.add(CategoryPickerItem(value: 0, label: "All".tr()));
-    generateCategoryList().then((categoryList) {
-      for (var category in categoryList) {
-        resultWidgets.add(CategoryPickerItem(value: category.id + 1, label: category.categoryName));
-      }
-    });
 
-    return resultWidgets;
-  }
 
   List<DropdownMenuItem> createDropdownMenuItems() {
     List<DropdownMenuItem> resultList = [];
@@ -85,7 +86,7 @@ class Category {
       for (var category in categoryList) {
         print(category.categoryName);
         resultList.add(DropdownMenuItem(
-          child: Text(category.categoryName),
+          child: Text(category.categoryName!),
           value: category.id,
         ));
       }

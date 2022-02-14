@@ -22,12 +22,12 @@ import 'package:in_app_purchase_android/in_app_purchase_android.dart';
 import 'package:share/share.dart';
 
 class ProfileScreen extends StatefulWidget {
-  ProfileScreen({Key key, this.analytics, this.observer, this.database})
+  ProfileScreen({Key? key, this.analytics, this.observer, this.database})
       : super(key: key);
 
-  final FirebaseDatabase database;
-  final FirebaseAnalytics analytics;
-  final FirebaseAnalyticsObserver observer;
+  final FirebaseDatabase? database;
+  final FirebaseAnalytics? analytics;
+  final FirebaseAnalyticsObserver? observer;
 
   static const String id = 'profile_screen';
 
@@ -42,18 +42,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
       'https://www.googleapis.com/auth/contacts.readonly',
     ],
   );
-  SharedPreferences prefs;
+  SharedPreferences? prefs;
 
   bool _isLoading = true;
 
   MyUser myUser = Get.find();
 
   int selectedValue = 0;
-  Map<String, dynamic> mealDbsNames = {};
-  Map<String, dynamic> mealDbsUsers = {};
+  Map<String?, dynamic> mealDbsNames = {};
+  Map<String?, dynamic> mealDbsUsers = {};
   TextEditingController newNameCtr = TextEditingController();
   var arguments;
-  String dbUIDtoAddFromFriend;
+  String? dbUIDtoAddFromFriend;
 
   @override
   void initState() {
@@ -75,7 +75,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   _addData() {
     if (myUser.UID != null) {
-      print("USER UID:::" + myUser.UID);
+      print("USER UID:::" + myUser.UID!);
     } else {
       print("UID Leer");
     }
@@ -83,16 +83,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   _signInWithGoogle() async {
     // Trigger the authentication flow
-    final GoogleSignInAccount googleUser = await GoogleSignIn().signIn();
+    final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
 
     // Obtain the auth details from the request
     final GoogleSignInAuthentication googleAuth =
-        await googleUser?.authentication;
+        (await googleUser?.authentication)!;
 
     // Create a new credential
     final credential = GoogleAuthProvider.credential(
-      accessToken: googleAuth?.accessToken,
-      idToken: googleAuth?.idToken,
+      accessToken: googleAuth.accessToken,
+      idToken: googleAuth.idToken,
     );
     await FirebaseAuth.instance.signInWithCredential(credential);
     Get.offAllNamed("/profile"); // Once signed in, return the UserCredential
@@ -134,8 +134,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   _doFirebaseMailRegistration(String mail, String password) async {
     bool hasError = false;
-    String title;
-    String content;
+    late String title;
+    String? content;
     try {
       UserCredential userCredential = await FirebaseAuth.instance
           .createUserWithEmailAndPassword(email: mail, password: password);
@@ -163,7 +163,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     setState(() {});
     print(hasError);
     if (hasError) {
-      Get.snackbar(title, content, snackPosition: SnackPosition.TOP);
+      Get.snackbar(title, content!, snackPosition: SnackPosition.TOP);
     } else {
       Get.snackbar("Success".tr(), "Account has been registred".tr(),
           snackPosition: SnackPosition.TOP);
@@ -211,8 +211,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   _doFireBaseLoginWithMail(String mail, String password) async {
     bool hasError = false;
-    String title;
-    String content;
+    late String title;
+    String? content;
     //              email: "barry.allen@example.com",
     //               password: "SuperSecretPassword!"
     try {
@@ -237,7 +237,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }
     Navigator.of(context).pop();
     if (hasError) {
-      Get.snackbar(title, content, snackPosition: SnackPosition.TOP);
+      Get.snackbar(title, content!, snackPosition: SnackPosition.TOP);
     }
     setState(() {});
   }
@@ -252,10 +252,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   _getMealPlanNamesAndUsers() async {
     if (myUser.allowedDbs != null) {
-      for (var dbs in myUser.allowedDbs) {
+      for (var dbs in myUser.allowedDbs!) {
         DatabaseEvent event =
             await FirebaseDatabase.instance.ref("mealDbs/$dbs").once();
-        Map<dynamic, dynamic> results = event.snapshot.value;
+        Map<dynamic, dynamic>? results =
+            event.snapshot.value as Map<dynamic, dynamic>?;
 
         if (results != null) {
           results.forEach((key, value) async {
@@ -282,13 +283,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
     setState(() {});
   }
 
-  _setNewMealplanName(String dbUID, String newName) {
+  _setNewMealplanName(String? dbUID, String newName) {
     if (newName != "") {
       FirebaseRTDB.changeMealPlanName(dbUID, newName);
     }
   }
 
-  _setNewMealplanNameDialog(String dbUID, String initialName) {
+  _setNewMealplanNameDialog(String? dbUID, String? initialName) {
     TextEditingController mealPlanName =
         TextEditingController(text: initialName);
 
@@ -315,7 +316,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  Future<void> _addFriend(String dbUID) async {
+  Future<void> _addFriend(String? dbUID) async {
     FirebaseDynamicLinks dynamicLinks = FirebaseDynamicLinks.instance;
 
     final DynamicLinkParameters parameters = DynamicLinkParameters(
@@ -338,12 +339,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
     Share.share("I want to add you to my meal plan: $uri");
   }
 
-  _handleAddingNewMealplanThroughLink(String newDBUID) async {
-    if (myUser.allowedDbs.contains(newDBUID)) {
+  _handleAddingNewMealplanThroughLink(String? newDBUID) async {
+    if (myUser.allowedDbs!.contains(newDBUID)) {
       return;
     } else {
-      await FirebaseRTDB.addDBtoAllowedDbs(myUser.UID, newDBUID);
-      List allowedDbs = myUser.allowedDbs;
+      await FirebaseRTDB.addDBtoAllowedDbs(myUser.UID!, newDBUID!);
+      List allowedDbs = myUser.allowedDbs!;
       allowedDbs.add(newDBUID);
       myUser.setAllowedDbs(allowedDbs);
     }
@@ -411,17 +412,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       myUser.allowedDbs != null
                           ? Expanded(
                               child: ListView.builder(
-                                itemCount: myUser.allowedDbs.length,
+                                itemCount: myUser.allowedDbs!.length,
                                 itemBuilder: (BuildContext context, int index) {
-                                  String currentDbInIndex =
-                                      myUser.allowedDbs[index];
+                                  String? currentDbInIndex =
+                                      myUser.allowedDbs![index];
                                   return GestureDetector(
                                     onTap: () {
-                                      selectMealPlan(myUser.allowedDbs[index]);
+                                      selectMealPlan(
+                                          myUser.allowedDbs![index]!);
                                     },
                                     child: GestureDetector(
                                       onTap: () {
-                                        _selectMealPlan(currentDbInIndex);
+                                        _selectMealPlan(currentDbInIndex!);
                                       },
                                       child: Card(
                                         color: myUser.selectedMealPlan ==
@@ -467,18 +469,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                                           ? Text("")
                                                           : Text(
                                                               mealDbsUsers[
-                                                                          currentDbInIndex]
-                                                                      .toString()
-                                                                      .replaceAll(
-                                                                          "[",
-                                                                          "")
-                                                                      .replaceAll(
-                                                                          "]",
-                                                                          "")
-                                                                      .replaceAll(
-                                                                          ",",
-                                                                          " ") ??
-                                                                  "",
+                                                                      currentDbInIndex]
+                                                                  .toString()
+                                                                  .replaceAll(
+                                                                      "[",
+                                                                      "")
+                                                                  .replaceAll(
+                                                                      "]",
+                                                                      "")
+                                                                  .replaceAll(
+                                                                      ",",
+                                                                      " "),
                                                               textAlign:
                                                                   TextAlign
                                                                       .center,
@@ -502,8 +503,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                                   children: [
                                                     ElevatedButton(
                                                       onPressed: () async {
-                                                        await _addFriend(myUser
-                                                            .allowedDbs[index]);
+                                                        await _addFriend(
+                                                            myUser.allowedDbs![
+                                                                index]);
                                                       },
                                                       child: Text(
                                                           "+ Add Friend".tr()),
@@ -628,7 +630,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
 class getPremium extends StatefulWidget {
   const getPremium({
-    Key key,
+    Key? key,
   }) : super(key: key);
 
   @override
@@ -646,7 +648,7 @@ class _getPremiumState extends State<getPremium> {
     InAppPurchase.instance.buyNonConsumable(purchaseParam: purchaseParam);
   }
 
-  String productPrice;
+  String? productPrice;
 
   @override
   void initState() {

@@ -1,12 +1,12 @@
 import 'package:shared_preferences/shared_preferences.dart';
 
 class MyUser {
-  String UID;
-  String username;
+  String? UID;
+  String? username;
   bool hasPremium;
   bool isLoggedIn;
-  String selectedMealPlan;
-  List<String> allowedDbs = [];
+  String? selectedMealPlan;
+  List<String?>? allowedDbs = [];
 
   MyUser(
       {this.isLoggedIn = false,
@@ -19,7 +19,7 @@ class MyUser {
     this.UID = UID;
   }
 
-  setUsername(String receivedName) {
+  setUsername(String? receivedName) {
     this.username = receivedName;
   }
 
@@ -29,7 +29,7 @@ class MyUser {
   }
 
   setAllowedDbs(List allowedDbscoming) {
-    this.allowedDbs = allowedDbscoming;
+    this.allowedDbs = allowedDbscoming as List<String?>?;
     print(this.allowedDbs);
   }
 
@@ -37,10 +37,10 @@ class MyUser {
     this.hasPremium = true;
   }
 
-  Future<String> getSelectedMealPlan() async {
+  Future<String?> getSelectedMealPlan() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     if (this.selectedMealPlan == null) {
-      String mealPlanFromPrefs = prefs.getString("selectedPlan");
+      String? mealPlanFromPrefs = prefs.getString("selectedPlan");
       if (mealPlanFromPrefs != null) {
         this.selectedMealPlan = mealPlanFromPrefs;
       } else {

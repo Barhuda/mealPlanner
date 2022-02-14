@@ -13,12 +13,12 @@ import 'package:mealpy/meallist.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class CategoryScreen extends StatefulWidget {
-  CategoryScreen({Key key, this.analytics, this.observer}) : super(key: key);
+  CategoryScreen({Key? key, this.analytics, this.observer}) : super(key: key);
 
   static const String id = 'category_screen';
 
-  final FirebaseAnalytics analytics;
-  final FirebaseAnalyticsObserver observer;
+  final FirebaseAnalytics? analytics;
+  final FirebaseAnalyticsObserver? observer;
 
   @override
   _CategoryScreenState createState() => _CategoryScreenState();
@@ -29,12 +29,12 @@ class _CategoryScreenState extends State<CategoryScreen> {
   List<Category> categoryList = [];
   Color currentColor = Colors.blue;
   void changeColor(Color color) => setState(() => currentColor = color);
-  SharedPreferences prefs;
+  late SharedPreferences prefs;
   bool sortAlphabetical = false;
 
   TextEditingController categoryTxtCtrl = TextEditingController();
 
-  StateSetter _setState;
+  late StateSetter _setState;
 
   final _formKey = GlobalKey<FormState>();
 
@@ -52,7 +52,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
     prefs = await SharedPreferences.getInstance();
     sortAlphabetical = prefs.getBool('sort') ?? false;
     if (sortAlphabetical) {
-      categoryList.sort((a, b) => a.categoryName.toLowerCase().compareTo(b.categoryName.toLowerCase()));
+      categoryList.sort((a, b) => a.categoryName!.toLowerCase().compareTo(b.categoryName!.toLowerCase()));
     }
   }
 
@@ -177,9 +177,9 @@ class _CategoryScreenState extends State<CategoryScreen> {
                         "Save",
                       ).tr(),
                       onPressed: () async {
-                        if (_formKey.currentState.validate()) {
+                        if (_formKey.currentState!.validate()) {
                           try {
-                            await _databaseHelper.db.insert(
+                            await _databaseHelper.db!.insert(
                               "category",
                               Category(
                                 categoryName: categoryTxtCtrl.text.toString(),
@@ -212,7 +212,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
                   itemCount: categoryList.length,
                   itemBuilder: (context, int index) {
                     Category currentCategory = categoryList[index];
-                    String valueString = currentCategory.colorValue.split('(0x')[1].split(')')[0]; // kind of hacky..
+                    String valueString = currentCategory.colorValue!.split('(0x')[1].split(')')[0]; // kind of hacky..
                     int value = int.parse(valueString, radix: 16);
                     Color currentCategoryColor = new Color(value);
                     return Center(
@@ -242,7 +242,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
                                       Align(
                                         alignment: Alignment.center,
                                         child: Text(
-                                          currentCategory.categoryName,
+                                          currentCategory.categoryName!,
                                           textAlign: TextAlign.center,
                                           style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
                                         ),
@@ -253,7 +253,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
                               ),
                             )),
                         onTap: () {
-                          categoryTxtCtrl.text = currentCategory.categoryName;
+                          categoryTxtCtrl.text = currentCategory.categoryName!;
                           currentColor = currentCategoryColor;
                           showDialog(
                               context: context,
@@ -375,7 +375,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
                                         "Save",
                                       ).tr(),
                                       onPressed: () async {
-                                        if (_formKey.currentState.validate()) {
+                                        if (_formKey.currentState!.validate()) {
                                           try {
                                             currentCategory.updateInDB(categoryTxtCtrl.text, currentColor.toString());
                                             Navigator.of(context).pop();

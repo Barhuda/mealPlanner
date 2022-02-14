@@ -31,11 +31,11 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 class MainScreen extends StatefulWidget {
-  MainScreen({Key key, this.analytics, this.observer}) : super(key: key);
+  MainScreen({Key? key, this.analytics, this.observer}) : super(key: key);
   static const String id = 'main_screen';
 
-  final FirebaseAnalytics analytics;
-  final FirebaseAnalyticsObserver observer;
+  final FirebaseAnalytics? analytics;
+  final FirebaseAnalyticsObserver? observer;
 
   @override
   _MainScreenState createState() => _MainScreenState();
@@ -45,18 +45,18 @@ class _MainScreenState extends State<MainScreen> {
   bool _initialized = false;
   bool _error = false;
   DatabaseHelper _databaseHelper = Injection.injector.get();
-  DateTime currentDate;
+  DateTime? currentDate;
   DateTime datePeriod = DateTime.now().add(Duration(days: 6));
   int mealDate = DateTime.now().millisecondsSinceEpoch;
   final DateFormat formatter = DateFormat("EEEE");
   final DateFormat formatWithWeekday = DateFormat("yMMMEd");
   String mealTime = 'Breakfast';
-  DateTime selectedDate;
+  DateTime? selectedDate;
   String mealName = '';
-  String editBreakfast = null;
-  String editLunch = null;
-  String editEvening = null;
-  String editSnack = null;
+  String? editBreakfast = null;
+  String? editLunch = null;
+  String? editEvening = null;
+  String? editSnack = null;
   String breakfastLink = "";
   String lunchLink = "";
   String eveningLink = "";
@@ -66,9 +66,9 @@ class _MainScreenState extends State<MainScreen> {
   FocusNode focusNode = FocusNode();
   ScreenshotController screenshotController = ScreenshotController();
   MyUser myUser = Get.find();
-  Stream<DatabaseEvent> dbStream;
+  Stream<DatabaseEvent>? dbStream;
   final DateFormat dateFormatter = DateFormat('yyyy-MM-dd');
-  String dbName;
+  String? dbName;
 
   List<String> selectedMealTimes = [];
 
@@ -79,12 +79,12 @@ class _MainScreenState extends State<MainScreen> {
     "Snack"
   ];
 
-  String selectedLocalMealTime;
+  String? selectedLocalMealTime;
 
-  SharedPreferences prefs;
-  int selectedWeekDayAsFirstDay;
+  late SharedPreferences prefs;
+  int? selectedWeekDayAsFirstDay;
 
-  Map<DateTime, Map<String, Meal>> weekMap = {};
+  Map<DateTime, Map<String?, Meal>> weekMap = {};
   Meal defaultMeal = Meal(
       mealName: "-",
       date: DateTime.utc(2000, 1, 1).millisecondsSinceEpoch,
@@ -115,11 +115,11 @@ class _MainScreenState extends State<MainScreen> {
     }
   }
 
-  static List<Map<String, String>> getIdeas(String query) {
-    List<Map<String, String>> resultList = [];
+  static List<Map<String, String?>> getIdeas(String query) {
+    List<Map<String, String?>> resultList = [];
     if (query != "") {
       for (var idea in ideaList) {
-        if (idea.mealName.toLowerCase().contains(query.toLowerCase())) {
+        if (idea.mealName!.toLowerCase().contains(query.toLowerCase())) {
           resultList.add({
             'mealName': idea.mealName,
             'recipe': idea.recipe,
@@ -155,7 +155,7 @@ class _MainScreenState extends State<MainScreen> {
     } else {
       DateTime thisDateIs = DateTime.now();
       currentDate = thisDateIs.subtract(
-          Duration(days: (thisDateIs.weekday - selectedWeekDayAsFirstDay) % 7));
+          Duration(days: (thisDateIs.weekday - selectedWeekDayAsFirstDay!) % 7));
     }
     asyncMethod().then((value) {
       setState(() {
@@ -174,14 +174,14 @@ class _MainScreenState extends State<MainScreen> {
 
   Future asyncMethod() async {
     print(currentDate);
-    weekMap = await Meal().generateWeekList(currentDate);
+    weekMap = await Meal().generateWeekList(currentDate!);
     ideaList = await Meallist().generateMealList(0);
     setState(() {});
   }
 
   void addWeek() {
-    currentDate = currentDate.add(Duration(days: 7));
-    datePeriod = currentDate.add(Duration(days: 6));
+    currentDate = currentDate!.add(Duration(days: 7));
+    datePeriod = currentDate!.add(Duration(days: 6));
     asyncMethod().then((value) {
       setState(() {
         if (myUser.isLoggedIn) _getDbRef();
@@ -190,8 +190,8 @@ class _MainScreenState extends State<MainScreen> {
   }
 
   void subtractWeek() {
-    currentDate = currentDate.subtract(Duration(days: 7));
-    datePeriod = currentDate.add(Duration(days: 6));
+    currentDate = currentDate!.subtract(Duration(days: 7));
+    datePeriod = currentDate!.add(Duration(days: 6));
     asyncMethod().then((value) {
       setState(() {
         if (myUser.isLoggedIn) _getDbRef();
@@ -202,8 +202,8 @@ class _MainScreenState extends State<MainScreen> {
   void backToCurrentDate() {
     DateTime thisDateIs = DateTime.now();
     currentDate = thisDateIs.subtract(
-        Duration(days: thisDateIs.weekday - selectedWeekDayAsFirstDay));
-    datePeriod = currentDate.add(Duration(days: 6));
+        Duration(days: thisDateIs.weekday - selectedWeekDayAsFirstDay!));
+    datePeriod = currentDate!.add(Duration(days: 6));
     _handleFirstDayOfWeek();
     asyncMethod().then((value) {
       setState(() {
@@ -224,7 +224,7 @@ class _MainScreenState extends State<MainScreen> {
   }
 
   Future<void> _sendAnalyticsEvent(mealName) async {
-    await widget.analytics.logEvent(
+    await widget.analytics!.logEvent(
       name: 'created_Meal',
       parameters: <String, dynamic>{
         'Meal': mealName,
@@ -263,7 +263,7 @@ class _MainScreenState extends State<MainScreen> {
         buttonColor: Colors.white,
         onConfirm: () {
           if (myUser.isLoggedIn) {
-            mealToDelete.deleteMealFromFirebase(myUser.selectedMealPlan);
+            mealToDelete.deleteMealFromFirebase(myUser.selectedMealPlan!);
           } else {
             mealToDelete.deleteMeal();
             textCtrl.clear();
@@ -279,7 +279,7 @@ class _MainScreenState extends State<MainScreen> {
     Get.offAllNamed(Constants.bottomNavigationRoutes[index]);
   }
 
-  _addMealDialog(String cardDate, {Map<dynamic, dynamic> parsedMeals}) {
+  _addMealDialog(String cardDate, {Map<dynamic, dynamic>? parsedMeals}) {
     TextEditingController breakfstCtrl = TextEditingController();
 
     TextEditingController lunchCtrl = TextEditingController();
@@ -294,7 +294,7 @@ class _MainScreenState extends State<MainScreen> {
       snackCtrl
     ];
 
-    Map<String, String> linkMap = {
+    Map<String, String?> linkMap = {
       "breakfast": "",
       "lunch": "",
       "dinner": "",
@@ -353,13 +353,13 @@ class _MainScreenState extends State<MainScreen> {
                     suggestionsCallback: (pattern) {
                       return getIdeas(pattern);
                     },
-                    itemBuilder: (context, idea) {
+                    itemBuilder: (context, dynamic idea) {
                       return ListTile(
                         title: Text(idea["mealName"]),
                       );
                     },
                     debounceDuration: Duration(milliseconds: 400),
-                    onSuggestionSelected: (idea) {
+                    onSuggestionSelected: (dynamic idea) {
                       editCtrls[mulitSelectMealTimesFullList.indexOf(meal)]
                           .text = idea["mealName"];
                       if (idea["recipe"] != "" || idea["recipe"] != null) {
@@ -397,7 +397,7 @@ class _MainScreenState extends State<MainScreen> {
                   child: ElevatedButton(
                     child: Text("Link to recipe").tr(),
                     onPressed: () {
-                      String recipeLink = linkMap[meal.toLowerCase()];
+                      String recipeLink = linkMap[meal.toLowerCase()]!;
                       if (recipeLink.startsWith("https://") ||
                           recipeLink.startsWith("http://")) {
                         launch(recipeLink);
@@ -427,14 +427,14 @@ class _MainScreenState extends State<MainScreen> {
                 date: DateTime.parse(cardDate).millisecondsSinceEpoch,
                 mealName: ctrls.text,
                 dayTime: mulitSelectMealTimesFullList[editctrls.indexOf(ctrls)])
-            .saveMealToFirebase(myUser.selectedMealPlan);
+            .saveMealToFirebase(myUser.selectedMealPlan!);
       }
     }
   }
 
   _getDbRef() async {
-    final DateTime now = currentDate;
-    String selectedMealplan = await myUser.getSelectedMealPlan();
+    final DateTime now = currentDate!;
+    String? selectedMealplan = await myUser.getSelectedMealPlan();
     final String formatted = dateFormatter.format(now);
     final String endDate = dateFormatter.format(now.add(Duration(days: 6)));
     if (myUser.UID != null) {
@@ -442,7 +442,7 @@ class _MainScreenState extends State<MainScreen> {
         dbStream = FirebaseDatabase.instance
             .ref()
             .child("mealDbs")
-            .child(selectedMealplan)
+            .child(selectedMealplan!)
             .child("weekdays")
             .orderByKey()
             .startAt(formatted)
@@ -497,9 +497,9 @@ class _MainScreenState extends State<MainScreen> {
                       (await getApplicationDocumentsDirectory()).path;
                   screenshotController
                       .captureAndSave(directory, fileName: "Mealplan.jpg")
-                      .then((path) => Share.shareFiles([path],
+                      .then((path) => Share.shareFiles([path!],
                           text:
-                              "Mealplan: ${currentDate.day.toString()}.${currentDate.month.toString()}.${currentDate.year.toString()} - ${datePeriod.day.toString()}.${datePeriod.month.toString()}.${datePeriod.year.toString()}"));
+                              "Mealplan: ${currentDate!.day.toString()}.${currentDate!.month.toString()}.${currentDate!.year.toString()} - ${datePeriod.day.toString()}.${datePeriod.month.toString()}.${datePeriod.year.toString()}"));
                 },
                 child: Icon(
                   Icons.share,
@@ -526,7 +526,7 @@ class _MainScreenState extends State<MainScreen> {
                       },
                     ),
                     Text(
-                      '${currentDate.day.toString()}.${currentDate.month.toString()}.${currentDate.year.toString()}  -  '
+                      '${currentDate!.day.toString()}.${currentDate!.month.toString()}.${currentDate!.year.toString()}  -  '
                       '${datePeriod.day.toString()}.${datePeriod.month.toString()}.${datePeriod.year.toString()}',
                       style:
                           TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
@@ -586,7 +586,7 @@ class _MainScreenState extends State<MainScreen> {
           print(snapshot.connectionState);
           if (snapshot.hasData) {
             DataSnapshot dataValues = snapshot.data.snapshot;
-            Map<dynamic, dynamic> values = dataValues.value;
+            Map<dynamic, dynamic>? values = dataValues.value as Map<dynamic, dynamic>?;
             Map<dynamic, dynamic> parsed = {};
             print("Data:" + values.toString());
             if (values != null) {
@@ -598,8 +598,8 @@ class _MainScreenState extends State<MainScreen> {
                   itemCount: 7,
                   itemBuilder: (BuildContext context, int index) {
                     String cardDate = dateFormatter
-                        .format(currentDate.add(Duration(days: index)));
-                    Map<dynamic, dynamic> mealsInDay = parsed[cardDate];
+                        .format(currentDate!.add(Duration(days: index)));
+                    Map<dynamic, dynamic>? mealsInDay = parsed[cardDate];
                     Map<String, Map<String, Meal>> mealMapPerDate = {};
                     if (mealsInDay != null) {
                       mealsInDay.forEach((key, value) {
@@ -771,8 +771,8 @@ class _MainScreenState extends State<MainScreen> {
                   itemCount: 7,
                   itemBuilder: (BuildContext context, int index) {
                     String cardDate = dateFormatter
-                        .format(currentDate.add(Duration(days: index)));
-                    Map<dynamic, dynamic> mealsInDay = parsed[cardDate];
+                        .format(currentDate!.add(Duration(days: index)));
+                    Map<dynamic, dynamic>? mealsInDay = parsed[cardDate];
                     return GestureDetector(
                       onTap: () {
                         _addMealDialog(cardDate);
@@ -809,10 +809,10 @@ class _MainScreenState extends State<MainScreen> {
   ListView offlineList() {
     return ListView.builder(
       scrollDirection: Axis.vertical,
-      itemCount: weekMap.length ?? 1,
+      itemCount: weekMap.length,
       itemBuilder: (context, int index) {
         DateTime key = weekMap.keys.elementAt(index);
-        Map currentMap = weekMap[key];
+        Map currentMap = weekMap[key]!;
         Meal breakfast = currentMap["Breakfast"] ?? Meal();
         Meal lunch = currentMap["Lunch"] ?? Meal();
         Meal evening = currentMap["Dinner"] ?? Meal();
@@ -824,7 +824,7 @@ class _MainScreenState extends State<MainScreen> {
             editLunch = null;
             editEvening = null;
             editSnack = null;
-            List<String> editMealStringList = [
+            List<String?> editMealStringList = [
               editBreakfast,
               editLunch,
               editEvening,
@@ -921,7 +921,7 @@ class _MainScreenState extends State<MainScreen> {
                                         suggestionsCallback: (pattern) {
                                           return getIdeas(pattern);
                                         },
-                                        itemBuilder: (context, idea) {
+                                        itemBuilder: (context, dynamic idea) {
                                           return ListTile(
                                             title: Text(idea["mealName"]),
                                           );
@@ -930,7 +930,7 @@ class _MainScreenState extends State<MainScreen> {
                                         hideOnError: true,
                                         debounceDuration:
                                             Duration(milliseconds: 400),
-                                        onSuggestionSelected: (idea) {
+                                        onSuggestionSelected: (dynamic idea) {
                                           editMealStringList[
                                                   mulitSelectMealTimesFullList
                                                       .indexOf(mealTimes)] =
@@ -968,7 +968,7 @@ class _MainScreenState extends State<MainScreen> {
                                                 mealsInCurrentDayList[
                                                         mulitSelectMealTimesFullList
                                                             .indexOf(mealTimes)]
-                                                    .recipe;
+                                                    .recipe!;
                                             if (recipeLink
                                                     .startsWith("https://") ||
                                                 recipeLink

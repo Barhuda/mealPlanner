@@ -8,7 +8,7 @@ class DatabaseHelper {
   static final DatabaseHelper _instance = new DatabaseHelper.internal();
 
   factory DatabaseHelper() => _instance;
-  static Database _db;
+  static Database? _db;
 
   DatabaseHelper.internal();
 
@@ -19,7 +19,7 @@ class DatabaseHelper {
     _db = await openDatabase(path, version: 8, onCreate: _onCreate, onUpgrade: _onUpgrade);
   }
 
-  Database get db {
+  Database? get db {
     return _db;
   }
 

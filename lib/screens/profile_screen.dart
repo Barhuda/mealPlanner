@@ -592,7 +592,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 padding: const EdgeInsets.only(top: 16.0, bottom: 34),
                 child: GoogleAuthButton(
                   onPressed: () {
-                    _signInWithGoogle();
+                    //TODO: Goolge Sign in wieder einschalten!!!!
+                    // _signInWithGoogle();
+                    myUser.hasPremium = false;
                   },
                 ),
               ),
@@ -666,22 +668,22 @@ class _getPremiumState extends State<getPremium> {
     setState(() {});
   }
 
-  _getPastPurchases() async {
-    if (defaultTargetPlatform == TargetPlatform.android) {
-      InAppPurchaseAndroidPlatformAddition androidAddition = InAppPurchase
-          .instance
-          .getPlatformAddition<InAppPurchaseAndroidPlatformAddition>();
+  // _getPastPurchases() async {
+  //   if (defaultTargetPlatform == TargetPlatform.android) {
+  //     InAppPurchaseAndroidPlatformAddition androidAddition = InAppPurchase
+  //         .instance
+  //         .getPlatformAddition<InAppPurchaseAndroidPlatformAddition>();
 
-      QueryPurchaseDetailsResponse response =
-          await androidAddition.queryPastPurchases();
-      if (response.pastPurchases.isNotEmpty) {
-        print("Hat gekauft: " + response.pastPurchases[0].productID);
-        print(response.pastPurchases[0].status);
-      } else {
-        print("leer");
-      }
-    }
-  }
+  //     QueryPurchaseDetailsResponse response =
+  //         await androidAddition.queryPastPurchases();
+  //     if (response.pastPurchases.isNotEmpty) {
+  //       print("Hat gekauft: " + response.pastPurchases[0].productID);
+  //       print(response.pastPurchases[0].status);
+  //     } else {
+  //       print("leer");
+  //     }
+  //   }
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -694,44 +696,32 @@ class _getPremiumState extends State<getPremium> {
               fontWeight: FontWeight.bold,
               color: Colors.blueGrey),
         ),
-        ElevatedButton(
-            style: MyButton.buyPremiumButton,
-            onPressed: () {
-              print("Premium Handler");
-              _purchasePremium();
-            },
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
+        Image.asset("assets/graphics/premium.png"),
+        Text(
+          "• Share your meal plan with family and friends \n• Edit the same meal plan together (every member needs premium) \n• Online sync \n• One time cost, no subscription \n• You keep your meal ideas seperate",
+          textAlign: TextAlign.left,
+          style:
+              TextStyle(fontSize: 16, fontWeight: FontWeight.bold, height: 1.5),
+        ),
+        Padding(
+          padding: const EdgeInsets.only(top: 70.0),
+          child: ElevatedButton(
+              style: MyButton.buyPremiumButton,
+              onPressed: () {
+                print("Premium Handler");
+                _purchasePremium();
+              },
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
-                child: Text(
-                  "Buy Premium (${productPrice})",
-                  style: TextStyle(fontSize: 18),
-                ),
-              ),
-            )),
-        ElevatedButton(
-            style: MyButton.buyPremiumButton,
-            onPressed: () {
-              print("Premium Handler");
-              _getPastPurchases();
-            },
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  Icon(Icons.grade),
-                  Padding(
-                    padding: const EdgeInsets.only(left: 32.0),
-                    child: Text(
-                      "Test History",
-                      style: TextStyle(fontSize: 18),
-                    ),
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Text(
+                    "Buy Premium (${productPrice})",
+                    style: TextStyle(fontSize: 18),
                   ),
-                ],
-              ),
-            ))
+                ),
+              )),
+        ),
       ],
     );
   }

@@ -49,33 +49,53 @@ class Meallist {
     );
   }
 
-  Future<void> updateMealInDB(String? newName, String? newNote, String newRecipe, int? newCategory) async {
-    await _databaseHelper.db!.update("meallist",
-        Meallist(id: this.id, mealName: newName ?? this.mealName, note: newNote, recipe: newRecipe, categoryId: newCategory).toMap(),
-        where: "id = ?", whereArgs: [this.id], conflictAlgorithm: ConflictAlgorithm.replace);
+  Future<void> updateMealInDB(String? newName, String? newNote,
+      String newRecipe, int? newCategory) async {
+    await _databaseHelper.db!.update(
+        "meallist",
+        Meallist(
+                id: this.id,
+                mealName: newName ?? this.mealName,
+                note: newNote,
+                recipe: newRecipe,
+                categoryId: newCategory)
+            .toMap(),
+        where: "id = ?",
+        whereArgs: [this.id],
+        conflictAlgorithm: ConflictAlgorithm.replace);
   }
 
   Future<void> deleteCategoryId(int? categoryId) async {
-    await _databaseHelper.db!.rawUpdate('UPDATE meallist SET category = ? WHERE category = ?', [null, '${categoryId}']);
+    await _databaseHelper.db!.rawUpdate(
+        'UPDATE meallist SET category = ? WHERE category = ?',
+        [null, '${categoryId}']);
   }
 
-  factory Meallist.fromMap(Map<String, dynamic> data) =>
-      new Meallist(id: data['id'], mealName: data['meal_name'], note: data['note'], recipe: data['recipe'], categoryId: data["category"]);
+  factory Meallist.fromMap(Map<String, dynamic> data) => new Meallist(
+      id: data['id'],
+      mealName: data['meal_name'],
+      note: data['note'],
+      recipe: data['recipe'],
+      categoryId: data["category"]);
 
   Future<List<Meallist>> generateMealList(int? id) async {
     List<Map<String, dynamic>> maps = [];
     print(id);
-    if (id == 0) {
+    if (id == -1) {
       maps = await _databaseHelper.db!.query("meallist");
     } else {
-      int newID = id! - 1;
       // id-1, weil 0 bereits durch den defaultwert besetzt ist. Mit -1 wird die korrekte Kategorie gewählt.
-      maps = await _databaseHelper.db!.query("meallist", where: "category = ?", whereArgs: [newID]);
+      maps = await _databaseHelper.db!
+          .query("meallist", where: "category = ?", whereArgs: [id]);
     }
 
     return List.generate(maps.length, (i) {
       return Meallist(
-          id: maps[i]['id'], mealName: maps[i]['meal_name'], note: maps[i]['note'], recipe: maps[i]['recipe'], categoryId: maps[i]["category"]);
+          id: maps[i]['id'],
+          mealName: maps[i]['meal_name'],
+          note: maps[i]['note'],
+          recipe: maps[i]['recipe'],
+          categoryId: maps[i]["category"]);
     });
   }
 }

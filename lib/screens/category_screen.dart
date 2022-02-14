@@ -52,7 +52,9 @@ class _CategoryScreenState extends State<CategoryScreen> {
     prefs = await SharedPreferences.getInstance();
     sortAlphabetical = prefs.getBool('sort') ?? false;
     if (sortAlphabetical) {
-      categoryList.sort((a, b) => a.categoryName!.toLowerCase().compareTo(b.categoryName!.toLowerCase()));
+      categoryList.sort((a, b) => a.categoryName!
+          .toLowerCase()
+          .compareTo(b.categoryName!.toLowerCase()));
     }
   }
 
@@ -76,14 +78,16 @@ class _CategoryScreenState extends State<CategoryScreen> {
               context: context,
               builder: (BuildContext context) {
                 return AlertDialog(
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(32.0))),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(32.0))),
                   backgroundColor: Constants.secondaryColor,
                   scrollable: true,
                   title: Text(
                     'Category'.tr(),
                     textAlign: TextAlign.center,
                   ),
-                  content: StatefulBuilder(builder: (BuildContext context, StateSetter setState) {
+                  content: StatefulBuilder(
+                      builder: (BuildContext context, StateSetter setState) {
                     _setState = setState;
                     return Container(
                       child: Form(
@@ -94,7 +98,8 @@ class _CategoryScreenState extends State<CategoryScreen> {
                           children: <Widget>[
                             TextFormField(
                               textCapitalization: TextCapitalization.sentences,
-                              decoration: InputDecoration(labelText: 'Category Name'.tr()),
+                              decoration: InputDecoration(
+                                  labelText: 'Category Name'.tr()),
                               textAlign: TextAlign.left,
                               controller: categoryTxtCtrl,
                               validator: (value) {
@@ -111,7 +116,10 @@ class _CategoryScreenState extends State<CategoryScreen> {
                               child: Container(
                                 width: 280,
                                 height: 40,
-                                decoration: BoxDecoration(borderRadius: BorderRadius.all(Radius.circular(32.0)), color: currentColor),
+                                decoration: BoxDecoration(
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(32.0)),
+                                    color: currentColor),
                               ),
                               onTap: () {
                                 showDialog(
@@ -130,9 +138,11 @@ class _CategoryScreenState extends State<CategoryScreen> {
                                           displayThumbColor: true,
                                           showLabel: true,
                                           paletteType: PaletteType.hsl,
-                                          pickerAreaBorderRadius: const BorderRadius.only(
+                                          pickerAreaBorderRadius:
+                                              const BorderRadius.only(
                                             topLeft: const Radius.circular(2.0),
-                                            topRight: const Radius.circular(2.0),
+                                            topRight:
+                                                const Radius.circular(2.0),
                                           ),
                                         ),
                                       ),
@@ -212,190 +222,250 @@ class _CategoryScreenState extends State<CategoryScreen> {
                   itemCount: categoryList.length,
                   itemBuilder: (context, int index) {
                     Category currentCategory = categoryList[index];
-                    String valueString = currentCategory.colorValue!.split('(0x')[1].split(')')[0]; // kind of hacky..
-                    int value = int.parse(valueString, radix: 16);
-                    Color currentCategoryColor = new Color(value);
-                    return Center(
-                      child: GestureDetector(
-                        child: Card(
-                            color: Colors.white,
-                            margin: EdgeInsets.all(6),
-                            elevation: 6,
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-                            child: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Column(
-                                children: [
-                                  Stack(
-                                    children: [
-                                      Align(
-                                        alignment: Alignment.centerLeft,
-                                        child: Padding(
-                                          padding: const EdgeInsets.only(left: 10),
-                                          child: Container(
-                                              height: 45,
-                                              width: 45,
-                                              decoration:
-                                                  BoxDecoration(borderRadius: BorderRadius.all(Radius.circular(32.0)), color: currentCategoryColor)),
+                    if (currentCategory.id == -1) {
+                      return SizedBox();
+                    } else {
+                      String valueString = currentCategory.colorValue!
+                          .split('(0x')[1]
+                          .split(')')[0]; // kind of hacky..
+                      int value = int.parse(valueString, radix: 16);
+                      Color currentCategoryColor = new Color(value);
+                      return Center(
+                        child: GestureDetector(
+                          child: Card(
+                              color: Colors.white,
+                              margin: EdgeInsets.all(6),
+                              elevation: 6,
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(20)),
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Column(
+                                  children: [
+                                    Stack(
+                                      children: [
+                                        Align(
+                                          alignment: Alignment.centerLeft,
+                                          child: Padding(
+                                            padding:
+                                                const EdgeInsets.only(left: 10),
+                                            child: Container(
+                                                height: 45,
+                                                width: 45,
+                                                decoration: BoxDecoration(
+                                                    borderRadius:
+                                                        BorderRadius.all(
+                                                            Radius.circular(
+                                                                32.0)),
+                                                    color:
+                                                        currentCategoryColor)),
+                                          ),
                                         ),
-                                      ),
-                                      Align(
-                                        alignment: Alignment.center,
-                                        child: Text(
-                                          currentCategory.categoryName!,
-                                          textAlign: TextAlign.center,
-                                          style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+                                        Align(
+                                          alignment: Alignment.center,
+                                          child: Text(
+                                            currentCategory.categoryName!,
+                                            textAlign: TextAlign.center,
+                                            style: TextStyle(
+                                                fontSize: 15,
+                                                fontWeight: FontWeight.bold),
+                                          ),
                                         ),
-                                      ),
-                                    ],
-                                  ),
-                                ],
-                              ),
-                            )),
-                        onTap: () {
-                          categoryTxtCtrl.text = currentCategory.categoryName!;
-                          currentColor = currentCategoryColor;
-                          showDialog(
-                              context: context,
-                              builder: (BuildContext context) {
-                                return AlertDialog(
-                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(32.0))),
-                                  backgroundColor: Constants.secondaryColor,
-                                  scrollable: true,
-                                  title: Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Text(
-                                        'Category'.tr(),
-                                        textAlign: TextAlign.center,
-                                      ),
-                                      IconButton(
-                                          icon: Icon(Icons.delete),
-                                          onPressed: () {
-                                            currentCategory.deleteFromDB();
-                                            Meallist().deleteCategoryId(currentCategory.id);
-                                            Navigator.of(context).pop();
-                                            updateList().then((value) {
-                                              setState(() {});
-                                            });
-                                          })
-                                    ],
-                                  ),
-                                  content: StatefulBuilder(builder: (BuildContext context, StateSetter setState) {
-                                    _setState = setState;
-                                    return Container(
-                                      child: Form(
-                                        key: _formKey,
-                                        child: Column(
-                                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                          crossAxisAlignment: CrossAxisAlignment.center,
-                                          children: <Widget>[
-                                            TextFormField(
-                                              textCapitalization: TextCapitalization.sentences,
-                                              decoration: InputDecoration(labelText: 'Category Name'.tr()),
-                                              textAlign: TextAlign.left,
-                                              controller: categoryTxtCtrl,
-                                              validator: (value) {
-                                                if (value == null || value.isEmpty) {
-                                                  return "Please add a name".tr();
-                                                }
-                                                return null;
-                                              },
-                                            ),
-                                            SizedBox(
-                                              height: 40,
-                                            ),
-                                            GestureDetector(
-                                              child: Container(
-                                                width: 280,
-                                                height: 40,
-                                                decoration: BoxDecoration(borderRadius: BorderRadius.all(Radius.circular(32.0)), color: currentColor),
-                                              ),
-                                              onTap: () {
-                                                showDialog(
-                                                  context: context,
-                                                  builder: (BuildContext context) {
-                                                    return AlertDialog(
-                                                      titlePadding: const EdgeInsets.all(0.0),
-                                                      contentPadding: const EdgeInsets.all(0.0),
-                                                      content: SingleChildScrollView(
-                                                        child: ColorPicker(
-                                                          pickerColor: currentColor,
-                                                          onColorChanged: changeColor,
-                                                          colorPickerWidth: 300.0,
-                                                          pickerAreaHeightPercent: 0.7,
-                                                          enableAlpha: true,
-                                                          displayThumbColor: true,
-                                                          showLabel: true,
-                                                          paletteType: PaletteType.hsl,
-                                                          pickerAreaBorderRadius: const BorderRadius.only(
-                                                            topLeft: const Radius.circular(2.0),
-                                                            topRight: const Radius.circular(2.0),
-                                                          ),
-                                                        ),
-                                                      ),
-                                                      actions: [
-                                                        ElevatedButton(
-                                                          child: Text(
-                                                            "Save",
-                                                          ).tr(),
-                                                          onPressed: () {
-                                                            print(currentColor);
-                                                            Navigator.of(context).pop();
-                                                            _setState(() {
-                                                              updateList();
-                                                            });
-                                                          },
-                                                          style: saveButtonStyle,
-                                                        ),
-                                                      ],
-                                                    );
-                                                  },
-                                                );
-                                              },
-                                            )
-                                          ],
-                                        ),
-                                      ),
-                                    );
-                                  }),
-                                  actions: <Widget>[
-                                    ElevatedButton(
-                                      child: Text(
-                                        "Cancel",
-                                        style: TextStyle(color: Colors.blue),
-                                      ).tr(),
-                                      onPressed: () {
-                                        Navigator.of(context).pop();
-                                      },
-                                      style: cancelButtonStyle,
-                                    ),
-                                    ElevatedButton(
-                                      child: Text(
-                                        "Save",
-                                      ).tr(),
-                                      onPressed: () async {
-                                        if (_formKey.currentState!.validate()) {
-                                          try {
-                                            currentCategory.updateInDB(categoryTxtCtrl.text, currentColor.toString());
-                                            Navigator.of(context).pop();
-                                            updateList().then((value) {
-                                              setState(() {});
-                                            });
-                                          } catch (e) {
-                                            Navigator.of(context).pop();
-                                            print(e);
-                                          }
-                                        }
-                                      },
-                                      style: saveButtonStyle,
+                                      ],
                                     ),
                                   ],
-                                );
-                              });
-                        },
-                      ),
-                    );
+                                ),
+                              )),
+                          onTap: () {
+                            categoryTxtCtrl.text =
+                                currentCategory.categoryName!;
+                            currentColor = currentCategoryColor;
+                            showDialog(
+                                context: context,
+                                builder: (BuildContext context) {
+                                  return AlertDialog(
+                                    shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.all(
+                                            Radius.circular(32.0))),
+                                    backgroundColor: Constants.secondaryColor,
+                                    scrollable: true,
+                                    title: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Text(
+                                          'Category'.tr(),
+                                          textAlign: TextAlign.center,
+                                        ),
+                                        IconButton(
+                                            icon: Icon(Icons.delete),
+                                            onPressed: () {
+                                              currentCategory.deleteFromDB();
+                                              Meallist().deleteCategoryId(
+                                                  currentCategory.id);
+                                              Navigator.of(context).pop();
+                                              updateList().then((value) {
+                                                setState(() {});
+                                              });
+                                            })
+                                      ],
+                                    ),
+                                    content: StatefulBuilder(builder:
+                                        (BuildContext context,
+                                            StateSetter setState) {
+                                      _setState = setState;
+                                      return Container(
+                                        child: Form(
+                                          key: _formKey,
+                                          child: Column(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceEvenly,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.center,
+                                            children: <Widget>[
+                                              TextFormField(
+                                                textCapitalization:
+                                                    TextCapitalization
+                                                        .sentences,
+                                                decoration: InputDecoration(
+                                                    labelText:
+                                                        'Category Name'.tr()),
+                                                textAlign: TextAlign.left,
+                                                controller: categoryTxtCtrl,
+                                                validator: (value) {
+                                                  if (value == null ||
+                                                      value.isEmpty) {
+                                                    return "Please add a name"
+                                                        .tr();
+                                                  }
+                                                  return null;
+                                                },
+                                              ),
+                                              SizedBox(
+                                                height: 40,
+                                              ),
+                                              GestureDetector(
+                                                child: Container(
+                                                  width: 280,
+                                                  height: 40,
+                                                  decoration: BoxDecoration(
+                                                      borderRadius:
+                                                          BorderRadius.all(
+                                                              Radius.circular(
+                                                                  32.0)),
+                                                      color: currentColor),
+                                                ),
+                                                onTap: () {
+                                                  showDialog(
+                                                    context: context,
+                                                    builder:
+                                                        (BuildContext context) {
+                                                      return AlertDialog(
+                                                        titlePadding:
+                                                            const EdgeInsets
+                                                                .all(0.0),
+                                                        contentPadding:
+                                                            const EdgeInsets
+                                                                .all(0.0),
+                                                        content:
+                                                            SingleChildScrollView(
+                                                          child: ColorPicker(
+                                                            pickerColor:
+                                                                currentColor,
+                                                            onColorChanged:
+                                                                changeColor,
+                                                            colorPickerWidth:
+                                                                300.0,
+                                                            pickerAreaHeightPercent:
+                                                                0.7,
+                                                            enableAlpha: true,
+                                                            displayThumbColor:
+                                                                true,
+                                                            showLabel: true,
+                                                            paletteType:
+                                                                PaletteType.hsl,
+                                                            pickerAreaBorderRadius:
+                                                                const BorderRadius
+                                                                    .only(
+                                                              topLeft: const Radius
+                                                                      .circular(
+                                                                  2.0),
+                                                              topRight: const Radius
+                                                                      .circular(
+                                                                  2.0),
+                                                            ),
+                                                          ),
+                                                        ),
+                                                        actions: [
+                                                          ElevatedButton(
+                                                            child: Text(
+                                                              "Save",
+                                                            ).tr(),
+                                                            onPressed: () {
+                                                              print(
+                                                                  currentColor);
+                                                              Navigator.of(
+                                                                      context)
+                                                                  .pop();
+                                                              _setState(() {
+                                                                updateList();
+                                                              });
+                                                            },
+                                                            style:
+                                                                saveButtonStyle,
+                                                          ),
+                                                        ],
+                                                      );
+                                                    },
+                                                  );
+                                                },
+                                              )
+                                            ],
+                                          ),
+                                        ),
+                                      );
+                                    }),
+                                    actions: <Widget>[
+                                      ElevatedButton(
+                                        child: Text(
+                                          "Cancel",
+                                          style: TextStyle(color: Colors.blue),
+                                        ).tr(),
+                                        onPressed: () {
+                                          Navigator.of(context).pop();
+                                        },
+                                        style: cancelButtonStyle,
+                                      ),
+                                      ElevatedButton(
+                                        child: Text(
+                                          "Save",
+                                        ).tr(),
+                                        onPressed: () async {
+                                          if (_formKey.currentState!
+                                              .validate()) {
+                                            try {
+                                              currentCategory.updateInDB(
+                                                  categoryTxtCtrl.text,
+                                                  currentColor.toString());
+                                              Navigator.of(context).pop();
+                                              updateList().then((value) {
+                                                setState(() {});
+                                              });
+                                            } catch (e) {
+                                              Navigator.of(context).pop();
+                                              print(e);
+                                            }
+                                          }
+                                        },
+                                        style: saveButtonStyle,
+                                      ),
+                                    ],
+                                  );
+                                });
+                          },
+                        ),
+                      );
+                    }
                   }),
             ),
           ],

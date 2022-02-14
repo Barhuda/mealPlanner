@@ -60,38 +60,44 @@ class Category {
 
   Future<List<Category>> generateCategoryList() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
+    List<Category> categoryList = [];
+    categoryList
+        .add(Category(id: -1, categoryName: "All", colorValue: "0xFFFFFFFF"));
     bool sortAlphabetical = prefs.getBool('sort') ?? false;
     final List<Map<String, dynamic>> maps = await _databaseHelper.db!.query(
         "category",
         orderBy: sortAlphabetical ? "category_name ASC" : null);
-    return List.generate(maps.length, (i) {
-      return Category(
+    List.generate(maps.length, (i) {
+      categoryList.add(Category(
           id: maps[i]['id'],
           categoryName: maps[i]['category_name'],
-          colorValue: maps[i]['color']);
+          colorValue: maps[i]['color']));
     });
+    return categoryList;
   }
-
-
 
   List<DropdownMenuItem> createDropdownMenuItems() {
     List<DropdownMenuItem> resultList = [];
     resultList.add(
       DropdownMenuItem(
         child: Text("No category").tr(),
-        value: -1,
+        value: -2,
       ),
     );
     generateCategoryList().then(((categoryList) {
       for (var category in categoryList) {
-        print(category.categoryName);
-        resultList.add(DropdownMenuItem(
-          child: Text(category.categoryName!),
-          value: category.id,
-        ));
+        if (category.id == -1)
+          print("test");
+        else {
+          print(category.categoryName);
+          resultList.add(DropdownMenuItem(
+            child: Text(category.categoryName!),
+            value: category.id,
+          ));
+        }
       }
     }));
-    print(resultList.length);
+    print("Dropdownlänge :   " + resultList.length.toString());
     return resultList;
   }
 }

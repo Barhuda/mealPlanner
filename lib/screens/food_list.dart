@@ -58,6 +58,7 @@ class _FoodListState extends State<FoodList> {
   bool sortAlphabetical = false;
 
   int? selectedCategoryFilterID;
+  int filterID = 0;
 
   var categoryDropDownItems = <DropdownMenuItem>[];
 
@@ -76,6 +77,7 @@ class _FoodListState extends State<FoodList> {
     super.initState();
     // categoryPickerItems = Category().catPickerItems();
     categoryDropDownItems = Category().createDropdownMenuItems();
+
     selectedCategoryID = -1;
     selectedCategoryFilterID = 0;
     firstLoad().then((value) {
@@ -84,7 +86,7 @@ class _FoodListState extends State<FoodList> {
   }
 
   Future firstLoad() async {
-    meallist = await Meallist().generateMealList(0);
+    meallist = await Meallist().generateMealList(-1);
     prefs = await SharedPreferences.getInstance();
     sortAlphabetical = prefs.getBool('sort') ?? false;
     selectedMealTimes = prefs.getStringList('mealTimes');
@@ -104,6 +106,7 @@ class _FoodListState extends State<FoodList> {
       meallist.sort((a, b) =>
           a.mealName!.toLowerCase().compareTo(b.mealName!.toLowerCase()));
     }
+    print("Meallist länge: " + meallist.length.toString());
     categoryList = await Category().generateCategoryList();
   }
 
@@ -190,7 +193,7 @@ class _FoodListState extends State<FoodList> {
             mealNote = null;
             mealDate = DateTime.now().millisecondsSinceEpoch;
             textEditingController.clear();
-            selectedCategoryID = -1;
+            selectedCategoryID = -2;
             showDialog(
                 context: context,
                 builder: (BuildContext context) {
@@ -228,7 +231,7 @@ class _FoodListState extends State<FoodList> {
                                       () => selectedCategoryID = newVal),
                                   value: selectedCategoryID,
                                   isExpanded: true,
-                                  hint: Text("Choose category"),
+                                  hint: Text("Choose category").tr(),
                                 ),
                               ),
                               TextFormField(
@@ -338,19 +341,24 @@ class _FoodListState extends State<FoodList> {
             children: [
               GroupButton(
                 isRadio: true,
-                mainGroupAlignment: MainGroupAlignment.start,
-                selectedButton: 1,
-                direction: Axis.horizontal,
-                spacing: 10,
+                controller: GroupButtonController(selectedIndex: filterID),
+                options: GroupButtonOptions(
+                    alignment: AlignmentDirectional.center,
+                    direction: Axis.horizontal,
+                    spacing: 10,
+                    borderRadius: BorderRadius.all(Radius.circular(48)),
+                    selectedColor: Constants.fourthColor),
                 onSelected: (index, isSelected) {
-                  selectedCategoryFilterID = index;
+                  print(categoryList[index].categoryName);
+                  print("ID ist:::: " + categoryList[index].id.toString());
+                  selectedCategoryFilterID = categoryList[index].id;
+                  filterID = index;
                   asyncMethod(selectedCategoryFilterID).then((value) {
                     setState(() {});
                   });
                 },
-                buttons: categoryList.cast(),
-                borderRadius: BorderRadius.all(Radius.circular(48)),
-                selectedColor: Colors.blue,
+                buttons: List.generate(categoryList.length,
+                    (index) => categoryList[index].categoryName!),
               ),
               Expanded(
                 child: ListView.builder(
@@ -361,15 +369,15 @@ class _FoodListState extends State<FoodList> {
                         onTap: () {
                           mealName = null;
                           mealNote = null;
-                          selectedCategoryID = -1;
+                          selectedCategoryID = -2;
                           textEditingController.text = currentMeal.recipe ?? "";
                           var mealNameCtrl =
                               TextEditingController(text: currentMeal.mealName);
                           var mealNoteCtrl =
                               TextEditingController(text: currentMeal.note);
-                          categoryDropDownItems =
-                              Category().createDropdownMenuItems();
-                          selectedCategoryID = currentMeal.categoryId ?? -1;
+                          // categoryDropDownItems =
+                          //     Category().createDropdownMenuItems();
+                          selectedCategoryID = currentMeal.categoryId ?? -2;
                           showDialog(
                               context: context,
                               builder: (BuildContext context) {
@@ -427,7 +435,8 @@ class _FoodListState extends State<FoodList> {
                                                               newVal),
                                                   value: selectedCategoryID,
                                                   isExpanded: true,
-                                                  hint: Text("Choose category"),
+                                                  hint: Text("Choose category")
+                                                      .tr(),
                                                 ),
                                               ),
                                               TextFormField(

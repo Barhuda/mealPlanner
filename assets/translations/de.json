@@ -31,8 +31,36 @@
   "Meals to show": "Sichtbare Mahlzeiten",
   "Meal planner": "Meal Planer",
   "Chose meals to show": "Mahzeiten zur Anzeige auswählen",
-  "buy-premium-text": "• Teile deinen Plan mit Freunden und Familie \n• Editiert einen Plan gemeinsam (jeder Benutzer braucht Premium) \n• Online synchronisation \n• Einmalige Kosten, kein Abo \n• Die Mahlzeitideen bleiben separat \n• Du startest mit einem neuen, leeren Plan\n• Nach dem Kauf ist ein Login nötig"
-
+  "buy-premium-text": "• Teile deinen Plan mit Freunden und Familie \n• Editiert einen Plan gemeinsam (jeder Benutzer braucht Premium) \n• Online synchronisation \n• Einmalige Kosten, kein Abo \n• Die Mahlzeitideen bleiben separat \n• Du startest mit einem neuen, leeren Plan\n• Nach dem Kauf ist ein Login nötig",
+  "Register with Mail": "Register with Mail",
+  "Register": "Registrieren",
+  "Enter Mail": "Mail",
+  "Password": "Passwort",
+  "Enter Password": "Passwort eingeben",
+  "Password weak": "Passwort zu schwach",
+  "The password provided is too weak.": "Das eingegebene Passwort ist zu schwach",
+  "E-Mail already in use": "E-Mail wird bereits verwendet",
+  "The account already exists for that email.": "Der Account existiert bereits für diese E-Mailadresse",
+  "Success": "Erfolg",
+  "Account has been registred": "Account wurde erstellt",
+  "Login with Mail": "Login mit Mail",
+  "Login": "Login",
+  "No User": "Kein Benutzer",
+  "No user found for that email.": "Kein Benutzer mit dieser E-Mailadresse gefunden.",
+  "Wrong Password": "Falsches Passwort",
+  "Wrong password provided for that user.": "Das Passwort stimmt für den Benutzer nicht.",
+  "Set new meal plan name": "Neue Bezeichnung für den Meal Plan setzen",
+  "Plan": "Plan",
+  "Profile": "Profil",
+  "Change your Username": "Benutzername ändern",
+  "Mealpan": "Mealpan",
+  "User: ": "Benutzer: ",
+  "+ Add Friend": "+ Benutzer hinzufügen",
+  "Rename plan": "Plan umbennen",
+  "Meal Plan": "Meal Plan",
+  "Ideas": "Ideen",
+  "Login for sync and share": "Einloggen für sync und Teilen",
+  "Register with Email": "Registrieren mit E-Mail"
 
 
 }

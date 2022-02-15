@@ -125,7 +125,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             obscureText: true,
             keyboardType: TextInputType.visiblePassword,
             decoration: InputDecoration(
-                label: Text("Password"), hintText: "Enter Password".tr()),
+                label: Text("Password".tr()), hintText: "Enter Password".tr()),
           ),
         ],
       ),

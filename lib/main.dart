@@ -141,6 +141,7 @@ class _MyAppState extends State<MyApp> {
       if (user == null) {
         myUser.userLoggedOut();
         print('User is currently signed out!');
+        setState(() {});
       } else {
         myUser.userLoggedIn(user.uid);
         _getUsersDB(user);

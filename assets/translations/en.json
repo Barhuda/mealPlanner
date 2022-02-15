@@ -31,7 +31,37 @@
   "Meals to show": "Meals to show",
   "Meal planner": "Meal Planner",
   "Chose meals to show": "Chose meals to show",
-  "buy-premium-text": "• Share your meal plan with family and friends \n• Edit the same meal plan together (every member needs premium) \n• Online sync \n• One time cost, no subscription \n• You keep your meal ideas seperate \n• You start with a new, empty meal plan\n• Login after purchase needed"
+  "buy-premium-text": "• Share your meal plan with family and friends \n• Edit the same meal plan together (every member needs premium) \n• Online sync \n• One time cost, no subscription \n• You keep your meal ideas seperate \n• You start with a new, empty meal plan\n• Login after purchase needed",
+  "Register with Mail": "Register with Mail",
+  "Register": "Register",
+  "Enter Mail": "Enter Mail",
+  "Password": "Password",
+  "Enter Password": "Enter Password",
+  "Password weak": "Password weak",
+  "The password provided is too weak.": "The password provided is too weak.",
+  "E-Mail already in use": "E-Mail already in use",
+  "The account already exists for that email.": "The account already exists for that email.",
+  "Success": "Success",
+  "Account has been registred": "Account has been registred",
+  "Login with Mail": "Login with Mail",
+  "Login": "Login",
+  "No User": "No User",
+  "No user found for that email.": "No user found for that email.",
+  "Wrong Password": "Wrong Password",
+  "Wrong password provided for that user.": "Wrong password provided for that user.",
+  "Set new meal plan name": "Set new meal plan name",
+  "Plan": "Plan",
+  "Profile": "Profile",
+  "Change your Username": "Change your Username",
+  "Mealpan": "Mealpan",
+  "User: ": "User: ",
+  "+ Add Friend": "+ Add Friend",
+  "Rename plan": "Rename plan",
+  "Meal Plan": "Meal Plan",
+  "Ideas": "Ideas",
+  "Login for sync and share": "Login for sync and share",
+  "Register with Email": "Register with Email"
+
 
 
 

@@ -642,12 +642,12 @@ class getPremium extends StatefulWidget {
 class _getPremiumState extends State<getPremium> {
   List<ProductDetails> products = [];
 
-  _purchasePremium() {
+  _purchasePremium() async {
     final ProductDetails productDetails = products[0];
     final PurchaseParam purchaseParam =
         PurchaseParam(productDetails: productDetails);
 
-    InAppPurchase.instance.buyNonConsumable(purchaseParam: purchaseParam);
+    await InAppPurchase.instance.buyNonConsumable(purchaseParam: purchaseParam);
   }
 
   String? productPrice;

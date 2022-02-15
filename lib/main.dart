@@ -90,6 +90,7 @@ class _MyAppState extends State<MyApp> {
           print("Gekauft!");
           myUser.setPremium();
           prefs.setBool("premium", true);
+          setState(() {});
         }
         if (purchaseDetails.pendingCompletePurchase) {
           await InAppPurchase.instance.completePurchase(purchaseDetails);

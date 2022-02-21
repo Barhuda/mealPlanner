@@ -95,7 +95,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       idToken: googleAuth.idToken,
     );
     await FirebaseAuth.instance.signInWithCredential(credential);
-    Get.offAllNamed("/profile"); // Once signed in, return the UserCredential
+    Get.offAllNamed("/"); // Once signed in, return the UserCredential
   }
 
   _registerWithMail() async {
@@ -105,7 +105,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       title: "Register with Mail".tr(),
       onConfirm: () async {
         await _doFirebaseMailRegistration(mailText.text, passwordText.text);
-        Get.offAllNamed("/profile");
+        Get.offAllNamed("/");
       },
       confirmTextColor: Colors.white,
       textConfirm: "Register".tr(),
@@ -167,11 +167,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
     } else {
       Get.snackbar("Success".tr(), "Account has been registred".tr(),
           snackPosition: SnackPosition.TOP);
+      Get.offAndToNamed("/");
     }
   }
 
   _signOut() async {
     await FirebaseAuth.instance.signOut();
+    newNameCtr.clear();
     setState(() {});
   }
 
@@ -182,7 +184,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
       title: "Login with Mail".tr(),
       onConfirm: () async {
         await _doFireBaseLoginWithMail(mailText.text, passwordText.text);
-        Get.offAllNamed("/profile");
       },
       confirmTextColor: Colors.white,
       textConfirm: "Login".tr(),
@@ -235,11 +236,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
         hasError = true;
       }
     }
-    Navigator.of(context).pop();
+
     if (hasError) {
+      Navigator.of(context).pop();
       Get.snackbar(title, content!, snackPosition: SnackPosition.TOP);
+      setState(() {});
+    } else {
+      Future.delayed(Duration(seconds: 1))
+          .then((value) => Get.offAllNamed("/profile"));
     }
-    setState(() {});
   }
 
   _changeScene(int index) {
@@ -351,7 +356,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+    newNameCtr.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    print(newNameCtr.text);
+    print(myUser.username);
     return Scaffold(
       appBar: AppBar(
           backgroundColor: Constants.mainColor,
@@ -434,6 +448,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                         key: ValueKey(index),
                                         margin: EdgeInsets.all(5),
                                         shape: RoundedRectangleBorder(
+                                          side: myUser.selectedMealPlan ==
+                                                  currentDbInIndex
+                                              ? BorderSide(
+                                                  color: Constants.thirdColor,
+                                                  width: 3)
+                                              : BorderSide(),
                                           borderRadius:
                                               BorderRadius.circular(16),
                                         ),
@@ -647,7 +667,7 @@ class _getPremiumState extends State<getPremium> {
     final PurchaseParam purchaseParam =
         PurchaseParam(productDetails: productDetails);
 
-    await InAppPurchase.instance.buyNonConsumable(purchaseParam: purchaseParam);
+    bool success = await InAppPurchase.instance.buyNonConsumable(purchaseParam: purchaseParam);
   }
 
   String? productPrice;

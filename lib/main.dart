@@ -108,7 +108,10 @@ class _MyAppState extends State<MyApp> {
       QueryPurchaseDetailsResponse response =
           await androidAddition.queryPastPurchases();
       if (response.pastPurchases.isNotEmpty) {
-        if (response.pastPurchases[0].productID == "premium") {
+        int? purchaseIndex = response.pastPurchases
+            .indexWhere((item) => item.productID == "premium");
+
+        if (purchaseIndex >= 0) {
           print("Der hat das schon gekauft");
           myUser.setPremium();
           prefs.setBool("premium", true);
@@ -148,6 +151,7 @@ class _MyAppState extends State<MyApp> {
         _getUsersDB(user);
         String? hisName = await FirebaseRTDB.getUserName(user.uid);
         myUser.setUsername(hisName);
+        setState(() {});
       }
     });
   }

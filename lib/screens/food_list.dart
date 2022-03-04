@@ -101,7 +101,7 @@ class _FoodListState extends State<FoodList> {
   Future asyncMethod(int? categoryID) async {
     // categoryPickerItems = Category().catPickerItems();
     categoryDropDownItems = Category().createDropdownMenuItems();
-    meallist = await Meallist().generateMealList(selectedCategoryFilterID);
+    meallist = await Meallist().generateMealList(categoryID);
     if (sortAlphabetical) {
       meallist.sort((a, b) =>
           a.mealName!.toLowerCase().compareTo(b.mealName!.toLowerCase()));
@@ -324,6 +324,11 @@ class _FoodListState extends State<FoodList> {
                           }
 
                           Navigator.of(context).pop();
+                          selectedCategoryFilterID = 0;
+                          filterID = -1;
+                          asyncMethod(selectedCategoryFilterID).then((value) {
+                            setState(() {});
+                          });
                           asyncMethod(selectedCategoryFilterID).then((value) {
                             setState(() {});
                           });
@@ -536,8 +541,7 @@ class _FoodListState extends State<FoodList> {
                                             saveCategoryId());
 
                                         Navigator.of(context).pop();
-                                        asyncMethod(selectedCategoryFilterID)
-                                            .then((value) {
+                                        asyncMethod(-1).then((value) {
                                           setState(() {});
                                         });
                                       },

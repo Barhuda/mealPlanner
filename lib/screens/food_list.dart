@@ -672,19 +672,17 @@ class _FoodListState extends State<FoodList> {
                                                                       .requestFocus(
                                                                           FocusNode());
 
-                                                                  date = await (showDatePicker(
-                                                                      context:
-                                                                          context,
-                                                                      initialDate:
-                                                                          DateTime
+                                                                  date = await showDatePicker(
+                                                                          context:
+                                                                              context,
+                                                                          initialDate: DateTime
                                                                               .now(),
-                                                                      firstDate:
-                                                                          DateTime(
+                                                                          firstDate: DateTime(
                                                                               1900),
-                                                                      lastDate:
-                                                                          DateTime(
-                                                                              2100)) as FutureOr<
-                                                                      DateTime>);
+                                                                          lastDate: DateTime(
+                                                                              2100)) ??
+                                                                      DateTime
+                                                                          .now();
 
                                                                   dateCtl.text =
                                                                       '${DateFormat('EE').format(date)} ${date.day.toString()}.${date.month.toString()}.${date.year.toString()}';

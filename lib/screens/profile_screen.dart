@@ -612,9 +612,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 padding: const EdgeInsets.only(top: 16.0, bottom: 34),
                 child: GoogleAuthButton(
                   onPressed: () {
-                    //TODO: Goolge Sign in wieder einschalten!!!!
-                    // _signInWithGoogle();
-                    myUser.hasPremium = false;
+                    _signInWithGoogle();
                   },
                 ),
               ),
@@ -667,7 +665,8 @@ class _getPremiumState extends State<getPremium> {
     final PurchaseParam purchaseParam =
         PurchaseParam(productDetails: productDetails);
 
-    bool success = await InAppPurchase.instance.buyNonConsumable(purchaseParam: purchaseParam);
+    bool success = await InAppPurchase.instance
+        .buyNonConsumable(purchaseParam: purchaseParam);
   }
 
   String? productPrice;

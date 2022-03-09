@@ -329,9 +329,6 @@ class _FoodListState extends State<FoodList> {
                           asyncMethod(selectedCategoryFilterID).then((value) {
                             setState(() {});
                           });
-                          asyncMethod(selectedCategoryFilterID).then((value) {
-                            setState(() {});
-                          });
                         },
                         style: saveButtonStyle,
                       ),
@@ -541,6 +538,8 @@ class _FoodListState extends State<FoodList> {
                                             saveCategoryId());
 
                                         Navigator.of(context).pop();
+                                        selectedCategoryFilterID = -1;
+                                        filterID = 0;
                                         asyncMethod(selectedCategoryFilterID)
                                             .then((value) {
                                           setState(() {});

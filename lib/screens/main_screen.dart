@@ -154,8 +154,8 @@ class _MainScreenState extends State<MainScreen> {
       currentDate = DateTime.now();
     } else {
       DateTime thisDateIs = DateTime.now();
-      currentDate = thisDateIs.subtract(
-          Duration(days: (thisDateIs.weekday - selectedWeekDayAsFirstDay!) % 7));
+      currentDate = thisDateIs.subtract(Duration(
+          days: (thisDateIs.weekday - selectedWeekDayAsFirstDay!) % 7));
     }
     asyncMethod().then((value) {
       setState(() {
@@ -175,7 +175,7 @@ class _MainScreenState extends State<MainScreen> {
   Future asyncMethod() async {
     print(currentDate);
     weekMap = await Meal().generateWeekList(currentDate!);
-    ideaList = await Meallist().generateMealList(0);
+    ideaList = await Meallist().generateMealList(-1);
     setState(() {});
   }
 
@@ -586,7 +586,8 @@ class _MainScreenState extends State<MainScreen> {
           print(snapshot.connectionState);
           if (snapshot.hasData) {
             DataSnapshot dataValues = snapshot.data.snapshot;
-            Map<dynamic, dynamic>? values = dataValues.value as Map<dynamic, dynamic>?;
+            Map<dynamic, dynamic>? values =
+                dataValues.value as Map<dynamic, dynamic>?;
             Map<dynamic, dynamic> parsed = {};
             print("Data:" + values.toString());
             if (values != null) {

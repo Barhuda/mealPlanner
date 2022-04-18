@@ -68,6 +68,29 @@ class _ProfileScreenState extends State<ProfileScreen> {
         print("UID from Friend is::::: $dbUIDtoAddFromFriend");
         _handleAddingNewMealplanThroughLink(dbUIDtoAddFromFriend);
       }
+    } else {
+      _getPastPurchases();
+    }
+  }
+
+  _getPastPurchases() async {
+    if (defaultTargetPlatform == TargetPlatform.android) {
+      InAppPurchaseAndroidPlatformAddition androidAddition = InAppPurchase
+          .instance
+          .getPlatformAddition<InAppPurchaseAndroidPlatformAddition>();
+
+      QueryPurchaseDetailsResponse response =
+          await androidAddition.queryPastPurchases();
+      if (response.pastPurchases.isNotEmpty) {
+        int? purchaseIndex = response.pastPurchases
+            .indexWhere((item) => item.productID == "premium");
+
+        if (purchaseIndex >= 0) {
+          print("Der hat das schon gekauft");
+          myUser.setPremium();
+          setState(() {});
+        }
+      }
     }
   }
 
@@ -706,42 +729,44 @@ class _getPremiumState extends State<getPremium> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Text(
-          "Get Premium",
-          style: TextStyle(
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
-              color: Colors.blueGrey),
-        ),
-        Image.asset("assets/graphics/premium.png"),
-        Text(
-          "buy-premium-text".tr(),
-          textAlign: TextAlign.left,
-          style:
-              TextStyle(fontSize: 16, fontWeight: FontWeight.bold, height: 1.8),
-        ),
-        Padding(
-          padding: const EdgeInsets.only(top: 50.0),
-          child: ElevatedButton(
-              style: MyButton.buyPremiumButton,
-              onPressed: () {
-                print("Premium Handler");
-                _purchasePremium();
-              },
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
+    return SingleChildScrollView(
+      child: Column(
+        children: [
+          Text(
+            "Get Premium",
+            style: TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+                color: Colors.blueGrey),
+          ),
+          Image.asset("assets/graphics/premium.png"),
+          Text(
+            "buy-premium-text".tr(),
+            textAlign: TextAlign.left,
+            style: TextStyle(
+                fontSize: 16, fontWeight: FontWeight.bold, height: 1.8),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(top: 50.0),
+            child: ElevatedButton(
+                style: MyButton.buyPremiumButton,
+                onPressed: () {
+                  print("Premium Handler");
+                  _purchasePremium();
+                },
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
-                  child: Text(
-                    "Buy Premium ({})".tr(args: [productPrice.toString()]),
-                    style: TextStyle(fontSize: 18),
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text(
+                      "Buy Premium ({})".tr(args: [productPrice.toString()]),
+                      style: TextStyle(fontSize: 18),
+                    ),
                   ),
-                ),
-              )),
-        ),
-      ],
+                )),
+          ),
+        ],
+      ),
     );
   }
 }

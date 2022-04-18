@@ -252,7 +252,7 @@ class _MainScreenState extends State<MainScreen> {
     return numberOfLinks;
   }
 
-  _showDeleteDialog(Meal mealToDelete, TextEditingController textCtrl) {
+  _showDeleteDialog(Meal mealToDelete, TextEditingController textCtrl) async {
     Get.defaultDialog(
         title: "Delete Meal".tr(),
         middleText: "Do you really want to delete this meal?".tr(),
@@ -261,13 +261,15 @@ class _MainScreenState extends State<MainScreen> {
         confirmTextColor: Colors.red,
         cancelTextColor: Colors.black,
         buttonColor: Colors.white,
-        onConfirm: () {
+        onConfirm: () async {
           if (myUser.isLoggedIn) {
             mealToDelete.deleteMealFromFirebase(myUser.selectedMealPlan!);
           } else {
-            mealToDelete.deleteMeal();
+            await mealToDelete.deleteMeal();
+            print(mealToDelete.toMap());
             textCtrl.clear();
             editBreakfast = null;
+            asyncMethod();
           }
 
           Get.back();
@@ -898,8 +900,8 @@ class _MainScreenState extends State<MainScreen> {
                                           decoration: InputDecoration(
                                               labelText: mealTimes.tr(),
                                               suffixIcon: IconButton(
-                                                onPressed: () {
-                                                  _showDeleteDialog(
+                                                onPressed: () async {
+                                                  await _showDeleteDialog(
                                                       mealsInCurrentDayList[
                                                           mulitSelectMealTimesFullList
                                                               .indexOf(

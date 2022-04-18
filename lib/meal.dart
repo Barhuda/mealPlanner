@@ -80,6 +80,7 @@ class Meal {
       where: "id = ?",
       whereArgs: [this.id],
     );
+    print("deleted");
   }
 
   Future<void> saveMeal(
@@ -105,8 +106,8 @@ class Meal {
           new DateTime(defaultDate.year, defaultDate.month, defaultDate.day);
       resultMap[formattedDefaultDate] = <String?, Meal>{};
     }
-    await getWeekList(firstWeekDay).then(
-        (value) => Future.forEach(value, (dynamic element) => weekList.add(element)));
+    await getWeekList(firstWeekDay).then((value) =>
+        Future.forEach(value, (dynamic element) => weekList.add(element)));
     for (int i = 0; i < weekList.length; i++) {
       Meal meal = weekList[i];
       DateTime inputDate = DateTime.fromMillisecondsSinceEpoch(meal.date!);
@@ -158,7 +159,10 @@ class Meal {
         .child("weekdays")
         .update({
       dateFormatted: {
-        this.dayTime!.toLowerCase(): {"link": this.recipe, "name": this.mealName}
+        this.dayTime!.toLowerCase(): {
+          "link": this.recipe,
+          "name": this.mealName
+        }
       }
     });
   }

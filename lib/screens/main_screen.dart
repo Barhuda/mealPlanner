@@ -72,12 +72,7 @@ class _MainScreenState extends State<MainScreen> {
 
   List<String> selectedMealTimes = [];
 
-  List<String> mulitSelectMealTimesFullList = [
-    "Breakfast",
-    "Lunch",
-    "Dinner",
-    "Snack"
-  ];
+  List<String> mulitSelectMealTimesFullList = ["Breakfast", "Lunch", "Dinner", "Snack"];
 
   String? selectedLocalMealTime;
 
@@ -85,16 +80,9 @@ class _MainScreenState extends State<MainScreen> {
   int? selectedWeekDayAsFirstDay;
 
   Map<DateTime, Map<String?, Meal>> weekMap = {};
-  Meal defaultMeal = Meal(
-      mealName: "-",
-      date: DateTime.utc(2000, 1, 1).millisecondsSinceEpoch,
-      dayTime: "Breakfast");
+  Meal defaultMeal = Meal(mealName: "-", date: DateTime.utc(2000, 1, 1).millisecondsSinceEpoch, dayTime: "Breakfast");
   List<Meal> meals = [
-    new Meal(
-        id: 0,
-        mealName: 'TestMeal',
-        date: DateTime.now().millisecondsSinceEpoch,
-        dayTime: "Breakfast"),
+    new Meal(id: 0, mealName: 'TestMeal', date: DateTime.now().millisecondsSinceEpoch, dayTime: "Breakfast"),
   ];
   TextEditingController dateCtl = TextEditingController(
       text:
@@ -120,11 +108,7 @@ class _MainScreenState extends State<MainScreen> {
     if (query != "") {
       for (var idea in ideaList) {
         if (idea.mealName!.toLowerCase().contains(query.toLowerCase())) {
-          resultList.add({
-            'mealName': idea.mealName,
-            'recipe': idea.recipe,
-            'id': idea.id.toString()
-          });
+          resultList.add({'mealName': idea.mealName, 'recipe': idea.recipe, 'id': idea.id.toString()});
         }
       }
     }
@@ -154,8 +138,7 @@ class _MainScreenState extends State<MainScreen> {
       currentDate = DateTime.now();
     } else {
       DateTime thisDateIs = DateTime.now();
-      currentDate = thisDateIs.subtract(Duration(
-          days: (thisDateIs.weekday - selectedWeekDayAsFirstDay!) % 7));
+      currentDate = thisDateIs.subtract(Duration(days: (thisDateIs.weekday - selectedWeekDayAsFirstDay!) % 7));
     }
     asyncMethod().then((value) {
       setState(() {
@@ -168,8 +151,7 @@ class _MainScreenState extends State<MainScreen> {
   _getSharedPrefs() async {
     prefs = await SharedPreferences.getInstance();
     selectedWeekDayAsFirstDay = prefs.getInt('selectedWeekDay');
-    selectedMealTimes = prefs.getStringList('mealTimes') ??
-        ["Breakfast", "Lunch", "Dinner", "Snack"];
+    selectedMealTimes = prefs.getStringList('mealTimes') ?? ["Breakfast", "Lunch", "Dinner", "Snack"];
   }
 
   Future asyncMethod() async {
@@ -201,8 +183,7 @@ class _MainScreenState extends State<MainScreen> {
 
   void backToCurrentDate() {
     DateTime thisDateIs = DateTime.now();
-    currentDate = thisDateIs.subtract(
-        Duration(days: thisDateIs.weekday - selectedWeekDayAsFirstDay!));
+    currentDate = thisDateIs.subtract(Duration(days: thisDateIs.weekday - selectedWeekDayAsFirstDay!));
     datePeriod = currentDate!.add(Duration(days: 6));
     _handleFirstDayOfWeek();
     asyncMethod().then((value) {
@@ -213,10 +194,7 @@ class _MainScreenState extends State<MainScreen> {
   }
 
   bool allEntriesEmpty(Map mapToCheck) {
-    if (mapToCheck["Breakfast"] == null &&
-        mapToCheck["Lunch"] == null &&
-        mapToCheck["Dinner"] == null &&
-        mapToCheck["Snack"] == null) {
+    if (mapToCheck["Breakfast"] == null && mapToCheck["Lunch"] == null && mapToCheck["Dinner"] == null && mapToCheck["Snack"] == null) {
       return true;
     } else {
       return false;
@@ -289,19 +267,9 @@ class _MainScreenState extends State<MainScreen> {
     TextEditingController dinnerCtrl = TextEditingController();
 
     TextEditingController snackCtrl = TextEditingController();
-    List<TextEditingController> editCtrls = [
-      breakfstCtrl,
-      lunchCtrl,
-      dinnerCtrl,
-      snackCtrl
-    ];
+    List<TextEditingController> editCtrls = [breakfstCtrl, lunchCtrl, dinnerCtrl, snackCtrl];
 
-    Map<String, String?> linkMap = {
-      "breakfast": "",
-      "lunch": "",
-      "dinner": "",
-      "snack": ""
-    };
+    Map<String, String?> linkMap = {"breakfast": "", "lunch": "", "dinner": "", "snack": ""};
 
     print(parsedMeals);
 
@@ -362,8 +330,7 @@ class _MainScreenState extends State<MainScreen> {
                     },
                     debounceDuration: Duration(milliseconds: 400),
                     onSuggestionSelected: (dynamic idea) {
-                      editCtrls[mulitSelectMealTimesFullList.indexOf(meal)]
-                          .text = idea["mealName"];
+                      editCtrls[mulitSelectMealTimesFullList.indexOf(meal)].text = idea["mealName"];
                       if (idea["recipe"] != "" || idea["recipe"] != null) {
                         print("Save Meal with idea and Recipe");
                       }
@@ -375,19 +342,13 @@ class _MainScreenState extends State<MainScreen> {
                       minLines: 1,
                       keyboardType: TextInputType.multiline,
                       textCapitalization: TextCapitalization.sentences,
-                      controller:
-                          editCtrls[mulitSelectMealTimesFullList.indexOf(meal)],
+                      controller: editCtrls[mulitSelectMealTimesFullList.indexOf(meal)],
                       decoration: InputDecoration(
                           labelText: meal.tr(),
                           suffixIcon: IconButton(
                             onPressed: () {
-                              _showDeleteDialog(
-                                  Meal(
-                                      date: DateTime.parse(cardDate)
-                                          .millisecondsSinceEpoch,
-                                      dayTime: meal),
-                                  editCtrls[mulitSelectMealTimesFullList
-                                      .indexOf(meal)]);
+                              _showDeleteDialog(Meal(date: DateTime.parse(cardDate).millisecondsSinceEpoch, dayTime: meal),
+                                  editCtrls[mulitSelectMealTimesFullList.indexOf(meal)]);
                             },
                             icon: Icon(Icons.delete),
                           )),
@@ -400,8 +361,7 @@ class _MainScreenState extends State<MainScreen> {
                     child: Text("Link to recipe").tr(),
                     onPressed: () {
                       String recipeLink = linkMap[meal.toLowerCase()]!;
-                      if (recipeLink.startsWith("https://") ||
-                          recipeLink.startsWith("http://")) {
+                      if (recipeLink.startsWith("https://") || recipeLink.startsWith("http://")) {
                         launch(recipeLink);
                       } else {
                         launch("https://" + recipeLink);
@@ -451,12 +411,7 @@ class _MainScreenState extends State<MainScreen> {
             .endAt(endDate)
             .onValue;
         print("DAten: " + selectedMealplan + "  " + "$formatted ; $endDate");
-        DatabaseEvent nameEvent = await FirebaseDatabase.instance
-            .ref()
-            .child("mealDbs")
-            .child(selectedMealplan)
-            .child("name")
-            .once();
+        DatabaseEvent nameEvent = await FirebaseDatabase.instance.ref().child("mealDbs").child(selectedMealplan).child("name").once();
         dbName = nameEvent.snapshot.value.toString();
         setState(() {});
       } catch (e) {
@@ -495,13 +450,10 @@ class _MainScreenState extends State<MainScreen> {
               padding: EdgeInsets.only(right: 30),
               child: GestureDetector(
                 onTap: () async {
-                  final directory =
-                      (await getApplicationDocumentsDirectory()).path;
-                  screenshotController
-                      .captureAndSave(directory, fileName: "Mealplan.jpg")
-                      .then((path) => Share.shareFiles([path!],
-                          text:
-                              "Mealplan: ${currentDate!.day.toString()}.${currentDate!.month.toString()}.${currentDate!.year.toString()} - ${datePeriod.day.toString()}.${datePeriod.month.toString()}.${datePeriod.year.toString()}"));
+                  final directory = (await getApplicationDocumentsDirectory()).path;
+                  screenshotController.captureAndSave(directory, fileName: "Mealplan.jpg").then((path) => Share.shareFiles([path!],
+                      text:
+                          "Mealplan: ${currentDate!.day.toString()}.${currentDate!.month.toString()}.${currentDate!.year.toString()} - ${datePeriod.day.toString()}.${datePeriod.month.toString()}.${datePeriod.year.toString()}"));
                 },
                 child: Icon(
                   Icons.share,
@@ -519,10 +471,9 @@ class _MainScreenState extends State<MainScreen> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: <Widget>[
-                    RaisedButton(
-                      color: Constants.fourthColor,
-                      child: Text("<",
-                          style: TextStyle(color: Colors.white, fontSize: 25)),
+                    ElevatedButton(
+                      // color: Constants.fourthColor,
+                      child: Text("<", style: TextStyle(color: Colors.white, fontSize: 25)),
                       onPressed: () {
                         subtractWeek();
                       },
@@ -530,11 +481,10 @@ class _MainScreenState extends State<MainScreen> {
                     Text(
                       '${currentDate!.day.toString()}.${currentDate!.month.toString()}.${currentDate!.year.toString()}  -  '
                       '${datePeriod.day.toString()}.${datePeriod.month.toString()}.${datePeriod.year.toString()}',
-                      style:
-                          TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                     ),
-                    RaisedButton(
-                      color: Constants.fourthColor,
+                    ElevatedButton(
+                      // color: Constants.fourthColor,
                       onPressed: () {
                         addWeek();
                       },
@@ -588,8 +538,7 @@ class _MainScreenState extends State<MainScreen> {
           print(snapshot.connectionState);
           if (snapshot.hasData) {
             DataSnapshot dataValues = snapshot.data.snapshot;
-            Map<dynamic, dynamic>? values =
-                dataValues.value as Map<dynamic, dynamic>?;
+            Map<dynamic, dynamic>? values = dataValues.value as Map<dynamic, dynamic>?;
             Map<dynamic, dynamic> parsed = {};
             print("Data:" + values.toString());
             if (values != null) {
@@ -600,14 +549,12 @@ class _MainScreenState extends State<MainScreen> {
               return ListView.builder(
                   itemCount: 7,
                   itemBuilder: (BuildContext context, int index) {
-                    String cardDate = dateFormatter
-                        .format(currentDate!.add(Duration(days: index)));
+                    String cardDate = dateFormatter.format(currentDate!.add(Duration(days: index)));
                     Map<dynamic, dynamic>? mealsInDay = parsed[cardDate];
                     Map<String, Map<String, Meal>> mealMapPerDate = {};
                     if (mealsInDay != null) {
                       mealsInDay.forEach((key, value) {
-                        Meal newMeal = Meal.fromFirebaseMap(
-                            mealsInDay, key.toString().toLowerCase(), cardDate);
+                        Meal newMeal = Meal.fromFirebaseMap(mealsInDay, key.toString().toLowerCase(), cardDate);
                         print("Meal name ${newMeal.mealName}");
                       });
                     }
@@ -626,14 +573,11 @@ class _MainScreenState extends State<MainScreen> {
                         ),
                         child: parsed[cardDate] == null
                             ? Column(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceEvenly,
+                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                                 children: <Widget>[
                                   Text(
                                       '${formatter.format(weekMap.keys.elementAt(index))} ${weekMap.keys.elementAt(index).day.toString()}.${weekMap.keys.elementAt(index).month.toString()}.${weekMap.keys.elementAt(index).year.toString()}',
-                                      style: TextStyle(
-                                          fontSize: 15,
-                                          fontWeight: FontWeight.bold)),
+                                      style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
                                   Text(""),
                                   Text("-"),
                                   Text(""),
@@ -646,61 +590,36 @@ class _MainScreenState extends State<MainScreen> {
                                     padding: const EdgeInsets.all(6.0),
                                     child: Text(
                                         '${formatter.format(weekMap.keys.elementAt(index))} ${weekMap.keys.elementAt(index).day.toString()}.${weekMap.keys.elementAt(index).month.toString()}.${weekMap.keys.elementAt(index).year.toString()}',
-                                        style: TextStyle(
-                                            fontSize: 15,
-                                            fontWeight: FontWeight.bold)),
+                                        style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
                                   ),
                                   Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceEvenly,
+                                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                                     children: [
-                                      for (int i = 0;
-                                          i < selectedMealTimes.length;
-                                          i++)
+                                      for (int i = 0; i < selectedMealTimes.length; i++)
                                         selectedMealTimes[i] == "Snack"
                                             ? SizedBox()
                                             : Expanded(
                                                 child: Padding(
-                                                  padding:
-                                                      const EdgeInsets.all(4.0),
+                                                  padding: const EdgeInsets.all(4.0),
                                                   child: Row(
-                                                    mainAxisAlignment:
-                                                        MainAxisAlignment
-                                                            .spaceEvenly,
+                                                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                                                     children: [
                                                       Expanded(
                                                         child: Column(
-                                                          mainAxisAlignment:
-                                                              MainAxisAlignment
-                                                                  .center,
+                                                          mainAxisAlignment: MainAxisAlignment.center,
                                                           children: [
                                                             Text(
-                                                              selectedMealTimes[
-                                                                      i]
-                                                                  .tr(),
-                                                              textAlign:
-                                                                  TextAlign
-                                                                      .start,
-                                                              style: TextStyle(
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .bold,
-                                                                  fontSize: 14),
+                                                              selectedMealTimes[i].tr(),
+                                                              textAlign: TextAlign.start,
+                                                              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
                                                             ),
                                                             Text(
                                                               mealsInDay != null
-                                                                  ? mealsInDay[selectedMealTimes[i]
-                                                                              .toLowerCase()] !=
-                                                                          null
-                                                                      ? mealsInDay[
-                                                                              selectedMealTimes[i].toLowerCase()]
-                                                                          [
-                                                                          "name"]
+                                                                  ? mealsInDay[selectedMealTimes[i].toLowerCase()] != null
+                                                                      ? mealsInDay[selectedMealTimes[i].toLowerCase()]["name"]
                                                                       : "-"
                                                                   : "-",
-                                                              textAlign:
-                                                                  TextAlign
-                                                                      .center,
+                                                              textAlign: TextAlign.center,
                                                             ),
                                                           ],
                                                         ),
@@ -709,24 +628,14 @@ class _MainScreenState extends State<MainScreen> {
                                                         width: 8,
                                                       ),
                                                       Visibility(
-                                                        visible: selectedMealTimes
-                                                                .contains(
-                                                                    "Snack")
-                                                            ? i <
-                                                                selectedMealTimes
-                                                                        .length -
-                                                                    2
-                                                            : i <
-                                                                selectedMealTimes
-                                                                        .length -
-                                                                    1,
+                                                        visible: selectedMealTimes.contains("Snack")
+                                                            ? i < selectedMealTimes.length - 2
+                                                            : i < selectedMealTimes.length - 1,
                                                         child: Container(
-                                                          color: Constants
-                                                              .fourthColor,
+                                                          color: Constants.fourthColor,
                                                           height: 30,
                                                           width: 1,
-                                                          margin:
-                                                              EdgeInsets.all(4),
+                                                          margin: EdgeInsets.all(4),
                                                         ),
                                                       ),
                                                     ],
@@ -737,24 +646,18 @@ class _MainScreenState extends State<MainScreen> {
                                   ),
                                   selectedMealTimes.contains("Snack")
                                       ? Padding(
-                                          padding:
-                                              const EdgeInsets.only(right: 15),
+                                          padding: const EdgeInsets.only(right: 15),
                                           child: Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.center,
+                                            crossAxisAlignment: CrossAxisAlignment.center,
                                             children: [
                                               Text(
                                                 "Snack".tr(),
-                                                style: TextStyle(
-                                                    fontWeight: FontWeight.bold,
-                                                    fontSize: 14),
+                                                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
                                               ),
                                               Text(
                                                 mealsInDay != null
-                                                    ? mealsInDay["snack"] !=
-                                                            null
-                                                        ? mealsInDay["snack"]
-                                                            ["name"]
+                                                    ? mealsInDay["snack"] != null
+                                                        ? mealsInDay["snack"]["name"]
                                                         : "-"
                                                     : "-",
                                                 textAlign: TextAlign.center,
@@ -773,8 +676,7 @@ class _MainScreenState extends State<MainScreen> {
               return ListView.builder(
                   itemCount: 7,
                   itemBuilder: (BuildContext context, int index) {
-                    String cardDate = dateFormatter
-                        .format(currentDate!.add(Duration(days: index)));
+                    String cardDate = dateFormatter.format(currentDate!.add(Duration(days: index)));
                     Map<dynamic, dynamic>? mealsInDay = parsed[cardDate];
                     return GestureDetector(
                       onTap: () {
@@ -792,9 +694,7 @@ class _MainScreenState extends State<MainScreen> {
                             children: <Widget>[
                               Text(
                                   '${formatter.format(weekMap.keys.elementAt(index))} ${weekMap.keys.elementAt(index).day.toString()}.${weekMap.keys.elementAt(index).month.toString()}.${weekMap.keys.elementAt(index).year.toString()}',
-                                  style: TextStyle(
-                                      fontSize: 15,
-                                      fontWeight: FontWeight.bold)),
+                                  style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
                               Text(""),
                               Text("-"),
                               Text(""),
@@ -827,57 +727,35 @@ class _MainScreenState extends State<MainScreen> {
             editLunch = null;
             editEvening = null;
             editSnack = null;
-            List<String?> editMealStringList = [
-              editBreakfast,
-              editLunch,
-              editEvening,
-              editSnack
-            ];
+            List<String?> editMealStringList = [editBreakfast, editLunch, editEvening, editSnack];
             var breakfastCtrl = TextEditingController(text: breakfast.mealName);
             var lunchCtrl = TextEditingController(text: lunch.mealName);
             var dinnerCtrl = TextEditingController(text: evening.mealName);
             var snackCtrl = TextEditingController(text: snack.mealName);
 
-            List<TextEditingController> txtControllersList = [
-              breakfastCtrl,
-              lunchCtrl,
-              dinnerCtrl,
-              snackCtrl
-            ];
+            List<TextEditingController> txtControllersList = [breakfastCtrl, lunchCtrl, dinnerCtrl, snackCtrl];
 
             breakfastLink = "";
             lunchLink = "";
             eveningLink = "";
             snackLink = "";
-            List<String> mealLinks = [
-              breakfastLink,
-              lunchLink,
-              eveningLink,
-              snackLink
-            ];
+            List<String> mealLinks = [breakfastLink, lunchLink, eveningLink, snackLink];
             print(evening.recipe);
             showDialog(
                 context: context,
                 builder: (BuildContext context) {
                   return Container(
                     child: AlertDialog(
-                      shape: RoundedRectangleBorder(
-                          borderRadius:
-                              BorderRadius.all(Radius.circular(20.0))),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(20.0))),
                       backgroundColor: Constants.secondaryColor,
                       scrollable: true,
                       title: Text(
                         '${formatter.format(weekMap.keys.elementAt(index))} ${weekMap.keys.elementAt(index).day.toString()}.${weekMap.keys.elementAt(index).month.toString()}.${weekMap.keys.elementAt(index).year.toString()}',
                         textAlign: TextAlign.center,
                       ),
-                      content: StatefulBuilder(builder:
-                          (BuildContext context, StateSetter setState) {
+                      content: StatefulBuilder(builder: (BuildContext context, StateSetter setState) {
                         return Container(
-                          height: 100 +
-                              (20 *
-                                  (countLinks(
-                                      breakfast, lunch, evening, snack))) +
-                              (50 * selectedMealTimes.length),
+                          height: 100 + (20 * (countLinks(breakfast, lunch, evening, snack))) + (50 * selectedMealTimes.length),
                           child: Form(
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -887,38 +765,25 @@ class _MainScreenState extends State<MainScreen> {
                                   Column(
                                     children: [
                                       TypeAheadField(
-                                        textFieldConfiguration:
-                                            TextFieldConfiguration(
+                                        textFieldConfiguration: TextFieldConfiguration(
                                           maxLines: 4,
                                           minLines: 1,
                                           keyboardType: TextInputType.multiline,
-                                          textCapitalization:
-                                              TextCapitalization.sentences,
-                                          controller: txtControllersList[
-                                              mulitSelectMealTimesFullList
-                                                  .indexOf(mealTimes)],
+                                          textCapitalization: TextCapitalization.sentences,
+                                          controller: txtControllersList[mulitSelectMealTimesFullList.indexOf(mealTimes)],
                                           decoration: InputDecoration(
                                               labelText: mealTimes.tr(),
                                               suffixIcon: IconButton(
                                                 onPressed: () async {
                                                   await _showDeleteDialog(
-                                                      mealsInCurrentDayList[
-                                                          mulitSelectMealTimesFullList
-                                                              .indexOf(
-                                                                  mealTimes)],
-                                                      txtControllersList[
-                                                          mulitSelectMealTimesFullList
-                                                              .indexOf(
-                                                                  mealTimes)]);
+                                                      mealsInCurrentDayList[mulitSelectMealTimesFullList.indexOf(mealTimes)],
+                                                      txtControllersList[mulitSelectMealTimesFullList.indexOf(mealTimes)]);
                                                 },
                                                 icon: Icon(Icons.delete),
                                               )),
                                           textAlign: TextAlign.left,
                                           onChanged: (value) {
-                                            editMealStringList[
-                                                    mulitSelectMealTimesFullList
-                                                        .indexOf(mealTimes)] =
-                                                value;
+                                            editMealStringList[mulitSelectMealTimesFullList.indexOf(mealTimes)] = value;
                                           },
                                         ),
                                         suggestionsCallback: (pattern) {
@@ -931,51 +796,25 @@ class _MainScreenState extends State<MainScreen> {
                                         },
                                         hideOnEmpty: true,
                                         hideOnError: true,
-                                        debounceDuration:
-                                            Duration(milliseconds: 400),
+                                        debounceDuration: Duration(milliseconds: 400),
                                         onSuggestionSelected: (dynamic idea) {
-                                          editMealStringList[
-                                                  mulitSelectMealTimesFullList
-                                                      .indexOf(mealTimes)] =
-                                              idea["mealName"];
-                                          mealLinks[mulitSelectMealTimesFullList
-                                              .indexOf(mealTimes)] = "";
-                                          txtControllersList[
-                                                  mulitSelectMealTimesFullList
-                                                      .indexOf(mealTimes)]
-                                              .text = idea["mealName"];
-                                          if (idea["recipe"] != "" ||
-                                              idea["recipe"] != null) {
-                                            mealsInCurrentDayList[
-                                                    mulitSelectMealTimesFullList
-                                                        .indexOf(mealTimes)]
-                                                .recipe = idea["recipe"];
+                                          editMealStringList[mulitSelectMealTimesFullList.indexOf(mealTimes)] = idea["mealName"];
+                                          mealLinks[mulitSelectMealTimesFullList.indexOf(mealTimes)] = "";
+                                          txtControllersList[mulitSelectMealTimesFullList.indexOf(mealTimes)].text = idea["mealName"];
+                                          if (idea["recipe"] != "" || idea["recipe"] != null) {
+                                            mealsInCurrentDayList[mulitSelectMealTimesFullList.indexOf(mealTimes)].recipe = idea["recipe"];
                                           }
                                         },
                                       ),
                                       Visibility(
-                                        visible: (mealsInCurrentDayList[
-                                                        mulitSelectMealTimesFullList
-                                                            .indexOf(mealTimes)]
-                                                    .recipe !=
-                                                "" &&
-                                            mealsInCurrentDayList[
-                                                        mulitSelectMealTimesFullList
-                                                            .indexOf(mealTimes)]
-                                                    .recipe !=
-                                                null),
+                                        visible: (mealsInCurrentDayList[mulitSelectMealTimesFullList.indexOf(mealTimes)].recipe != "" &&
+                                            mealsInCurrentDayList[mulitSelectMealTimesFullList.indexOf(mealTimes)].recipe != null),
                                         child: ElevatedButton(
                                           child: Text("Link to recipe").tr(),
                                           onPressed: () {
                                             String recipeLink =
-                                                mealsInCurrentDayList[
-                                                        mulitSelectMealTimesFullList
-                                                            .indexOf(mealTimes)]
-                                                    .recipe!;
-                                            if (recipeLink
-                                                    .startsWith("https://") ||
-                                                recipeLink
-                                                    .startsWith("http://")) {
+                                                mealsInCurrentDayList[mulitSelectMealTimesFullList.indexOf(mealTimes)].recipe!;
+                                            if (recipeLink.startsWith("https://") || recipeLink.startsWith("http://")) {
                                               launch(recipeLink);
                                             } else {
                                               launch("https://" + recipeLink);
@@ -1012,13 +851,9 @@ class _MainScreenState extends State<MainScreen> {
                           child: Text("Save").tr(),
                           onPressed: () {
                             for (int i = 0; i < selectedMealTimes.length; i++) {
-                              int correctIndex = mulitSelectMealTimesFullList
-                                  .indexOf(selectedMealTimes[i]);
-                              mealsInCurrentDayList[correctIndex].saveMeal(
-                                  txtControllersList[correctIndex].text,
-                                  weekMap.keys.elementAt(index),
-                                  selectedMealTimes[i],
-                                  mealsInCurrentDayList[correctIndex].recipe);
+                              int correctIndex = mulitSelectMealTimesFullList.indexOf(selectedMealTimes[i]);
+                              mealsInCurrentDayList[correctIndex].saveMeal(txtControllersList[correctIndex].text,
+                                  weekMap.keys.elementAt(index), selectedMealTimes[i], mealsInCurrentDayList[correctIndex].recipe);
                               editMealStringList[correctIndex] = null;
                             }
                             Navigator.of(context).pop();
@@ -1049,8 +884,7 @@ class _MainScreenState extends State<MainScreen> {
                     children: <Widget>[
                       Text(
                           '${formatter.format(weekMap.keys.elementAt(index))} ${weekMap.keys.elementAt(index).day.toString()}.${weekMap.keys.elementAt(index).month.toString()}.${weekMap.keys.elementAt(index).year.toString()}',
-                          style: TextStyle(
-                              fontSize: 15, fontWeight: FontWeight.bold)),
+                          style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
                       Text(""),
                       Text("-"),
                       Text(""),
@@ -1063,8 +897,7 @@ class _MainScreenState extends State<MainScreen> {
                         padding: const EdgeInsets.all(6.0),
                         child: Text(
                             '${formatter.format(weekMap.keys.elementAt(index))} ${weekMap.keys.elementAt(index).day.toString()}.${weekMap.keys.elementAt(index).month.toString()}.${weekMap.keys.elementAt(index).year.toString()}',
-                            style: TextStyle(
-                                fontSize: 15, fontWeight: FontWeight.bold)),
+                            style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
                       ),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -1076,28 +909,19 @@ class _MainScreenState extends State<MainScreen> {
                                     child: Padding(
                                       padding: const EdgeInsets.all(4.0),
                                       child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceEvenly,
+                                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                                         children: [
                                           Expanded(
                                             child: Column(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.center,
+                                              mainAxisAlignment: MainAxisAlignment.center,
                                               children: [
                                                 Text(
                                                   selectedMealTimes[i].tr(),
                                                   textAlign: TextAlign.start,
-                                                  style: TextStyle(
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                      fontSize: 14),
+                                                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
                                                 ),
                                                 Text(
-                                                  mealsInCurrentDayList[
-                                                              mulitSelectMealTimesFullList
-                                                                  .indexOf(
-                                                                      selectedMealTimes[
-                                                                          i])]
+                                                  mealsInCurrentDayList[mulitSelectMealTimesFullList.indexOf(selectedMealTimes[i])]
                                                           .mealName ??
                                                       "-",
                                                   textAlign: TextAlign.center,
@@ -1109,13 +933,9 @@ class _MainScreenState extends State<MainScreen> {
                                             width: 8,
                                           ),
                                           Visibility(
-                                            visible: selectedMealTimes
-                                                    .contains("Snack")
-                                                ? i <
-                                                    selectedMealTimes.length - 2
-                                                : i <
-                                                    selectedMealTimes.length -
-                                                        1,
+                                            visible: selectedMealTimes.contains("Snack")
+                                                ? i < selectedMealTimes.length - 2
+                                                : i < selectedMealTimes.length - 1,
                                             child: Container(
                                               color: Constants.fourthColor,
                                               height: 30,
@@ -1137,16 +957,10 @@ class _MainScreenState extends State<MainScreen> {
                                 children: [
                                   Text(
                                     "Snack".tr(),
-                                    style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 14),
+                                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
                                   ),
                                   Text(
-                                    mealsInCurrentDayList[
-                                                mulitSelectMealTimesFullList
-                                                    .indexOf("Snack")]
-                                            .mealName ??
-                                        "-",
+                                    mealsInCurrentDayList[mulitSelectMealTimesFullList.indexOf("Snack")].mealName ?? "-",
                                     textAlign: TextAlign.center,
                                   ),
                                 ],

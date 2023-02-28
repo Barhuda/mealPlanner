@@ -350,7 +350,7 @@ class _FoodListState extends State<FoodList> {
                     spacing: 10,
                     borderRadius: BorderRadius.all(Radius.circular(48)),
                     selectedColor: Constants.fourthColor),
-                onSelected: (index, isSelected) {
+                onSelected: (_ ,index, isSelected) {
                   print(categoryList[index].categoryName);
                   print("ID ist:::: " + categoryList[index].id.toString());
                   selectedCategoryFilterID = categoryList[index].id;

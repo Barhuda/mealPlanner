@@ -742,94 +742,100 @@ class _MainScreenState extends State<MainScreen> {
             List<String> mealLinks = [breakfastLink, lunchLink, eveningLink, snackLink];
             print(evening.recipe);
             showDialog(
+                barrierDismissible: false,
                 context: context,
                 builder: (BuildContext context) {
                   return Container(
                     child: AlertDialog(
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(20.0))),
                       backgroundColor: Constants.secondaryColor,
-                      scrollable: true,
+                      actionsPadding: EdgeInsets.only(top: 2.0),
+                      actionsOverflowAlignment: OverflowBarAlignment.end,
+                      scrollable: false,
                       title: Text(
                         '${formatter.format(weekMap.keys.elementAt(index))} ${weekMap.keys.elementAt(index).day.toString()}.${weekMap.keys.elementAt(index).month.toString()}.${weekMap.keys.elementAt(index).year.toString()}',
                         textAlign: TextAlign.center,
                       ),
-                      content: StatefulBuilder(builder: (BuildContext context, StateSetter setState) {
-                        return Container(
-                          height: 100 + (20 * (countLinks(breakfast, lunch, evening, snack))) + (50 * selectedMealTimes.length),
-                          child: Form(
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: <Widget>[
-                                for (var mealTimes in selectedMealTimes)
-                                  Column(
-                                    children: [
-                                      TypeAheadField(
-                                        textFieldConfiguration: TextFieldConfiguration(
-                                          maxLines: 4,
-                                          minLines: 1,
-                                          keyboardType: TextInputType.multiline,
-                                          textCapitalization: TextCapitalization.sentences,
-                                          controller: txtControllersList[mulitSelectMealTimesFullList.indexOf(mealTimes)],
-                                          decoration: InputDecoration(
-                                              labelText: mealTimes.tr(),
-                                              suffixIcon: IconButton(
-                                                onPressed: () async {
-                                                  await _showDeleteDialog(
-                                                      mealsInCurrentDayList[mulitSelectMealTimesFullList.indexOf(mealTimes)],
-                                                      txtControllersList[mulitSelectMealTimesFullList.indexOf(mealTimes)]);
-                                                },
-                                                icon: Icon(Icons.delete),
-                                              )),
-                                          textAlign: TextAlign.left,
-                                          onChanged: (value) {
-                                            editMealStringList[mulitSelectMealTimesFullList.indexOf(mealTimes)] = value;
+                      content: SingleChildScrollView(
+                        child: StatefulBuilder(builder: (BuildContext context, StateSetter setState) {
+                          return Container(
+                            height: 100 + (20 * (countLinks(breakfast, lunch, evening, snack))) + (50 * selectedMealTimes.length),
+                            child: Form(
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: <Widget>[
+                                  for (var mealTimes in selectedMealTimes)
+                                    Column(
+                                      children: [
+                                        TypeAheadField(
+                                          textFieldConfiguration: TextFieldConfiguration(
+                                            maxLines: 4,
+                                            minLines: 1,
+                                            keyboardType: TextInputType.multiline,
+                                            textCapitalization: TextCapitalization.sentences,
+                                            controller: txtControllersList[mulitSelectMealTimesFullList.indexOf(mealTimes)],
+                                            decoration: InputDecoration(
+                                                labelText: mealTimes.tr(),
+                                                suffixIcon: IconButton(
+                                                  onPressed: () async {
+                                                    await _showDeleteDialog(
+                                                        mealsInCurrentDayList[mulitSelectMealTimesFullList.indexOf(mealTimes)],
+                                                        txtControllersList[mulitSelectMealTimesFullList.indexOf(mealTimes)]);
+                                                  },
+                                                  icon: Icon(Icons.delete),
+                                                )),
+                                            textAlign: TextAlign.left,
+                                            onChanged: (value) {
+                                              editMealStringList[mulitSelectMealTimesFullList.indexOf(mealTimes)] = value;
+                                            },
+                                          ),
+                                          suggestionsCallback: (pattern) {
+                                            return getIdeas(pattern);
                                           },
-                                        ),
-                                        suggestionsCallback: (pattern) {
-                                          return getIdeas(pattern);
-                                        },
-                                        itemBuilder: (context, dynamic idea) {
-                                          return ListTile(
-                                            title: Text(idea["mealName"]),
-                                          );
-                                        },
-                                        hideOnEmpty: true,
-                                        hideOnError: true,
-                                        debounceDuration: Duration(milliseconds: 400),
-                                        onSuggestionSelected: (dynamic idea) {
-                                          editMealStringList[mulitSelectMealTimesFullList.indexOf(mealTimes)] = idea["mealName"];
-                                          mealLinks[mulitSelectMealTimesFullList.indexOf(mealTimes)] = "";
-                                          txtControllersList[mulitSelectMealTimesFullList.indexOf(mealTimes)].text = idea["mealName"];
-                                          if (idea["recipe"] != "" || idea["recipe"] != null) {
-                                            mealsInCurrentDayList[mulitSelectMealTimesFullList.indexOf(mealTimes)].recipe = idea["recipe"];
-                                          }
-                                        },
-                                      ),
-                                      Visibility(
-                                        visible: (mealsInCurrentDayList[mulitSelectMealTimesFullList.indexOf(mealTimes)].recipe != "" &&
-                                            mealsInCurrentDayList[mulitSelectMealTimesFullList.indexOf(mealTimes)].recipe != null),
-                                        child: ElevatedButton(
-                                          child: Text("Link to recipe").tr(),
-                                          onPressed: () {
-                                            String recipeLink =
-                                                mealsInCurrentDayList[mulitSelectMealTimesFullList.indexOf(mealTimes)].recipe!;
-                                            if (recipeLink.startsWith("https://") || recipeLink.startsWith("http://")) {
-                                              launch(recipeLink);
-                                            } else {
-                                              launch("https://" + recipeLink);
+                                          itemBuilder: (context, dynamic idea) {
+                                            return ListTile(
+                                              title: Text(idea["mealName"]),
+                                            );
+                                          },
+                                          hideOnEmpty: true,
+                                          hideOnError: true,
+                                          debounceDuration: Duration(milliseconds: 400),
+                                          onSuggestionSelected: (dynamic idea) {
+                                            editMealStringList[mulitSelectMealTimesFullList.indexOf(mealTimes)] = idea["mealName"];
+                                            mealLinks[mulitSelectMealTimesFullList.indexOf(mealTimes)] = "";
+                                            txtControllersList[mulitSelectMealTimesFullList.indexOf(mealTimes)].text = idea["mealName"];
+                                            if (idea["recipe"] != "" || idea["recipe"] != null) {
+                                              mealsInCurrentDayList[mulitSelectMealTimesFullList.indexOf(mealTimes)].recipe =
+                                                  idea["recipe"];
                                             }
                                           },
-                                          style: recipeButtonStyle,
                                         ),
-                                      ),
-                                    ],
-                                  ),
-                              ],
+                                        Visibility(
+                                          visible: (mealsInCurrentDayList[mulitSelectMealTimesFullList.indexOf(mealTimes)].recipe != "" &&
+                                              mealsInCurrentDayList[mulitSelectMealTimesFullList.indexOf(mealTimes)].recipe != null),
+                                          child: ElevatedButton(
+                                            child: Text("Link to recipe").tr(),
+                                            onPressed: () {
+                                              String recipeLink =
+                                                  mealsInCurrentDayList[mulitSelectMealTimesFullList.indexOf(mealTimes)].recipe!;
+                                              if (recipeLink.startsWith("https://") || recipeLink.startsWith("http://")) {
+                                                launch(recipeLink);
+                                              } else {
+                                                launch("https://" + recipeLink);
+                                              }
+                                            },
+                                            style: recipeButtonStyle,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                ],
+                              ),
                             ),
-                          ),
-                        );
-                      }),
+                          );
+                        }),
+                      ),
                       actions: <Widget>[
                         ElevatedButton(
                           child: Text(

@@ -118,7 +118,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
       accessToken: googleAuth.accessToken,
       idToken: googleAuth.idToken,
     );
-    await FirebaseAuth.instance.signInWithCredential(credential);
+    await FirebaseAuth.instanceFor(app: Firebase.app("mealpy"))
+        .signInWithCredential(credential);
     Get.offAllNamed("/"); // Once signed in, return the UserCredential
   }
 
@@ -161,8 +162,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
     late String title;
     String? content;
     try {
-      UserCredential userCredential = await FirebaseAuth.instance
-          .createUserWithEmailAndPassword(email: mail, password: password);
+      UserCredential userCredential =
+          await FirebaseAuth.instanceFor(app: Firebase.app("mealpy"))
+              .createUserWithEmailAndPassword(email: mail, password: password);
     } on FirebaseAuthException catch (e) {
       if (e.code == 'weak-password') {
         title = "Password weak".tr();
@@ -196,7 +198,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   _signOut() async {
-    await FirebaseAuth.instance.signOut();
+    await FirebaseAuth.instanceFor(app: Firebase.app("mealpy")).signOut();
     newNameCtr.clear();
     setState(() {});
   }
@@ -284,7 +286,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
     if (myUser.allowedDbs != null) {
       for (var dbs in myUser.allowedDbs!) {
         DatabaseEvent event =
-            await FirebaseDatabase.instance.ref("mealDbs/$dbs").once();
+            await FirebaseDatabase.instanceFor(app: Firebase.app("mealpy"))
+                .ref("mealDbs/$dbs")
+                .once();
         Map<dynamic, dynamic>? results =
             event.snapshot.value as Map<dynamic, dynamic>?;
 

@@ -45,10 +45,11 @@ void main() async {
 }
 
 class MyApp extends StatefulWidget {
-  static FirebaseAnalytics analytics = FirebaseAnalytics.instanceFor(app: Firebase.app("mealpy"));
+  static FirebaseAnalytics analytics = FirebaseAnalytics.instance;
   static FirebaseAnalyticsObserver observer =
       FirebaseAnalyticsObserver(analytics: analytics);
-  static FirebaseDatabase database = FirebaseDatabase.instanceFor(app: Firebase.app("mealpy"));
+  static FirebaseDatabase database =
+      FirebaseDatabase.instanceFor(app: Firebase.app("mealpy"));
 
   @override
   State<MyApp> createState() => _MyAppState();
@@ -161,7 +162,7 @@ class _MyAppState extends State<MyApp> {
 
   _handleDeepLink() async {
     final PendingDynamicLinkData? initialLink =
-        await FirebaseDynamicLinks.instanceFor(app: Firebase.app("mealpy")).getInitialLink();
+        await FirebaseDynamicLinks.instance.getInitialLink();
     if (initialLink != null) {
       final Uri deepLink = initialLink.link;
       await Future.delayed(Duration(seconds: 1));
@@ -172,7 +173,7 @@ class _MyAppState extends State<MyApp> {
   }
 
   _handleDeepLinkStream() {
-    FirebaseDynamicLinks.instanceFor(app: Firebase.app("mealpy")).onLink.listen((dynamicLinkData) async {
+    FirebaseDynamicLinks.instance.onLink.listen((dynamicLinkData) async {
       await Future.delayed(Duration(seconds: 1));
       String? dbUID = dynamicLinkData.link.queryParameters['uid'];
       print(dbUID);
@@ -183,7 +184,9 @@ class _MyAppState extends State<MyApp> {
   }
 
   Future<void> _getUsersDB(User user) async {
-    DatabaseReference ref = FirebaseDatabase.instance.ref("Users/${user.uid}");
+    DatabaseReference ref =
+        FirebaseDatabase.instanceFor(app: Firebase.app("mealpy"))
+            .ref("Users/${user.uid}");
 
     DatabaseEvent event = await ref.once();
 

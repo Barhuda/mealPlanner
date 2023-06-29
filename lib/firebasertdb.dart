@@ -6,7 +6,7 @@ class FirebaseRTDB {
     if (newName != "") {
       Map<String, dynamic> newMap = {};
       newMap["name"] = newName;
-      await FirebaseDatabase.instanceFor(app: Firebase.app("mealpy"))
+      await FirebaseDatabase.instance
           .ref("Users/$userUID")
           .update(newMap);
     }
@@ -15,7 +15,7 @@ class FirebaseRTDB {
   static Future<List<String>> getAllowedUsersNames(String? UserUID) async {
     List<String> allowedUsers = [""];
     DatabaseEvent event =
-        await FirebaseDatabase.instanceFor(app: Firebase.app("mealpy"))
+        await FirebaseDatabase.instance
             .ref("mealDbs/$UserUID/allowedUsers")
             .once();
     Map<dynamic, dynamic>? results =
@@ -25,7 +25,7 @@ class FirebaseRTDB {
       results.forEach((key, value) async {
         print("KEY: $key");
         DatabaseEvent secondEvent =
-            await FirebaseDatabase.instanceFor(app: Firebase.app("mealpy"))
+            await FirebaseDatabase.instance
                 .ref("Users/$key/name")
                 .once();
         if (secondEvent != null) {
@@ -40,7 +40,7 @@ class FirebaseRTDB {
 
   static Future<String?> getUserName(String userUID) async {
     DatabaseEvent event =
-        await FirebaseDatabase.instanceFor(app: Firebase.app("mealpy"))
+        await FirebaseDatabase.instance
             .ref("Users/$userUID")
             .once();
     Map<dynamic, dynamic> results =
@@ -51,7 +51,7 @@ class FirebaseRTDB {
   static Future<void> changeMealPlanName(String? dbID, String newName) async {
     Map<String, dynamic> newMap = {};
     newMap["name"] = newName;
-    await FirebaseDatabase.instanceFor(app: Firebase.app("mealpy"))
+    await FirebaseDatabase.instance
         .ref("mealDbs/$dbID")
         .update(newMap);
   }
@@ -60,12 +60,12 @@ class FirebaseRTDB {
       String userUID, String newDBToAdd) async {
     Map<String, dynamic> newMap = {};
     newMap[newDBToAdd] = true;
-    await FirebaseDatabase.instanceFor(app: Firebase.app("mealpy"))
+    await FirebaseDatabase.instance
         .ref("Users/$userUID/allowedDbs")
         .update(newMap);
     Map<String, dynamic> userMap = {};
     userMap[userUID] = true;
-    await FirebaseDatabase.instanceFor(app: Firebase.app("mealpy"))
+    await FirebaseDatabase.instance
         .ref("mealDbs/$newDBToAdd/allowedUsers")
         .update(userMap);
     return;

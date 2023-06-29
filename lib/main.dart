@@ -32,8 +32,7 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Injection.initInjection();
   await EasyLocalization.ensureInitialized();
-  await Firebase.initializeApp(
-      name: "mealpy", options: DefaultFirebaseOptions.currentPlatform);
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   prefs = await SharedPreferences.getInstance();
   runApp(EasyLocalization(
     useOnlyLangCode: true,
@@ -49,7 +48,7 @@ class MyApp extends StatefulWidget {
   static FirebaseAnalyticsObserver observer =
       FirebaseAnalyticsObserver(analytics: analytics);
   static FirebaseDatabase database =
-      FirebaseDatabase.instanceFor(app: Firebase.app("mealpy"));
+      FirebaseDatabase.instance;
 
   @override
   State<MyApp> createState() => _MyAppState();
@@ -144,7 +143,7 @@ class _MyAppState extends State<MyApp> {
 
   Future<void> _getFireBaseStream() async {
     final FirebaseAuth _auth =
-        FirebaseAuth.instanceFor(app: Firebase.app("mealpy"));
+        FirebaseAuth.instance;
     _auth.authStateChanges().listen((User? user) async {
       if (user == null) {
         myUser.userLoggedOut();
@@ -185,7 +184,7 @@ class _MyAppState extends State<MyApp> {
 
   Future<void> _getUsersDB(User user) async {
     DatabaseReference ref =
-        FirebaseDatabase.instanceFor(app: Firebase.app("mealpy"))
+        FirebaseDatabase.instance
             .ref("Users/${user.uid}");
 
     DatabaseEvent event = await ref.once();

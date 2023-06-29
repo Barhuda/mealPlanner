@@ -118,8 +118,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       accessToken: googleAuth.accessToken,
       idToken: googleAuth.idToken,
     );
-    await FirebaseAuth.instanceFor(app: Firebase.app("mealpy"))
-        .signInWithCredential(credential);
+    await FirebaseAuth.instance.signInWithCredential(credential);
     Get.offAllNamed("/"); // Once signed in, return the UserCredential
   }
 
@@ -162,9 +161,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
     late String title;
     String? content;
     try {
-      UserCredential userCredential =
-          await FirebaseAuth.instanceFor(app: Firebase.app("mealpy"))
-              .createUserWithEmailAndPassword(email: mail, password: password);
+      UserCredential userCredential = await FirebaseAuth.instance
+          .createUserWithEmailAndPassword(email: mail, password: password);
     } on FirebaseAuthException catch (e) {
       if (e.code == 'weak-password') {
         title = "Password weak".tr();
@@ -198,7 +196,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   _signOut() async {
-    await FirebaseAuth.instanceFor(app: Firebase.app("mealpy")).signOut();
+    await FirebaseAuth.instance.signOut();
     newNameCtr.clear();
     setState(() {});
   }
@@ -243,9 +241,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
     //              email: "barry.allen@example.com",
     //               password: "SuperSecretPassword!"
     try {
-      UserCredential userCredential =
-          await FirebaseAuth.instanceFor(app: Firebase.app("mealpy"))
-              .signInWithEmailAndPassword(email: mail, password: password);
+      UserCredential userCredential = await FirebaseAuth.instance
+          .signInWithEmailAndPassword(email: mail, password: password);
     } on FirebaseAuthException catch (e) {
       if (e.code == 'user-not-found') {
         title = "No User".tr();
@@ -286,9 +283,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     if (myUser.allowedDbs != null) {
       for (var dbs in myUser.allowedDbs!) {
         DatabaseEvent event =
-            await FirebaseDatabase.instanceFor(app: Firebase.app("mealpy"))
-                .ref("mealDbs/$dbs")
-                .once();
+            await FirebaseDatabase.instance.ref("mealDbs/$dbs").once();
         Map<dynamic, dynamic>? results =
             event.snapshot.value as Map<dynamic, dynamic>?;
 

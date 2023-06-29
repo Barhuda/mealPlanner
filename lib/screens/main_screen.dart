@@ -425,7 +425,7 @@ class _MainScreenState extends State<MainScreen> {
     final String endDate = dateFormatter.format(now.add(Duration(days: 6)));
     if (myUser.UID != null) {
       try {
-        dbStream = FirebaseDatabase.instanceFor(app: Firebase.app("mealpy"))
+        dbStream = FirebaseDatabase.instance
             .ref()
             .child("mealDbs")
             .child(selectedMealplan!)
@@ -436,7 +436,7 @@ class _MainScreenState extends State<MainScreen> {
             .onValue;
         print("DAten: " + selectedMealplan + "  " + "$formatted ; $endDate");
         DatabaseEvent nameEvent =
-            await FirebaseDatabase.instanceFor(app: Firebase.app("mealpy"))
+            await FirebaseDatabase.instance
                 .ref()
                 .child("mealDbs")
                 .child(selectedMealplan)

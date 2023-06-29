@@ -8,7 +8,8 @@ import 'package:mealpy/my_user.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:intl/intl.dart';
 import 'package:multiselect/multiselect.dart';
-import 'package:auth_buttons/auth_buttons.dart' show GoogleAuthButton, EmailAuthButton, AuthButtonType, AuthIconType;
+import 'package:auth_buttons/auth_buttons.dart'
+    show GoogleAuthButton, EmailAuthButton, AuthButtonType, AuthIconType;
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart' hide Trans;
 import 'package:mealpy/constants.dart' as Constants;
@@ -19,9 +20,11 @@ import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
 import 'package:in_app_purchase_android/in_app_purchase_android.dart';
 import 'package:share/share.dart';
+import 'package:firebase_core/firebase_core.dart';
 
 class ProfileScreen extends StatefulWidget {
-  ProfileScreen({Key? key, this.analytics, this.observer, this.database}) : super(key: key);
+  ProfileScreen({Key? key, this.analytics, this.observer, this.database})
+      : super(key: key);
 
   final FirebaseDatabase? database;
   final FirebaseAnalytics? analytics;
@@ -73,12 +76,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   _getPastPurchases() async {
     if (defaultTargetPlatform == TargetPlatform.android) {
-      InAppPurchaseAndroidPlatformAddition androidAddition =
-          InAppPurchase.instance.getPlatformAddition<InAppPurchaseAndroidPlatformAddition>();
+      InAppPurchaseAndroidPlatformAddition androidAddition = InAppPurchase
+          .instance
+          .getPlatformAddition<InAppPurchaseAndroidPlatformAddition>();
 
-      QueryPurchaseDetailsResponse response = await androidAddition.queryPastPurchases();
+      QueryPurchaseDetailsResponse response =
+          await androidAddition.queryPastPurchases();
       if (response.pastPurchases.isNotEmpty) {
-        int? purchaseIndex = response.pastPurchases.indexWhere((item) => item.productID == "premium");
+        int? purchaseIndex = response.pastPurchases
+            .indexWhere((item) => item.productID == "premium");
 
         if (purchaseIndex >= 0) {
           print("Der hat das schon gekauft");
@@ -104,7 +110,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
     final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
 
     // Obtain the auth details from the request
-    final GoogleSignInAuthentication googleAuth = (await googleUser?.authentication)!;
+    final GoogleSignInAuthentication googleAuth =
+        (await googleUser?.authentication)!;
 
     // Create a new credential
     final credential = GoogleAuthProvider.credential(
@@ -134,13 +141,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
           TextFormField(
             controller: mailText,
             keyboardType: TextInputType.emailAddress,
-            decoration: InputDecoration(label: Text("Mail"), hintText: "Enter Mail".tr()),
+            decoration: InputDecoration(
+                label: Text("Mail"), hintText: "Enter Mail".tr()),
           ),
           TextFormField(
             controller: passwordText,
             obscureText: true,
             keyboardType: TextInputType.visiblePassword,
-            decoration: InputDecoration(label: Text("Password".tr()), hintText: "Enter Password".tr()),
+            decoration: InputDecoration(
+                label: Text("Password".tr()), hintText: "Enter Password".tr()),
           ),
         ],
       ),
@@ -152,7 +161,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
     late String title;
     String? content;
     try {
-      UserCredential userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(email: mail, password: password);
+      UserCredential userCredential = await FirebaseAuth.instance
+          .createUserWithEmailAndPassword(email: mail, password: password);
     } on FirebaseAuthException catch (e) {
       if (e.code == 'weak-password') {
         title = "Password weak".tr();
@@ -179,7 +189,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
     if (hasError) {
       Get.snackbar(title, content!, snackPosition: SnackPosition.TOP);
     } else {
-      Get.snackbar("Success".tr(), "Account has been registred".tr(), snackPosition: SnackPosition.TOP);
+      Get.snackbar("Success".tr(), "Account has been registred".tr(),
+          snackPosition: SnackPosition.TOP);
       Get.offAndToNamed("/");
     }
   }
@@ -208,13 +219,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
           TextFormField(
             controller: mailText,
             keyboardType: TextInputType.emailAddress,
-            decoration: InputDecoration(label: Text("Mail"), hintText: "Enter Mail".tr()),
+            decoration: InputDecoration(
+                label: Text("Mail"), hintText: "Enter Mail".tr()),
           ),
           TextFormField(
             controller: passwordText,
             obscureText: true,
             keyboardType: TextInputType.visiblePassword,
-            decoration: InputDecoration(label: Text("Password"), hintText: "Enter Password".tr()),
+            decoration: InputDecoration(
+                label: Text("Password"), hintText: "Enter Password".tr()),
           ),
         ],
       ),
@@ -228,7 +241,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
     //              email: "barry.allen@example.com",
     //               password: "SuperSecretPassword!"
     try {
-      UserCredential userCredential = await FirebaseAuth.instance.signInWithEmailAndPassword(email: mail, password: password);
+      UserCredential userCredential =
+          await FirebaseAuth.instanceFor(app: Firebase.app("mealpy"))
+              .signInWithEmailAndPassword(email: mail, password: password);
     } on FirebaseAuthException catch (e) {
       if (e.code == 'user-not-found') {
         title = "No User".tr();
@@ -252,7 +267,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
       Get.snackbar(title, content!, snackPosition: SnackPosition.TOP);
       setState(() {});
     } else {
-      Future.delayed(Duration(seconds: 1)).then((value) => Get.offAllNamed("/profile"));
+      Future.delayed(Duration(seconds: 1))
+          .then((value) => Get.offAllNamed("/profile"));
     }
   }
 
@@ -267,8 +283,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
   _getMealPlanNamesAndUsers() async {
     if (myUser.allowedDbs != null) {
       for (var dbs in myUser.allowedDbs!) {
-        DatabaseEvent event = await FirebaseDatabase.instance.ref("mealDbs/$dbs").once();
-        Map<dynamic, dynamic>? results = event.snapshot.value as Map<dynamic, dynamic>?;
+        DatabaseEvent event =
+            await FirebaseDatabase.instance.ref("mealDbs/$dbs").once();
+        Map<dynamic, dynamic>? results =
+            event.snapshot.value as Map<dynamic, dynamic>?;
 
         if (results != null) {
           results.forEach((key, value) async {
@@ -302,7 +320,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   _setNewMealplanNameDialog(String? dbUID, String? initialName) {
-    TextEditingController mealPlanName = TextEditingController(text: initialName);
+    TextEditingController mealPlanName =
+        TextEditingController(text: initialName);
 
     Get.defaultDialog(
       title: "Set new meal plan name".tr(),
@@ -319,7 +338,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
         children: [
           TextFormField(
             controller: mealPlanName,
-            decoration: InputDecoration(label: Text("Plan".tr()), hintText: "Enter Mail".tr()),
+            decoration: InputDecoration(
+                label: Text("Plan".tr()), hintText: "Enter Mail".tr()),
           ),
         ],
       ),
@@ -331,7 +351,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
     final DynamicLinkParameters parameters = DynamicLinkParameters(
       uriPrefix: 'https://mealpy.page.link',
-      link: Uri.parse('https://mealpy.page.link/sharemeals?uid=$dbUID'), // <- your paramaters
+      link: Uri.parse(
+          'https://mealpy.page.link/sharemeals?uid=$dbUID'), // <- your paramaters
 
       androidParameters: AndroidParameters(
         packageName: 'com.mk.mealpy',
@@ -341,7 +362,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
         title: "Add Mealplan",
       ),
     );
-    final ShortDynamicLink shortenedLink = await dynamicLinks.buildShortLink(parameters);
+    final ShortDynamicLink shortenedLink =
+        await dynamicLinks.buildShortLink(parameters);
 
     final Uri uri = shortenedLink.shortUrl;
     Share.share("I want to add you to my meal plan: $uri");
@@ -421,7 +443,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           child: Text(
                             "Mealpan".tr(),
                             textAlign: TextAlign.left,
-                            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                            style: TextStyle(
+                                fontSize: 18, fontWeight: FontWeight.bold),
                           ),
                         ),
                       ),
@@ -430,54 +453,84 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               child: ListView.builder(
                                 itemCount: myUser.allowedDbs!.length,
                                 itemBuilder: (BuildContext context, int index) {
-                                  String? currentDbInIndex = myUser.allowedDbs![index];
+                                  String? currentDbInIndex =
+                                      myUser.allowedDbs![index];
                                   return GestureDetector(
                                     onTap: () {
-                                      selectMealPlan(myUser.allowedDbs![index]!);
+                                      selectMealPlan(
+                                          myUser.allowedDbs![index]!);
                                     },
                                     child: GestureDetector(
                                       onTap: () {
                                         _selectMealPlan(currentDbInIndex!);
                                       },
                                       child: Card(
-                                        color: myUser.selectedMealPlan == currentDbInIndex ? Colors.teal : Colors.blueGrey,
+                                        color: myUser.selectedMealPlan ==
+                                                currentDbInIndex
+                                            ? Colors.teal
+                                            : Colors.blueGrey,
                                         elevation: 6,
                                         key: ValueKey(index),
                                         margin: EdgeInsets.all(5),
                                         shape: RoundedRectangleBorder(
-                                          side: myUser.selectedMealPlan == currentDbInIndex
-                                              ? BorderSide(color: Constants.thirdColor, width: 3)
+                                          side: myUser.selectedMealPlan ==
+                                                  currentDbInIndex
+                                              ? BorderSide(
+                                                  color: Constants.thirdColor,
+                                                  width: 3)
                                               : BorderSide(),
-                                          borderRadius: BorderRadius.circular(16),
+                                          borderRadius:
+                                              BorderRadius.circular(16),
                                         ),
                                         child: Padding(
                                           padding: const EdgeInsets.all(8.0),
                                           child: Column(
-                                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceEvenly,
                                             children: [
                                               Text(
-                                                mealDbsNames[currentDbInIndex] ?? "",
-                                                style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
+                                                mealDbsNames[
+                                                        currentDbInIndex] ??
+                                                    "",
+                                                style: TextStyle(
+                                                    color: Colors.white,
+                                                    fontSize: 18,
+                                                    fontWeight:
+                                                        FontWeight.bold),
                                                 textAlign: TextAlign.center,
                                               ),
                                               Row(
                                                 children: [
                                                   Text("User: ".tr(),
                                                       style: TextStyle(
-                                                        color: Constants.thirdColor,
+                                                        color: Constants
+                                                            .thirdColor,
                                                       )),
                                                   Expanded(
                                                     child: Center(
-                                                      child: mealDbsUsers[currentDbInIndex] == null
+                                                      child: mealDbsUsers[
+                                                                  currentDbInIndex] ==
+                                                              null
                                                           ? Text("")
                                                           : Text(
-                                                              mealDbsUsers[currentDbInIndex]
+                                                              mealDbsUsers[
+                                                                      currentDbInIndex]
                                                                   .toString()
-                                                                  .replaceAll("[", "")
-                                                                  .replaceAll("]", "")
-                                                                  .replaceAll(",", " "),
-                                                              textAlign: TextAlign.center,
-                                                              style: TextStyle(color: Constants.secondaryColor)),
+                                                                  .replaceAll(
+                                                                      "[",
+                                                                      "")
+                                                                  .replaceAll(
+                                                                      "]",
+                                                                      "")
+                                                                  .replaceAll(
+                                                                      ",",
+                                                                      " "),
+                                                              textAlign:
+                                                                  TextAlign
+                                                                      .center,
+                                                              style: TextStyle(
+                                                                  color: Constants
+                                                                      .secondaryColor)),
                                                     ),
                                                   ),
                                                   SizedBox(
@@ -486,23 +539,35 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                                 ],
                                               ),
                                               Padding(
-                                                padding: const EdgeInsets.only(top: 24.0, bottom: 12),
+                                                padding: const EdgeInsets.only(
+                                                    top: 24.0, bottom: 12),
                                                 child: Row(
-                                                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment
+                                                          .spaceAround,
                                                   children: [
                                                     ElevatedButton(
                                                       onPressed: () async {
-                                                        await _addFriend(myUser.allowedDbs![index]);
+                                                        await _addFriend(
+                                                            myUser.allowedDbs![
+                                                                index]);
                                                       },
-                                                      child: Text("+ Add Friend".tr()),
-                                                      style: MyButton.addFriendButtonStyle,
+                                                      child: Text(
+                                                          "+ Add Friend".tr()),
+                                                      style: MyButton
+                                                          .addFriendButtonStyle,
                                                     ),
                                                     ElevatedButton(
                                                         onPressed: () {
-                                                          _setNewMealplanNameDialog(currentDbInIndex, mealDbsNames[currentDbInIndex]);
+                                                          _setNewMealplanNameDialog(
+                                                              currentDbInIndex,
+                                                              mealDbsNames[
+                                                                  currentDbInIndex]);
                                                         },
-                                                        child: Text("Rename plan".tr()),
-                                                        style: MyButton.addFriendButtonStyle)
+                                                        child: Text(
+                                                            "Rename plan".tr()),
+                                                        style: MyButton
+                                                            .addFriendButtonStyle)
                                                   ],
                                                 ),
                                               ),
@@ -557,7 +622,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
           alignment: AlignmentDirectional.topStart,
           child: Text(
             "Login for sync and share".tr(),
-            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.blueGrey),
+            style: TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+                color: Colors.blueGrey),
           ),
         ),
         Padding(
@@ -619,9 +687,11 @@ class _getPremiumState extends State<getPremium> {
 
   _purchasePremium() async {
     final ProductDetails productDetails = products[0];
-    final PurchaseParam purchaseParam = PurchaseParam(productDetails: productDetails);
+    final PurchaseParam purchaseParam =
+        PurchaseParam(productDetails: productDetails);
 
-    bool success = await InAppPurchase.instance.buyNonConsumable(purchaseParam: purchaseParam);
+    bool success = await InAppPurchase.instance
+        .buyNonConsumable(purchaseParam: purchaseParam);
   }
 
   String? productPrice;
@@ -634,7 +704,8 @@ class _getPremiumState extends State<getPremium> {
 
   _getProductDetails() async {
     const Set<String> _kIds = <String>{'premium', "Premium"};
-    final ProductDetailsResponse response = await InAppPurchase.instance.queryProductDetails(_kIds);
+    final ProductDetailsResponse response =
+        await InAppPurchase.instance.queryProductDetails(_kIds);
     print(response.productDetails);
     products = response.productDetails;
     productPrice = products[0].price;
@@ -665,7 +736,10 @@ class _getPremiumState extends State<getPremium> {
         children: [
           Text(
             "Get Premium",
-            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.blueGrey),
+            style: TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+                color: Colors.blueGrey),
           ),
           Image.asset("assets/graphics/premium.png"),
           Padding(
@@ -690,7 +764,8 @@ class _getPremiumState extends State<getPremium> {
           Text(
             "buy-premium-text".tr(),
             textAlign: TextAlign.left,
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, height: 1.8),
+            style: TextStyle(
+                fontSize: 16, fontWeight: FontWeight.bold, height: 1.8),
           ),
         ],
       ),

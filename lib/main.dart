@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'firebase_options.dart';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
@@ -31,7 +32,8 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Injection.initInjection();
   await EasyLocalization.ensureInitialized();
-  await Firebase.initializeApp();
+  await Firebase.initializeApp(
+      name: "mealpy", options: DefaultFirebaseOptions.currentPlatform);
   prefs = await SharedPreferences.getInstance();
   runApp(EasyLocalization(
     useOnlyLangCode: true,
@@ -43,9 +45,10 @@ void main() async {
 }
 
 class MyApp extends StatefulWidget {
-  static FirebaseAnalytics analytics = FirebaseAnalytics.instance;
-  static FirebaseAnalyticsObserver observer = FirebaseAnalyticsObserver(analytics: analytics);
-  static FirebaseDatabase database = FirebaseDatabase.instance;
+  static FirebaseAnalytics analytics = FirebaseAnalytics.instanceFor(app: Firebase.app("mealpy"));
+  static FirebaseAnalyticsObserver observer =
+      FirebaseAnalyticsObserver(analytics: analytics);
+  static FirebaseDatabase database = FirebaseDatabase.instanceFor(app: Firebase.app("mealpy"));
 
   @override
   State<MyApp> createState() => _MyAppState();
@@ -84,7 +87,8 @@ class _MyAppState extends State<MyApp> {
       } else {
         if (purchaseDetails.status == PurchaseStatus.error) {
           print(purchaseDetails.error);
-        } else if (purchaseDetails.status == PurchaseStatus.purchased || purchaseDetails.status == PurchaseStatus.restored) {
+        } else if (purchaseDetails.status == PurchaseStatus.purchased ||
+            purchaseDetails.status == PurchaseStatus.restored) {
           print("Gekauft!");
           myUser.setPremium();
           prefs.setBool("premium", true);
@@ -99,12 +103,15 @@ class _MyAppState extends State<MyApp> {
 
   _getPastPurchases() async {
     if (defaultTargetPlatform == TargetPlatform.android) {
-      InAppPurchaseAndroidPlatformAddition androidAddition =
-          InAppPurchase.instance.getPlatformAddition<InAppPurchaseAndroidPlatformAddition>();
+      InAppPurchaseAndroidPlatformAddition androidAddition = InAppPurchase
+          .instance
+          .getPlatformAddition<InAppPurchaseAndroidPlatformAddition>();
 
-      QueryPurchaseDetailsResponse response = await androidAddition.queryPastPurchases();
+      QueryPurchaseDetailsResponse response =
+          await androidAddition.queryPastPurchases();
       if (response.pastPurchases.isNotEmpty) {
-        int? purchaseIndex = response.pastPurchases.indexWhere((item) => item.productID == "premium");
+        int? purchaseIndex = response.pastPurchases
+            .indexWhere((item) => item.productID == "premium");
 
         if (purchaseIndex >= 0) {
           print("Der hat das schon gekauft");
@@ -120,9 +127,11 @@ class _MyAppState extends State<MyApp> {
   }
 
   _getSharedPrefs() async {
-    List<String>? selectedMultiselectMealTimes = prefs.getStringList('mealTimes');
+    List<String>? selectedMultiselectMealTimes =
+        prefs.getStringList('mealTimes');
     if (selectedMultiselectMealTimes == null) {
-      prefs.setStringList("mealTimes", ["Breakfast", "Lunch", "Dinner", "Snack"]);
+      prefs.setStringList(
+          "mealTimes", ["Breakfast", "Lunch", "Dinner", "Snack"]);
     }
     bool userPremium = await prefs.getBool("premium") ?? false;
     if (userPremium) {
@@ -133,7 +142,8 @@ class _MyAppState extends State<MyApp> {
   }
 
   Future<void> _getFireBaseStream() async {
-    final FirebaseAuth _auth = FirebaseAuth.instance;
+    final FirebaseAuth _auth =
+        FirebaseAuth.instanceFor(app: Firebase.app("mealpy"));
     _auth.authStateChanges().listen((User? user) async {
       if (user == null) {
         myUser.userLoggedOut();
@@ -150,7 +160,8 @@ class _MyAppState extends State<MyApp> {
   }
 
   _handleDeepLink() async {
-    final PendingDynamicLinkData? initialLink = await FirebaseDynamicLinks.instance.getInitialLink();
+    final PendingDynamicLinkData? initialLink =
+        await FirebaseDynamicLinks.instanceFor(app: Firebase.app("mealpy")).getInitialLink();
     if (initialLink != null) {
       final Uri deepLink = initialLink.link;
       await Future.delayed(Duration(seconds: 1));
@@ -161,7 +172,7 @@ class _MyAppState extends State<MyApp> {
   }
 
   _handleDeepLinkStream() {
-    FirebaseDynamicLinks.instance.onLink.listen((dynamicLinkData) async {
+    FirebaseDynamicLinks.instanceFor(app: Firebase.app("mealpy")).onLink.listen((dynamicLinkData) async {
       await Future.delayed(Duration(seconds: 1));
       String? dbUID = dynamicLinkData.link.queryParameters['uid'];
       print(dbUID);
@@ -187,7 +198,8 @@ class _MyAppState extends State<MyApp> {
   _getAvailableDbs(User user, DatabaseReference ref) async {
     List<String> allowedDbs = [];
     DatabaseEvent event = await ref.child("allowedDbs").once();
-    Map<dynamic, dynamic> decoded = event.snapshot.value as Map<dynamic, dynamic>;
+    Map<dynamic, dynamic> decoded =
+        event.snapshot.value as Map<dynamic, dynamic>;
     decoded.forEach((key, value) {
       allowedDbs.add(key);
     });
@@ -238,28 +250,42 @@ class _MyAppState extends State<MyApp> {
       }),
       getPages: [
         GetPage(
-            transition: Transition.noTransition, name: "/", page: () => MainScreen(analytics: MyApp.analytics, observer: MyApp.observer)),
+            transition: Transition.noTransition,
+            name: "/",
+            page: () => MainScreen(
+                analytics: MyApp.analytics, observer: MyApp.observer)),
         GetPage(
-            transition: Transition.noTransition, name: "/idea", page: () => FoodList(analytics: MyApp.analytics, observer: MyApp.observer)),
+            transition: Transition.noTransition,
+            name: "/idea",
+            page: () =>
+                FoodList(analytics: MyApp.analytics, observer: MyApp.observer)),
         GetPage(
             transition: Transition.noTransition,
             name: "/settings",
-            page: () => SettingsScreen(analytics: MyApp.analytics, observer: MyApp.observer)),
+            page: () => SettingsScreen(
+                analytics: MyApp.analytics, observer: MyApp.observer)),
         GetPage(
             transition: Transition.noTransition,
             name: "/category",
-            page: () => CategoryScreen(analytics: MyApp.analytics, observer: MyApp.observer)),
+            page: () => CategoryScreen(
+                analytics: MyApp.analytics, observer: MyApp.observer)),
         GetPage(
             transition: Transition.noTransition,
             name: "/profile",
-            page: () => ProfileScreen(analytics: MyApp.analytics, observer: MyApp.observer))
+            page: () => ProfileScreen(
+                analytics: MyApp.analytics, observer: MyApp.observer))
       ],
       routes: {
-        MainScreen.id: (context) => MainScreen(analytics: MyApp.analytics, observer: MyApp.observer),
-        FoodList.id: (context) => FoodList(analytics: MyApp.analytics, observer: MyApp.observer),
-        CategoryScreen.id: (context) => CategoryScreen(analytics: MyApp.analytics, observer: MyApp.observer),
-        SettingsScreen.id: (context) => SettingsScreen(analytics: MyApp.analytics, observer: MyApp.observer),
-        ProfileScreen.id: (context) => ProfileScreen(analytics: MyApp.analytics, observer: MyApp.observer),
+        MainScreen.id: (context) =>
+            MainScreen(analytics: MyApp.analytics, observer: MyApp.observer),
+        FoodList.id: (context) =>
+            FoodList(analytics: MyApp.analytics, observer: MyApp.observer),
+        CategoryScreen.id: (context) => CategoryScreen(
+            analytics: MyApp.analytics, observer: MyApp.observer),
+        SettingsScreen.id: (context) => SettingsScreen(
+            analytics: MyApp.analytics, observer: MyApp.observer),
+        ProfileScreen.id: (context) =>
+            ProfileScreen(analytics: MyApp.analytics, observer: MyApp.observer),
       },
     );
   }

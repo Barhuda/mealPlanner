@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>697635097783-ov5ncaadj1n2jfb7e01uf735269p9t9d.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.697635097783-ov5ncaadj1n2jfb7e01uf735269p9t9d</string>
+	<key>ANDROID_CLIENT_ID</key>
+	<string>697635097783-d6q3cb4al5jqon8ridrvr2tkhrgd56vs.apps.googleusercontent.com</string>
+	<key>API_KEY</key>
+	<string>AIzaSyAQcfsMMYR7rASYUx5JXnlygc_b5ggzrYs</string>
+	<key>GCM_SENDER_ID</key>
+	<string>697635097783</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.mk.mealpy</string>
+	<key>PROJECT_ID</key>
+	<string>mealpy-ca38a</string>
+	<key>STORAGE_BUCKET</key>
+	<string>mealpy-ca38a.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:697635097783:ios:5b2a91cca5ba0491d65132</string>
+	<key>DATABASE_URL</key>
+	<string>https://mealpy-ca38a-default-rtdb.europe-west1.firebasedatabase.app</string>
+</dict>
+</plist>

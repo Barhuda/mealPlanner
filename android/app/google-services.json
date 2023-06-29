@@ -15,11 +15,35 @@
       },
       "oauth_client": [
         {
+          "client_id": "697635097783-d6q3cb4al5jqon8ridrvr2tkhrgd56vs.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.mk.mealpy",
+            "certificate_hash": "481ac33186d569067cc6443c3d6624dc4f451295"
+          }
+        },
+        {
+          "client_id": "697635097783-lp0m2fei3jh1ibju9id8q49k6fd7v5ht.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.mk.mealpy",
+            "certificate_hash": "f73485cfaaa996fb432b895c84d0cef0e19c1a0a"
+          }
+        },
+        {
           "client_id": "697635097783-ps4pss3hmbji63spddvo6dq7kmfup4l7.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.mk.mealpy",
             "certificate_hash": "e549fe0d0a14f79dbe8fb26c71c7a3b141ba7d6f"
+          }
+        },
+        {
+          "client_id": "697635097783-sophj4268iv2d0o5in0a5v0jdgqou9eo.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.mk.mealpy",
+            "certificate_hash": "9c0461b684f521057d50892b1a35a38b057e44a1"
           }
         },
         {
@@ -38,6 +62,13 @@
             {
               "client_id": "697635097783-s84s15fp5hlseosqa9s98mp2mm0amujr.apps.googleusercontent.com",
               "client_type": 3
+            },
+            {
+              "client_id": "697635097783-ov5ncaadj1n2jfb7e01uf735269p9t9d.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.mk.mealpy"
+              }
             }
           ]
         }

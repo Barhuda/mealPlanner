@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -632,12 +634,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              Padding(
-                padding: const EdgeInsets.only(top: 16.0, bottom: 34),
-                child: GoogleAuthButton(
-                  onPressed: () {
-                    _signInWithGoogle();
-                  },
+              Visibility(
+                visible: Platform.isAndroid,
+                child: Padding(
+                  padding: const EdgeInsets.only(top: 16.0, bottom: 34),
+                  child: GoogleAuthButton(
+                    onPressed: () {
+                      _signInWithGoogle();
+                    },
+                  ),
                 ),
               ),
               Padding(

@@ -237,6 +237,7 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return GetMaterialApp(
+      debugShowCheckedModeBanner: false,
       title: 'Meal Planer App',
       theme: ThemeData(
         primarySwatch: Colors.red,

@@ -37,6 +37,10 @@ class MyUser {
     this.hasPremium = true;
   }
 
+  setNotBought(){
+    this.hasPremium = false;
+  }
+
   Future<String?> getSelectedMealPlan() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     if (this.selectedMealPlan == null) {

@@ -91,9 +91,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
         if (purchaseIndex >= 0) {
           print("Der hat das schon gekauft");
           myUser.setPremium();
+          myUser.setNotBought();
           setState(() {});
         }
       }
+    }
+    if(defaultTargetPlatform == TargetPlatform.iOS){
+      await InAppPurchase.instance.restorePurchases();
     }
   }
 
@@ -716,22 +720,11 @@ class _getPremiumState extends State<getPremium> {
     setState(() {});
   }
 
-  // _getPastPurchases() async {
-  //   if (defaultTargetPlatform == TargetPlatform.android) {
-  //     InAppPurchaseAndroidPlatformAddition androidAddition = InAppPurchase
-  //         .instance
-  //         .getPlatformAddition<InAppPurchaseAndroidPlatformAddition>();
-
-  //     QueryPurchaseDetailsResponse response =
-  //         await androidAddition.queryPastPurchases();
-  //     if (response.pastPurchases.isNotEmpty) {
-  //       print("Hat gekauft: " + response.pastPurchases[0].productID);
-  //       print(response.pastPurchases[0].status);
-  //     } else {
-  //       print("leer");
-  //     }
-  //   }
-  // }
+  _restoreiOS() async{
+      if(defaultTargetPlatform == TargetPlatform.iOS){
+      await InAppPurchase.instance.restorePurchases();
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -771,6 +764,9 @@ class _getPremiumState extends State<getPremium> {
             style: TextStyle(
                 fontSize: 16, fontWeight: FontWeight.bold, height: 1.8),
           ),
+          ElevatedButton(onPressed: (){
+            _restoreiOS();
+          }, child: Text("Restore Purchase".tr())),
         ],
       ),
     );

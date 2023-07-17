@@ -59,9 +59,9 @@
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
 	<key>FirebaseDynamicLinksCustomDomains</key>
-<array>
-    <string>https://mealpy.page.link/sharemeals</string>
-    <string>https://mealpy.sharemeals.com</string>
-</array>
+	<array>
+		<string>https://mealpy.page.link/sharemeals</string>
+		<string>https://mealpy.sharemeals.com</string>
+	</array>
 </dict>
 </plist>
